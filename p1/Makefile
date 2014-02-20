@@ -1,0 +1,2 @@
+main:
+	gcc Main.c
