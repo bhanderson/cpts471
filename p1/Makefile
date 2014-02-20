@@ -1,2 +1,2 @@
 main:
-	gcc Main.c
+	gcc Main.c -ggdb
