@@ -6,19 +6,26 @@ int main(int argc, const char *argv[])
 	char input;
 	char one[MAXSTRLEN], two[MAXSTRLEN];
 
+	int i,j;
 	if(settings(argv)){
 		return -1;
 	}
 	while (1) {
 		print_menu();
 		int i,j;
-		init();
 		if(fgets(linein, sizeof(linein), stdin))
 			input = linein[0];
 		switch(input){
 			case 'n':
 			case 'N':
 				printf("Needleman-Wunsch:\n");
+				align(s1,s2);
+				for (i = 0; i < strlen(s1); i++) {
+					for (j = 0; j < strlen(s2); j++) {
+						printf("%d\t",array[i][j].score);
+					}
+					printf("\n");
+				}
 				break;
 			case 's':
 			case 'S':

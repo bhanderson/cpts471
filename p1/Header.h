@@ -12,7 +12,8 @@ char s1name[64], s2name[64];
 
 typedef struct DP_cell{
 	int score;
-	char dir;
+	int dir;
+	int gap; // if 1 it is already had the gap penalty 0 if not
 } DP_cell;
 
 
@@ -25,6 +26,30 @@ void print_menu(){
 void inputerror(){
 	printf("Usage: <executable name> <input file containing both s1 and s2> <0: global, 1: local> <optional: path to parameters config file>\n");
 }
+
+/*
+ * int cellscore(DP_cell* cell){
+ if(cell->s > cell->d && cell->s > cell->i)
+ return cell->s;
+ else if (cell->d > cell->s && cell->d > cell->i) {
+ return cell->d;
+ } else
+ return cell->i;
+ }
+ */
+int max(int a, int b, int c, int *d){
+	if(a > b && a > c){
+		*d = 1;
+		return a;
+	}
+	if (b > a && b > c){
+		*d = 2;
+		return b;
+	}
+	*d = 3;
+	return c;
+}
+
 
 int strtoint(char *str){
 	int i = 0, val = 0, result = 0, temp = 0;
@@ -50,19 +75,44 @@ int strtoint(char *str){
 
 int align(char *s1, char *s2)
 {
+	int i,j,m,n, dir = 0;
+	int sub, del, ins;
+	m = strlen(s1);
+	n = strlen(s2);
+	for (i = 1; i < MAXSTRLEN; i++) { // initialize the first column and row
+		array[0][i].score = h + g * i;
+		array[0][i].gap = 1;
+		array[i][0].score = h + g * i;
+		array[i][0].gap = 1;
+	}
 
-}
+	for (i = 1; i < m; i++) {
+		for (j = 1; j < n; j++) {
+			// substitution
+			if (strncmp(&s1[i-1], &s2[j-1], 1)==0)
+				sub = array[i-1][j-1].score + ma;
+			else
+				sub = array[i-1][j-1].score + mi;
+			// deletion
+			if(array[i-1][j].gap == 1)
+				del = array[i-1][j].score + g;
+			else
+				del = array[i-1][j].score + h;
+			// insertion
+			if(array[i][j-1].gap == 1)
+				ins = array[i][j-1].score + g;
+			else
+				ins = array[i][j-1].score + h;
 
-int init()
-{
-	int i;
-	// set row and column zero to zero
-	for (i = 0; i < MAXSTRLEN; i++) {
-		array[0][i].score = 0;
-		array[i][0].score = 0;
+			array[i][j].score = max(del, ins, sub, &dir);
+			if (dir == 1 || dir == 2)
+				array[i][j].gap = 1;
+
+		}
 	}
 
 }
+
 
 int settings(const char *argv[]){
 	char sline[32];
@@ -177,10 +227,15 @@ int strinput(char *path){
 				fclose(sfp);
 			return -1;
 		}
-		printf("%s: %s\n", s1name, s1);
-		printf("%s: %s\n", s2name, s2);
+		printf("%s length %d\n", s1name, strlen(s1));
+		printf("%s length %d\n", s2name, strlen(s2));
 	}
 	fclose(sfp);
+	return 0;
+}
+
+int traceback(){
+
 	return 0;
 }
 
