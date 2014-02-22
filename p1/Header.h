@@ -197,7 +197,7 @@ int align(char *s1, char *s2){
 			array[i][j].dir = dir;
 		}
 	}
-
+	printf("Optimal Score: %d\n", array[i-1][j-1].score);
 }
 
 
@@ -330,10 +330,10 @@ int localretrace(int i, int j){ // input the position of where to start
 	revs1[0] = revs2[0] = match[0] = 0;
 	int count = 0, dir=0;
 	// while still in the array and not the last place on the alignment
-	printf("Start score: %d\n", array[i][j]);
-	printf("i: %d j: %d", i, j);
-	printf("S1: %s\n", s1);
-	printf("S2: %s\n", s2);
+	//printf("Start score: %d\n", array[i][j]);
+	//printf("i: %d j: %d", i, j);
+	//printf("S1: %s\n", s1);
+	//printf("S2: %s\n", s2);
 	while(array[i][j].score > 0){
 		max(array[i-1][j-1].score, array[i-1][j].score, array[i][j-1].score, &dir);
 		if(dir & SUB){ // substitution
@@ -360,9 +360,10 @@ int localretrace(int i, int j){ // input the position of where to start
 	//strcat(match, "?");
 	revs1[count] = 0;
 	revs2[count] = 0;
-	printf("%s\n", revstring(revs1));
-	printf("%s\n", revstring(match));
-	printf("%s\n", revstring(revs2));
+	//printf("%s\n", revstring(revs1));
+	//printf("%s\n", revstring(match));
+	//printf("%s\n", revstring(revs2));
+	wordwrap(revs1, match, revs2);
 }
 
 
@@ -410,8 +411,8 @@ int retrace(){
 	revstring(res1);
 	revstring(match);
 	revstring(res2);
-	printf("%s\n", res1);
-	printf("%s\n", res2);
+	//printf("%s\n", res1);
+	//printf("%s\n", res2);
 	wordwrap(res1, match, res2);
 
 }
