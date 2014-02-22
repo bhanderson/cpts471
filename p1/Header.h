@@ -6,14 +6,17 @@
 
 #define MAXSTRLEN 256
 
+#define SUB 1
+#define DEL 2
+#define INS 4
+
 int setting = 0, ma = 0, mi = 0, g = 0, h = 0;
 char s1[MAXSTRLEN], s2[MAXSTRLEN];
 char s1name[64], s2name[64];
 
 typedef struct DP_cell{
 	int score;
-	int dir;
-	int gap; // if 1 it is already had the gap penalty 0 if not
+	int dir; // S: 1 D: 3 I: 5	and any combination of the three
 } DP_cell;
 
 
@@ -23,31 +26,58 @@ void print_menu(){
 	printf("(N)eedleman-Wunsch,\n(S)mith-Waterman,\n(Q)uit\n");
 }
 
+
+void revstring(char *str){
+	int end = strlen(str)-1;
+	int start = 0;
+
+	while(start<end)
+	{
+		str[start] ^= str[end];
+		str[end] ^= str[start];
+		str[start]^= str[end];
+
+		++start;
+		--end;
+	}
+}
+
+
+
 void inputerror(){
 	printf("Usage: <executable name> <input file containing both s1 and s2> <0: global, 1: local> <optional: path to parameters config file>\n");
 }
 
-/*
- * int cellscore(DP_cell* cell){
- if(cell->s > cell->d && cell->s > cell->i)
- return cell->s;
- else if (cell->d > cell->s && cell->d > cell->i) {
- return cell->d;
- } else
- return cell->i;
- }
- */
-int max(int a, int b, int c, int *d){
-	if(a > b && a > c){
-		*d = 1;
-		return a;
+
+int max(int s, int d, int i, int *dir){ // substitution deletion insertion
+	if(s > d && s > i){
+		*dir = SUB;
+		return s;
 	}
-	if (b > a && b > c){
-		*d = 2;
-		return b;
+	if (d > s && d > i){
+		*dir = DEL;
+		return d;
 	}
-	*d = 3;
-	return c;
+	if (i > d && i > s) {
+		*dir = INS;
+		return i;
+	}
+	if (s == d && s == i){
+		*dir = SUB | DEL | INS;
+		return s;
+	}
+	else if (s == d && s != i){
+		*dir = SUB | DEL;
+		return d;
+	}
+	else if (d == i && d != s){
+		*dir = DEL | INS;
+		return i;
+	}
+	else if (i == s && i != d){
+		*dir = INS | SUB;
+		return i;
+	}
 }
 
 
@@ -73,41 +103,43 @@ int strtoint(char *str){
 	return result;
 }
 
-int align(char *s1, char *s2)
-{
+
+int align(char *s1, char *s2){
 	int i,j,m,n, dir = 0;
-	int sub, del, ins;
+	int su, de, in;
 	m = strlen(s1);
 	n = strlen(s2);
+	array[0][0].score = 0;
 	for (i = 1; i < MAXSTRLEN; i++) { // initialize the first column and row
-		array[0][i].score = h + g * i;
-		array[0][i].gap = 1;
-		array[i][0].score = h + g * i;
-		array[i][0].gap = 1;
+		array[i][0].score = h + (g * (i-1));
+		array[i][0].dir = DEL;
+	}
+	for (j = 1; j < MAXSTRLEN; j++) {
+		array[0][j].score = h + (g * (j-1));
+		array[0][j].dir = INS;
 	}
 
-	for (i = 1; i < m; i++) {
-		for (j = 1; j < n; j++) {
+	for (i = 1; i < m+1; i++) {
+		for (j = 1; j < n+1; j++) {
 			// substitution
 			if (strncmp(&s1[i-1], &s2[j-1], 1)==0)
-				sub = array[i-1][j-1].score + ma;
+				su = array[i-1][j-1].score + ma;
 			else
-				sub = array[i-1][j-1].score + mi;
+				su = array[i-1][j-1].score + mi;
 			// deletion
-			if(array[i-1][j].gap == 1)
-				del = array[i-1][j].score + g;
+			if(array[i-1][j].dir & DEL)
+				de = array[i-1][j].score + g;
 			else
-				del = array[i-1][j].score + h;
+				de = array[i-1][j].score + h + g;
 			// insertion
-			if(array[i][j-1].gap == 1)
-				ins = array[i][j-1].score + g;
+			if(array[i][j-1].dir & INS)
+				in = array[i][j-1].score + g;
 			else
-				ins = array[i][j-1].score + h;
+				in = array[i][j-1].score + h + g;
 
-			array[i][j].score = max(del, ins, sub, &dir);
-			if (dir == 1 || dir == 2)
-				array[i][j].gap = 1;
-
+			// set the score and the direction the score was found to the cell
+			array[i][j].score = max(su, de, in, &dir);
+			array[i][j].dir = dir;
 		}
 	}
 
@@ -128,7 +160,7 @@ int settings(const char *argv[]){
 		goto ERROR;
 	}
 
-	if(strinput(strpath)== -1){
+	if(stringsinput(strpath)== -1){
 		return -1;
 	}
 
@@ -188,21 +220,23 @@ ERROR:
 	return -1;
 }
 
-int strinput(char *path){
-	//printf("strings: %s\n", strpath);
+
+int stringsinput(char *path){
 	FILE *sfp = fopen(path, "r");
 	int c, n = 0, strnum = 0;
 	char line[256];
 
 	if (sfp){
-		//printf("1\n");
 		while ((c = fgetc(sfp)) != EOF && n < MAXSTRLEN) {
 			switch(c){
-				//printf("C: %c\n", c);
 				case 'a':
+				case 'A':
 				case 'c':
+				case 'C':
 				case 't':
+				case 'T':
 				case 'g':
+				case 'G':
 					if(strnum == 1)
 						s1[n++] = c;
 					else
@@ -219,6 +253,8 @@ int strinput(char *path){
 						strcpy(s2name, tok);
 					}
 					break;
+				default:
+					break;
 			}
 		}
 		if(n == MAXSTRLEN){
@@ -234,9 +270,64 @@ int strinput(char *path){
 	return 0;
 }
 
-int traceback(){
 
-	return 0;
+int retrace(){
+	int i = strlen(s1)-1, j = strlen(s2)-1;
+	int dir = 0;
+	int count = 0;
+	int gaps = 0, matches = 0, mismatches = 0;
+	char res1[MAXSTRLEN], res2[MAXSTRLEN], match[MAXSTRLEN];
+
+	while(i !=0 && j !=0){
+		max(array[i-1][j-1].score, array[i-1][j].score, array[i][j-1].score, &dir);
+		if(dir & SUB){
+			res1[count] = s1[i];
+			res2[count] = s2[j];
+			if(s1[i]==s2[j]){
+				matches++;
+				match[count] = '|';
+			}
+			else{
+				mismatches++;
+				match[count] = ' ';
+			}
+			i--;
+			j--;
+		} else if(dir & DEL){
+			res1[count] = s1[i];
+			res2[count] = '-';
+			match[count] = ' ';
+			gaps++;
+			i--;
+		}else if(dir & INS){
+			res1[count] = '-';
+			res2[count] = s2[j];
+			match[count] = ' ';
+			j--;
+		}
+		count++;
+	}
+	res1[count] = 0;
+	res2[count] = 0;
+	match[count] = 0;
+	revstring(res1);
+	revstring(match);
+	revstring(res2);
+	printf("%s\n", res1);
+	printf("%s\n", match);
+	printf("%s\n", res2);
+
 }
 
+
+void printarray(){
+	int i,j;
+	for (i = 0; i < strlen(s1)+1; i++) {
+		for (j = 0; j < strlen(s2)+1; j++) {
+			printf("%d\t", array[i][j].score);
+		}
+		printf("\n");
+	}
+	return;
+}
 #endif
