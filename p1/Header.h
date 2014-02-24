@@ -3,8 +3,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 
-#define MAXSTRLEN 256
+#define MAXSTRLEN 12000
 
 #define SUB 1
 #define DEL 2
@@ -22,6 +23,7 @@ typedef struct DP_cell{
 
 
 DP_cell array[MAXSTRLEN][MAXSTRLEN];
+
 
 void print_menu(){
 	printf("(N)eedleman-Wunsch,\n(S)mith-Waterman,\n(Q)uit\n");
@@ -69,6 +71,7 @@ void wordwrap(char* a1, char* m, char* a2){
 	return;
 }
 
+
 char* revstring(char *str){
 	int end = strlen(str)-1;
 	int start = 0;
@@ -83,7 +86,6 @@ char* revstring(char *str){
 	}
 	return str;
 }
-
 
 
 void inputerror(){
@@ -197,7 +199,11 @@ int align(char *s1, char *s2){
 			array[i][j].dir = dir;
 		}
 	}
-	printf("Optimal Score: %d\n", array[i-1][j-1].score);
+	if (local)
+		printf("Optimal Score: %d\n", array[highscore[0]][highscore[1]]);
+
+	else
+		printf("Optimal Score: %d\n", array[i-1][j-1].score);
 }
 
 
@@ -218,6 +224,7 @@ int settings(const char *argv[]){
 	if(stringsinput(strpath)== -1){
 		return -1;
 	}
+	dynamicstrinput(strpath);
 
 	if(argv[3]){
 		strncpy(configpath, argv[3], 64);
@@ -276,6 +283,16 @@ ERROR:
 }
 
 
+int dynamicstrinput(char *path){
+	struct stat st;
+	stat(path, &st);
+	int size = st.st_size;
+	printf("FILESIZE: %d\n", size);
+
+	return 0;
+}
+
+
 int stringsinput(char *path){
 	FILE *sfp = fopen(path, "r");
 	int c, n = 0, strnum = 0;
@@ -325,6 +342,7 @@ int stringsinput(char *path){
 	return 0;
 }
 
+
 int localretrace(int i, int j){ // input the position of where to start
 	char revs1[MAXSTRLEN*2], revs2[MAXSTRLEN*2], match[MAXSTRLEN*2];
 	revs1[0] = revs2[0] = match[0] = 0;
@@ -365,7 +383,6 @@ int localretrace(int i, int j){ // input the position of where to start
 	//printf("%s\n", revstring(revs2));
 	wordwrap(revs1, match, revs2);
 }
-
 
 
 int retrace(){
