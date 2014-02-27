@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 
 #define MAXSTRLEN 12000
 
@@ -16,12 +17,14 @@ char s1[MAXSTRLEN], s2[MAXSTRLEN];
 char s1name[64], s2name[64];
 int highscore[2];
 
+
 typedef struct DP_cell{
 	int score;
 	int dir; // S: 1 D: 3 I: 5	and any combination of the three
 } DP_cell;
 
 
+DP_cell **dynamicarray;
 DP_cell array[MAXSTRLEN][MAXSTRLEN];
 
 
@@ -122,6 +125,7 @@ int max(int s, int d, int i, int *dir){ // substitution deletion insertion
 		*dir = INS | SUB;
 		return i;
 	}
+	return -1;
 }
 
 
@@ -200,10 +204,72 @@ int align(char *s1, char *s2){
 		}
 	}
 	if (local)
-		printf("Optimal Score: %d\n", array[highscore[0]][highscore[1]]);
+		printf("Optimal Score: %d\n", array[highscore[0]][highscore[1]].score);
 
 	else
 		printf("Optimal Score: %d\n", array[i-1][j-1].score);
+	return 0;
+}
+
+
+int stringsinput(char *path){
+	FILE *sfp = fopen(path, "r");
+	int c, n = 0, strnum = 0;
+	char line[256];
+
+	if (sfp){
+		while ((c = fgetc(sfp)) != EOF && n < MAXSTRLEN) {
+			switch(c){
+				case 'a':
+				case 'A':
+				case 'c':
+				case 'C':
+				case 't':
+				case 'T':
+				case 'g':
+				case 'G':
+					if(strnum == 1)
+						s1[n++] = c;
+					else
+						s2[n++] = c;
+					break;
+				case '>':
+					strnum++;
+					n = 0;
+					fgets(line, sizeof(line), sfp);
+					char *tok = strtok(line, " ");
+					if (strnum == 1) {
+						strcpy(s1name, tok);
+					} else if (strnum == 2) {
+						strcpy(s2name, tok);
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		if(n == MAXSTRLEN){
+			printf("ERROR SEQUENCE %d SIZE TOO LARGE\n", strnum);
+			if(sfp)
+				fclose(sfp);
+			return -1;
+		}
+		printf("%s length %d\n", s1name, (int)strlen(s1));
+		printf("%s length %d\n", s2name, (int)strlen(s2));
+	}
+	fclose(sfp);
+	return 0;
+}
+
+
+int dynamicstrinput(char *path){
+	struct stat st;
+	stat(path, &st);
+	int size = st.st_size;
+	printf("FILESIZE: %d\n", size);
+	dynamicarray = (DP_cell **)calloc(size, sizeof(DP_cell));
+
+	return 0;
 }
 
 
@@ -221,7 +287,7 @@ int settings(const char *argv[]){
 		goto ERROR;
 	}
 
-	if(stringsinput(strpath)== -1){
+	if(-1 == stringsinput(strpath)){
 		return -1;
 	}
 	dynamicstrinput(strpath);
@@ -283,64 +349,9 @@ ERROR:
 }
 
 
-int dynamicstrinput(char *path){
-	struct stat st;
-	stat(path, &st);
-	int size = st.st_size;
-	printf("FILESIZE: %d\n", size);
-
-	return 0;
-}
 
 
-int stringsinput(char *path){
-	FILE *sfp = fopen(path, "r");
-	int c, n = 0, strnum = 0;
-	char line[256];
 
-	if (sfp){
-		while ((c = fgetc(sfp)) != EOF && n < MAXSTRLEN) {
-			switch(c){
-				case 'a':
-				case 'A':
-				case 'c':
-				case 'C':
-				case 't':
-				case 'T':
-				case 'g':
-				case 'G':
-					if(strnum == 1)
-						s1[n++] = c;
-					else
-						s2[n++] = c;
-					break;
-				case '>':
-					strnum++;
-					n = 0;
-					fgets(line, sizeof(line), sfp);
-					char *tok = strtok(line, " ");
-					if (strnum == 1) {
-						strcpy(s1name, tok);
-					} else if (strnum == 2) {
-						strcpy(s2name, tok);
-					}
-					break;
-				default:
-					break;
-			}
-		}
-		if(n == MAXSTRLEN){
-			printf("ERROR SEQUENCE %d SIZE TOO LARGE\n", strnum);
-			if(sfp)
-				fclose(sfp);
-			return -1;
-		}
-		printf("%s length %d\n", s1name, strlen(s1));
-		printf("%s length %d\n", s2name, strlen(s2));
-	}
-	fclose(sfp);
-	return 0;
-}
 
 
 int localretrace(int i, int j){ // input the position of where to start
@@ -382,6 +393,7 @@ int localretrace(int i, int j){ // input the position of where to start
 	//printf("%s\n", revstring(match));
 	//printf("%s\n", revstring(revs2));
 	wordwrap(revs1, match, revs2);
+	return 0;
 }
 
 
@@ -431,14 +443,14 @@ int retrace(){
 	//printf("%s\n", res1);
 	//printf("%s\n", res2);
 	wordwrap(res1, match, res2);
-
+	return 0;
 }
 
 
 void printarray(){
 	int i,j;
-	for (i = 0; i < strlen(s1)+1; i++) {
-		for (j = 0; j < strlen(s2)+1; j++) {
+	for (i = 0; i < (int)strlen(s1)+1; i++) {
+		for (j = 0; j < (int)strlen(s2)+1; j++) {
 			printf("%d\t", array[i][j].score);
 		}
 		printf("\n");
