@@ -1,2 +1,2 @@
 main:
-	gcc Main.c -ggdb
+	clang Main.c -ggdb -Wall -Wextra -Werror
