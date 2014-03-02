@@ -14,6 +14,7 @@
 
 int local = 0, ma = 0, mi = 0, g = 0, h = 0;
 char s1[MAXSTRLEN], s2[MAXSTRLEN];
+char *dynamicstring;
 char s1name[64], s2name[64];
 int highscore[2];
 
@@ -264,10 +265,45 @@ int stringsinput(char *path){
 
 int dynamicstrinput(char *path){
 	struct stat st;
+	char c, line[256];
+	int size;
+	char *pos;
+
+	size = st.st_size;
 	stat(path, &st);
-	int size = st.st_size;
 	printf("FILESIZE: %d\n", size);
-	dynamicarray = (DP_cell **)calloc(size, sizeof(DP_cell));
+	dynamicstring = (char *)malloc(size * sizeof(char));
+	pos = dynamicstring;
+	FILE *dsfp = fopen(path, "r");
+	if (!dsfp){
+		return -1;
+	} else {
+		while((c = fgetc(dsfp)) != EOF){
+			switch(c){
+				case '>':
+					fgets(line, sizeof(line), dsfp);
+					char *tok = strtok(line, " ");
+					strcpy(pos, tok);
+					pos += strlen(tok);
+					*pos = 0;
+					pos++;
+					break;
+				case 'a':
+				case 'A':
+				case 'c':
+				case 'C':
+				case 'g':
+				case 'G':
+				case 't':
+				case 'T':
+						*pos = c;
+						pos++;
+				default:
+					break;
+			}
+
+		}
+	}
 
 	return 0;
 }
@@ -341,8 +377,8 @@ int settings(const char *argv[]){
 	return 0;
 
 ERROR:
-	if(fp)
-		fclose(fp);
+//	if(fp)
+//		fclose(fp);
 	printf("TEST\n");
 	inputerror();
 	return -1;

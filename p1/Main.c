@@ -2,6 +2,8 @@
 
 int main(int argc, const char *argv[])
 {
+	if(argc<1)
+		return -1;
 	if(settings(argv)){
 		return -1;
 	}
