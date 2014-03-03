@@ -13,10 +13,11 @@
 #define INS 4
 
 int local = 0, ma = 0, mi = 0, g = 0, h = 0;
-char s1[MAXSTRLEN], s2[MAXSTRLEN];
+//char s1[MAXSTRLEN], s2[MAXSTRLEN];
 char *dynamicstring;
 char s1name[64], s2name[64];
 int highscore[2];
+int strnum;
 
 
 typedef struct DP_cell{
@@ -26,7 +27,7 @@ typedef struct DP_cell{
 
 
 DP_cell **dynamicarray;
-DP_cell array[MAXSTRLEN][MAXSTRLEN];
+//DP_cell array[MAXSTRLEN][MAXSTRLEN];
 
 
 void print_menu(){
@@ -152,7 +153,7 @@ int strtoint(char *str){
 	return result;
 }
 
-
+/*
 int align(char *s1, char *s2){
 	int i,j,m,n, dir = 0;
 	int su, de, in;
@@ -211,8 +212,8 @@ int align(char *s1, char *s2){
 		printf("Optimal Score: %d\n", array[i-1][j-1].score);
 	return 0;
 }
-
-
+*/
+/*
 int stringsinput(char *path){
 	FILE *sfp = fopen(path, "r");
 	int c, n = 0, strnum = 0;
@@ -261,7 +262,7 @@ int stringsinput(char *path){
 	fclose(sfp);
 	return 0;
 }
-
+*/
 
 int dynamicstrinput(char *path){
 	struct stat st;
@@ -269,11 +270,16 @@ int dynamicstrinput(char *path){
 	int size;
 	char *pos;
 
+	if (stat(path, &st) < 0){
+		printf("Error reading file\n");
+		return 1;
+	}
 	size = st.st_size;
-	stat(path, &st);
+	printf("Path: %s\n", path);
 	printf("FILESIZE: %d\n", size);
 	dynamicstring = (char *)malloc(size * sizeof(char));
 	pos = dynamicstring;
+
 	FILE *dsfp = fopen(path, "r");
 	if (!dsfp){
 		return -1;
@@ -281,6 +287,11 @@ int dynamicstrinput(char *path){
 		while((c = fgetc(dsfp)) != EOF){
 			switch(c){
 				case '>':
+					if (*pos){ // there is a letter here
+						pos++;
+						*pos = 0;
+						pos++;
+					}
 					fgets(line, sizeof(line), dsfp);
 					char *tok = strtok(line, " ");
 					strcpy(pos, tok);
@@ -296,8 +307,8 @@ int dynamicstrinput(char *path){
 				case 'G':
 				case 't':
 				case 'T':
-						*pos = c;
 						pos++;
+						*pos = c;
 				default:
 					break;
 			}
@@ -322,10 +333,11 @@ int settings(const char *argv[]){
 	}else{
 		goto ERROR;
 	}
-
+/*
 	if(-1 == stringsinput(strpath)){
 		return -1;
 	}
+	*/
 	dynamicstrinput(strpath);
 
 	if(argv[3]){
@@ -389,7 +401,7 @@ ERROR:
 
 
 
-
+/*
 int localretrace(int i, int j){ // input the position of where to start
 	char revs1[MAXSTRLEN*2], revs2[MAXSTRLEN*2], match[MAXSTRLEN*2];
 	revs1[0] = revs2[0] = match[0] = 0;
@@ -431,8 +443,8 @@ int localretrace(int i, int j){ // input the position of where to start
 	wordwrap(revs1, match, revs2);
 	return 0;
 }
-
-
+*/
+/*
 int retrace(){
 	int i = strlen(s1), j = strlen(s2);
 	int dir = 0;
@@ -481,8 +493,8 @@ int retrace(){
 	wordwrap(res1, match, res2);
 	return 0;
 }
-
-
+*/
+/*
 void printarray(){
 	int i,j;
 	for (i = 0; i < (int)strlen(s1)+1; i++) {
@@ -493,4 +505,5 @@ void printarray(){
 	}
 	return;
 }
+*/
 #endif
