@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAXSTRLEN 256
+#define MAXSTRLEN 12000
 
 #define SUB 1
 #define DEL 2
@@ -35,7 +35,7 @@ void wordwrap(char* a1, char* m, char* a2){
 	int j= 0;
 	while(a2[bpos] != 0 && a1[apos] != 0){
 		i = 0;
-		printf("s1: %d\t", count1);
+		printf("s1: %05d\t", count1);
 		for (i = 0; i < 60 && a1[apos] != 0; i++) {
 			printf("%c", a1[apos]);
 			if (a1[apos] == 'a' || a1[apos] == 'c' || a1[apos] == 'g' || a1[apos] == 't' || a1[apos] == 'A' || a1[apos] == 'C' || a1[apos] == 'G' || a1[apos] == 'T') {
@@ -45,7 +45,7 @@ void wordwrap(char* a1, char* m, char* a2){
 		}
 		printf(" %d", count1-1);
 		printf("\n");
-		printf("      \t");
+		printf("\t\t");
 		i = 0;
 		for (i = 0; i < 60 && m[mpos] != 0; i++) {
 			printf("%c", m[mpos]);
@@ -53,7 +53,7 @@ void wordwrap(char* a1, char* m, char* a2){
 		}
 		printf("\n");
 
-		printf("s2: %d\t", count2);
+		printf("s2: %05d\t", count2);
 		i = 0;
 		for (i = 0; i < 60 && a2[bpos] != 0; i++) {
 			printf("%c", a2[bpos]);
