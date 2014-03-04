@@ -9,10 +9,10 @@ int main(int argc, const char *argv[])
 	}
 	align(s1,s2);
 
-	//	if(local)
-	//		localretrace(highscore[0],highscore[1]);
-	//	else
-	//		retrace();
+	if(local)
+		localretrace(highscore[0],highscore[1]);
+	else
+		retrace();
 	dynamicfree();
 	return 0;
 }

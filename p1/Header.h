@@ -396,7 +396,7 @@ ERROR:
 
 
 
-/*
+
 int localretrace(int i, int j){ // input the position of where to start
 	char revs1[MAXSTRLEN*2], revs2[MAXSTRLEN*2], match[MAXSTRLEN*2];
 	revs1[0] = revs2[0] = match[0] = 0;
@@ -406,8 +406,8 @@ int localretrace(int i, int j){ // input the position of where to start
 	//printf("i: %d j: %d", i, j);
 	//printf("S1: %s\n", s1);
 	//printf("S2: %s\n", s2);
-	while(array[i][j].score > 0){
-		max(array[i-1][j-1].score, array[i-1][j].score, array[i][j-1].score, &dir);
+	while(dynamicarray[i][j].score > 0){
+		max(dynamicarray[i-1][j-1].score, dynamicarray[i-1][j].score, dynamicarray[i][j-1].score, &dir);
 		if(dir & SUB){ // substitution
 			revs1[count] = s1[i-1];
 			revs2[count] = s2[j-1];
@@ -438,8 +438,8 @@ int localretrace(int i, int j){ // input the position of where to start
 	wordwrap(revs1, match, revs2);
 	return 0;
 }
-*/
-/*
+
+
 int retrace(){
 	int i = strlen(s1), j = strlen(s2);
 	int dir = 0;
@@ -449,7 +449,7 @@ int retrace(){
 	match[0]=0;
 
 	while(i !=0 && j !=0){
-		max(array[i-1][j-1].score, array[i-1][j].score, array[i][j-1].score, &dir);
+		max(dynamicarray[i-1][j-1].score, dynamicarray[i-1][j].score, dynamicarray[i][j-1].score, &dir);
 		if(dir & SUB){
 			res1[count] = s1[i-1];
 			res2[count] = s2[j-1];
@@ -488,7 +488,7 @@ int retrace(){
 	wordwrap(res1, match, res2);
 	return 0;
 }
-*/
+
 /*
 void printarray(){
 	int i,j;
