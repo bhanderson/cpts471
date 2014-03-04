@@ -28,13 +28,23 @@ typedef struct DP_cell{
 
 
 DP_cell **dynamicarray;
-//DP_cell array[MAXSTRLEN][MAXSTRLEN];
 
 
 void print_menu(){
 	printf("(N)eedleman-Wunsch,\n(S)mith-Waterman,\n(Q)uit\n");
 }
 
+int dynamicfree(){
+	if (dynamicarray){
+		for (int i=0;i< (int)strlen(s1)+1;i++){
+			free(dynamicarray[i]);
+		}
+		free(dynamicarray);
+	}
+	if(dynamicstring)
+		free(dynamicstring);
+	return 0;
+}
 
 void wordwrap(char* a1, char* m, char* a2){
 	int count1 = 1, count2 = 1;
@@ -234,57 +244,6 @@ int align(char *s1, char *s2){
 	return 0;
 }
 
-/*
-int stringsinput(char *path){
-	FILE *sfp = fopen(path, "r");
-	int c, n = 0, strnum = 0;
-	char line[256];
-
-	if (sfp){
-		while ((c = fgetc(sfp)) != EOF && n < MAXSTRLEN) {
-			switch(c){
-				case 'a':
-				case 'A':
-				case 'c':
-				case 'C':
-				case 't':
-				case 'T':
-				case 'g':
-				case 'G':
-					if(strnum == 1)
-						s1[n++] = c;
-					else
-						s2[n++] = c;
-					break;
-				case '>':
-					strnum++;
-					n = 0;
-					fgets(line, sizeof(line), sfp);
-					char *tok = strtok(line, " ");
-					if (strnum == 1) {
-						strcpy(s1name, tok);
-					} else if (strnum == 2) {
-						strcpy(s2name, tok);
-					}
-					break;
-				default:
-					break;
-			}
-		}
-		if(n == MAXSTRLEN){
-			printf("ERROR SEQUENCE %d SIZE TOO LARGE\n", strnum);
-			if(sfp)
-				fclose(sfp);
-			return -1;
-		}
-		printf("%s length %d\n", s1name, (int)strlen(s1));
-		printf("%s length %d\n", s2name, (int)strlen(s2));
-	}
-	fclose(sfp);
-	return 0;
-}
-*/
-
 int dynamicstrinput(char *path){
 	struct stat st;
 	char c, line[256];
@@ -371,11 +330,7 @@ int settings(const char *argv[]){
 	}else{
 		goto ERROR;
 	}
-/*
-	if(-1 == stringsinput(strpath)){
-		return -1;
-	}
-	*/
+
 	if (dynamicstrinput(strpath) < 0){
 		return -1;
 	}
