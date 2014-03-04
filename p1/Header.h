@@ -6,17 +6,13 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
-#define MAXSTRLEN 12000
-
 #define SUB 1
 #define DEL 2
 #define INS 4
 
 int local = 0, ma = 0, mi = 0, g = 0, h = 0;
-//char s1[MAXSTRLEN], s2[MAXSTRLEN];
 char *dynamicstring;
 char *s1, *s2, *s1name, *s2name;
-//char s1name[64], s2name[64];
 int highscore[2];
 int strnum = 0;
 
@@ -34,6 +30,7 @@ void print_menu(){
 	printf("(N)eedleman-Wunsch,\n(S)mith-Waterman,\n(Q)uit\n");
 }
 
+
 int dynamicfree(){
 	if (dynamicarray){
 		for (int i=0;i< (int)strlen(s1)+1;i++){
@@ -45,6 +42,7 @@ int dynamicfree(){
 		free(dynamicstring);
 	return 0;
 }
+
 
 void wordwrap(char* a1, char* m, char* a2){
 	int count1 = 1, count2 = 1;
@@ -164,6 +162,7 @@ int strtoint(char *str){
 	return result;
 }
 
+
 int allarr(int m, int n){
 	DP_cell **temp;
 	temp = malloc(m * sizeof(DP_cell*));
@@ -243,6 +242,7 @@ int align(char *s1, char *s2){
 		printf("Optimal Score: %d\n", dynamicarray[i-1][j-1].score);
 	return 0;
 }
+
 
 int dynamicstrinput(char *path){
 	struct stat st;
@@ -392,20 +392,11 @@ ERROR:
 }
 
 
-
-
-
-
-
 int localretrace(int i, int j){ // input the position of where to start
-	char revs1[MAXSTRLEN*2], revs2[MAXSTRLEN*2], match[MAXSTRLEN*2];
+	char revs1[strlen(s1)], revs2[strlen(s2)], match[strlen(s1)];
 	revs1[0] = revs2[0] = match[0] = 0;
 	int count = 0, dir=0;
-	// while still in the array and not the last place on the alignment
-	//printf("Start score: %d\n", array[i][j]);
-	//printf("i: %d j: %d", i, j);
-	//printf("S1: %s\n", s1);
-	//printf("S2: %s\n", s2);
+
 	while(dynamicarray[i][j].score > 0){
 		max(dynamicarray[i-1][j-1].score, dynamicarray[i-1][j].score, dynamicarray[i][j-1].score, &dir);
 		if(dir & SUB){ // substitution
@@ -429,12 +420,8 @@ int localretrace(int i, int j){ // input the position of where to start
 		}
 		count++;
 	}
-	//strcat(match, "?");
 	revs1[count] = 0;
 	revs2[count] = 0;
-	//printf("%s\n", revstring(revs1));
-	//printf("%s\n", revstring(match));
-	//printf("%s\n", revstring(revs2));
 	wordwrap(revs1, match, revs2);
 	return 0;
 }
@@ -445,7 +432,7 @@ int retrace(){
 	int dir = 0;
 	int count = 0;
 	int gaps = 0, matches = 0, mismatches = 0;
-	char res1[MAXSTRLEN], res2[MAXSTRLEN], match[MAXSTRLEN];
+	char res1[strlen(s1)], res2[strlen(s2)], match[strlen(s1)];
 	match[0]=0;
 
 	while(i !=0 && j !=0){
@@ -483,22 +470,20 @@ int retrace(){
 	revstring(res1);
 	revstring(match);
 	revstring(res2);
-	//printf("%s\n", res1);
-	//printf("%s\n", res2);
 	wordwrap(res1, match, res2);
 	return 0;
 }
 
-/*
+
 void printarray(){
 	int i,j;
 	for (i = 0; i < (int)strlen(s1)+1; i++) {
 		for (j = 0; j < (int)strlen(s2)+1; j++) {
-			printf("%d\t", array[i][j].score);
+			printf("%d\t", dynamicarray[i][j].score);
 		}
 		printf("\n");
 	}
 	return;
 }
-*/
+
 #endif
