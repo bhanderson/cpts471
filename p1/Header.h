@@ -25,7 +25,6 @@ typedef struct DP_cell{
 
 DP_cell **dynamicarray;
 
-
 void print_menu(){
 	printf("(N)eedleman-Wunsch,\n(S)mith-Waterman,\n(Q)uit\n");
 }
@@ -301,9 +300,9 @@ int dynamicstrinput(char *path){
 				case 'G':
 				case 't':
 				case 'T':
-						*pos = c;
-						pos++;
-						break;
+					*pos = c;
+					pos++;
+					break;
 				default:
 					break;
 			} // end switch
@@ -384,8 +383,8 @@ int settings(const char *argv[]){
 	return 0;
 
 ERROR:
-//	if(fp)
-//		fclose(fp);
+	//	if(fp)
+	//		fclose(fp);
 	printf("TEST\n");
 	inputerror();
 	return -1;
@@ -432,7 +431,7 @@ int retrace(){
 	int dir = 0;
 	int count = 0;
 	int gaps = 0, matches = 0, mismatches = 0;
-	char res1[strlen(s1)], res2[strlen(s2)], match[strlen(s1)];
+	char res1[strlen(s1)], res2[strlen(s2)], match[1200000];
 	match[0]=0;
 
 	while(i !=0 && j !=0){
