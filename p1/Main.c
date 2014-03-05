@@ -7,6 +7,7 @@ int main(int argc, const char *argv[])
 	if(settings(argv)){
 		return -1;
 	}
+	//printf("S1 length: %d\nS2 length: %d\n", (int)strlen(s1), (int)strlen(s2));
 	align(s1,s2);
 
 	if(local)
