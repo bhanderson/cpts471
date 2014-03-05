@@ -431,7 +431,8 @@ int retrace(){
 	int dir = 0;
 	int count = 0;
 	int gaps = 0, matches = 0, mismatches = 0;
-	char res1[strlen(s1)], res2[strlen(s2)], match[1200000];
+	int m = strlen(s1), n = strlen(s2);
+	char res1[m], res2[n], match[m];
 	match[0]=0;
 
 	while(i !=0 && j !=0){
