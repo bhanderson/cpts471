@@ -3,17 +3,19 @@
 
 #include <stdio.h>
 #include <string.h>
-
-#define MAXSTRLEN 12000
+#include <sys/stat.h>
+#include <stdlib.h>
 
 #define SUB 1
 #define DEL 2
 #define INS 4
 
 int local = 0, ma = 0, mi = 0, g = 0, h = 0;
-char s1[MAXSTRLEN], s2[MAXSTRLEN];
-char s1name[64], s2name[64];
+char *dynamicstring;
+char *s1, *s2, *s1name, *s2name;
 int highscore[2];
+int strnum = 0;
+
 
 typedef struct DP_cell{
 	int score;
@@ -21,10 +23,25 @@ typedef struct DP_cell{
 } DP_cell;
 
 
-DP_cell array[MAXSTRLEN][MAXSTRLEN];
+DP_cell **dynamicarray;
+
 
 void print_menu(){
 	printf("(N)eedleman-Wunsch,\n(S)mith-Waterman,\n(Q)uit\n");
+}
+
+
+int dynamicfree(){
+	int i = 0;
+	if (dynamicarray){
+		for (i=0;i< (int)strlen(s1)+1;i++){
+			free(dynamicarray[i]);
+		}
+		free(dynamicarray);
+	}
+	if(dynamicstring)
+		free(dynamicstring);
+	return 0;
 }
 
 
@@ -69,6 +86,7 @@ void wordwrap(char* a1, char* m, char* a2){
 	return;
 }
 
+
 char* revstring(char *str){
 	int end = strlen(str)-1;
 	int start = 0;
@@ -85,9 +103,46 @@ char* revstring(char *str){
 }
 
 
-
 void inputerror(){
 	printf("Usage: <executable name> <input file containing both s1 and s2> <0: global, 1: local> <optional: path to parameters config file>\n");
+}
+
+
+int threemax(int a, int b, int c)
+{
+     int m = a;
+     (m < b) && (m = b); //these are not conditional statements.
+     (m < c) && (m = c); //these are just boolean expressions.
+     return m;
+}
+
+int maxscore(int i, int j, int *dir){
+	int su = 0, de = 0, in = 0;
+	int score = 0;
+	// substitution
+	if (strncmp(&s1[i-1], &s2[j-1], 1)==0)
+		su = dynamicarray[i-1][j-1].score + ma;
+	else
+		su = dynamicarray[i-1][j-1].score + mi;
+	// deletion
+	if(dynamicarray[i-1][j].dir & DEL)
+		de = dynamicarray[i-1][j].score + g;
+	else
+		de = dynamicarray[i-1][j].score + h + g;
+	// insertion
+	if(dynamicarray[i][j-1].dir & INS)
+		in = dynamicarray[i][j-1].score + g;
+	else
+		in = dynamicarray[i][j-1].score + h + g;
+
+	score = threemax(su, de, in);
+	if (score == su)
+		*dir |= SUB;
+	if (score == de)
+		*dir |= DEL;
+	if (score == in)
+		*dir |= INS;
+	return score;
 }
 
 
@@ -120,6 +175,7 @@ int max(int s, int d, int i, int *dir){ // substitution deletion insertion
 		*dir = INS | SUB;
 		return i;
 	}
+	return -1;
 }
 
 
@@ -146,58 +202,159 @@ int strtoint(char *str){
 }
 
 
+int allarr(int m, int n){
+	DP_cell **temp;
+	int i = 0;
+	temp = malloc(m * sizeof(DP_cell*));
+	if (temp == 0){
+		printf("Error allocatign dynamic table");
+		return -1;
+	}
+	for (i = 0; i < m; i++){
+		temp[i] = malloc(n * sizeof(DP_cell));
+		if(temp[i] == NULL){
+			printf("Error allocating dynamic table");
+			return -1;
+		}
+	}
+	dynamicarray = temp;
+	return 0;
+}
+
+
 int align(char *s1, char *s2){
 	int i,j,m,n, dir = 0;
 	int su, de, in;
 	m = strlen(s1);
 	n = strlen(s2);
-	array[0][0].score = 0;
-	for (i = 1; i < MAXSTRLEN; i++) { // initialize the first column and row
-		array[i][0].score = h + (g * (i-1));
-		array[i][0].dir = DEL;
+	if(allarr(m+1,n+1)<0)
+		return -1;
+	dynamicarray[0][0].score = 0;
+	for (i = 1; i < m+1; i++) { // initialize the first column and row
+		dynamicarray[i][0].dir = DEL;
 		if (local) {
-			array[i][0].score = 0;
-		}
+			dynamicarray[i][0].score = 0;
+		} else
+			dynamicarray[i][0].score = h + (g * (i-1));
 	}
-	for (j = 1; j < MAXSTRLEN; j++) {
-		array[0][j].score = h + (g * (j-1));
-		array[0][j].dir = INS;
+	for (j = 1; j < n+1; j++) {
+		dynamicarray[0][j].dir = INS;
 		if (local) {
-			array[0][j].score = 0;
-		}
+			dynamicarray[0][j].score = 0;
+		} else
+			dynamicarray[0][j].score = h + (g * (j-1));
 	}
 
 	for (i = 1; i < m+1; i++) {
 		for (j = 1; j < n+1; j++) {
 			// substitution
 			if (strncmp(&s1[i-1], &s2[j-1], 1)==0)
-				su = array[i-1][j-1].score + ma;
+				su = dynamicarray[i-1][j-1].score + ma;
 			else
-				su = array[i-1][j-1].score + mi;
+				su = dynamicarray[i-1][j-1].score + mi;
 			// deletion
-			if(array[i-1][j].dir & DEL)
-				de = array[i-1][j].score + g;
+			if(dynamicarray[i-1][j].dir & DEL)
+				de = dynamicarray[i-1][j].score + g;
 			else
-				de = array[i-1][j].score + h + g;
+				de = dynamicarray[i-1][j].score + h + g;
 			// insertion
-			if(array[i][j-1].dir & INS)
-				in = array[i][j-1].score + g;
+			if(dynamicarray[i][j-1].dir & INS)
+				in = dynamicarray[i][j-1].score + g;
 			else
-				in = array[i][j-1].score + h + g;
+				in = dynamicarray[i][j-1].score + h + g;
 
 			// set the score and the direction the score was found to the cell
-			array[i][j].score = max(su, de, in, &dir);
-			if (array[i][j].score > array[highscore[0]][highscore[1]].score) {
+			if (local && dynamicarray[i][j].score < 0) {
+				dynamicarray[i][j].score = 0;
+			} else
+				dynamicarray[i][j].score = max(su, de, in, &dir);
+
+			if (dynamicarray[i][j].score > dynamicarray[highscore[0]][highscore[1]].score) {
 				highscore[0] = i;
 				highscore[1] = j;
 			}
-			if (local && array[i][j].score < 0) {
-				array[i][j].score = 0;
-			}
-			array[i][j].dir = dir;
+			dynamicarray[i][j].dir = dir;
 		}
 	}
-	printf("Optimal Score: %d\n", array[i-1][j-1].score);
+	if (local)
+		printf("Optimal Score: %d\n", dynamicarray[highscore[0]][highscore[1]].score);
+
+	else
+		printf("Optimal Score: %d\n", dynamicarray[i-1][j-1].score);
+	return 0;
+}
+
+
+int dynamicstrinput(char *path){
+	struct stat st;
+	char c, line[256];
+	int size;
+	char *pos;
+
+	if (stat(path, &st) < 0){
+		printf("Error reading file\n");
+		return -1;
+	}
+	size = st.st_size;
+	printf("Path: %s\n", path);
+	printf("FILESIZE: %d\n", size);
+	dynamicstring = (char *)malloc(size * sizeof(char));
+
+	if (dynamicstring == 0)
+		return -1;
+
+	pos = dynamicstring;
+	FILE *dsfp = fopen(path, "r");
+	if (!dsfp){
+		return -1;
+	} else {
+		while((c = fgetc(dsfp)) != EOF){
+			switch(c){
+				case '>':
+					if (strnum == 0) // it is the first string
+						s1name = pos;
+					else{
+						*pos = 0;
+						pos ++;
+						s2name = pos;
+					}
+					// get the line of the header
+					// then copy the line to the dynamic array
+					// terminate it with zero then move the pointer to the next
+					// char position
+					fgets(line, sizeof(line), dsfp);
+					char *tok = strtok(line, " ");
+					strcpy(pos, tok);
+					pos += strlen(tok);
+					*pos = 0;
+					pos++;
+					if (strnum == 0){
+						s1 = pos;
+					} else
+						s2 = pos;
+					strnum++;
+					break;
+				case 'a':
+				case 'A':
+				case 'c':
+				case 'C':
+				case 'g':
+				case 'G':
+				case 't':
+				case 'T':
+					*pos = c;
+					pos++;
+					break;
+				default:
+					break;
+			} // end switch
+
+		}// end while
+		*pos = 0;
+	}
+	if(dsfp)
+		fclose(dsfp);
+	return 0;
 }
 
 
@@ -215,7 +372,7 @@ int settings(const char *argv[]){
 		goto ERROR;
 	}
 
-	if(stringsinput(strpath)== -1){
+	if (dynamicstrinput(strpath) < 0){
 		return -1;
 	}
 
@@ -268,74 +425,23 @@ int settings(const char *argv[]){
 	return 0;
 
 ERROR:
-	if(fp)
-		fclose(fp);
+//	if(fp)
+//		fclose(fp);
 	printf("TEST\n");
 	inputerror();
 	return -1;
 }
 
 
-int stringsinput(char *path){
-	FILE *sfp = fopen(path, "r");
-	int c, n = 0, strnum = 0;
-	char line[256];
-
-	if (sfp){
-		while ((c = fgetc(sfp)) != EOF && n < MAXSTRLEN) {
-			switch(c){
-				case 'a':
-				case 'A':
-				case 'c':
-				case 'C':
-				case 't':
-				case 'T':
-				case 'g':
-				case 'G':
-					if(strnum == 1)
-						s1[n++] = c;
-					else
-						s2[n++] = c;
-					break;
-				case '>':
-					strnum++;
-					n = 0;
-					fgets(line, sizeof(line), sfp);
-					char *tok = strtok(line, " ");
-					if (strnum == 1) {
-						strcpy(s1name, tok);
-					} else if (strnum == 2) {
-						strcpy(s2name, tok);
-					}
-					break;
-				default:
-					break;
-			}
-		}
-		if(n == MAXSTRLEN){
-			printf("ERROR SEQUENCE %d SIZE TOO LARGE\n", strnum);
-			if(sfp)
-				fclose(sfp);
-			return -1;
-		}
-		printf("%s length %d\n", s1name, strlen(s1));
-		printf("%s length %d\n", s2name, strlen(s2));
-	}
-	fclose(sfp);
-	return 0;
-}
-
 int localretrace(int i, int j){ // input the position of where to start
-	char revs1[MAXSTRLEN*2], revs2[MAXSTRLEN*2], match[MAXSTRLEN*2];
+	int k = strlen(s1) + strlen(s2);
+	char revs1[k], revs2[k], match[k];
 	revs1[0] = revs2[0] = match[0] = 0;
 	int count = 0, dir=0;
-	// while still in the array and not the last place on the alignment
-	//printf("Start score: %d\n", array[i][j]);
-	//printf("i: %d j: %d", i, j);
-	//printf("S1: %s\n", s1);
-	//printf("S2: %s\n", s2);
-	while(array[i][j].score > 0){
-		max(array[i-1][j-1].score, array[i-1][j].score, array[i][j-1].score, &dir);
+
+	while(dynamicarray[i][j].score > 0){
+		max(dynamicarray[i-1][j-1].score, dynamicarray[i-1][j].score, dynamicarray[i][j-1].score, &dir);
+		dir = dynamicarray[i][j].dir;
 		if(dir & SUB){ // substitution
 			revs1[count] = s1[i-1];
 			revs2[count] = s2[j-1];
@@ -357,76 +463,78 @@ int localretrace(int i, int j){ // input the position of where to start
 		}
 		count++;
 	}
-	//strcat(match, "?");
 	revs1[count] = 0;
 	revs2[count] = 0;
-	//printf("%s\n", revstring(revs1));
-	//printf("%s\n", revstring(match));
-	//printf("%s\n", revstring(revs2));
 	wordwrap(revs1, match, revs2);
+	return 0;
 }
 
 
-
-int retrace(){
-	int i = strlen(s1), j = strlen(s2);
-	int dir = 0;
-	int count = 0;
-	int gaps = 0, matches = 0, mismatches = 0;
-	char res1[MAXSTRLEN], res2[MAXSTRLEN], match[MAXSTRLEN];
-	match[0]=0;
-
-	while(i !=0 && j !=0){
-		max(array[i-1][j-1].score, array[i-1][j].score, array[i][j-1].score, &dir);
-		if(dir & SUB){
-			res1[count] = s1[i-1];
-			res2[count] = s2[j-1];
-			if(s1[i-1]==s2[j-1]){
-				matches++;
-				strcat(match, "|");
-			}
-			else{
-				mismatches++;
-				strcat(match, " ");
-			}
+int dynamicretrace(){
+	int i = strlen(s1), j = strlen(s2), k = i + j;
+	int dir = 0, pos = 0, matches=0, mismatches=0, openings=0, gaps=0;
+	int lastgap = 0;
+	char res1[k], res2[k], match[k];
+	while(i > 0 && j > 0){
+		dir = dynamicarray[i][j].dir;
+		if (dir & DEL){
 			i--;
-			j--;
-		} else if(dir & DEL){
-			res1[count] = s1[i-1];
-			res2[count] = '-';
-			strcat(match, " ");
+			res1[pos] = s1[i];
+			res2[pos] = '-';
+			match[pos] = ' ';
+			if(!lastgap){
+				openings++;
+			}
 			gaps++;
-			i--;
-		}else if(dir & INS){
-			res1[count] = '-';
-			res2[count] = s2[j-1];
-			strcat(match, " ");
+			lastgap = 1;
+		} else if (dir & INS){
 			j--;
+			res1[pos] = '-';
+			res2[pos] = s2[j];
+			match[pos] = ' ';
+			if(!lastgap){
+				openings++;
+			}
+			gaps++;
+			lastgap = 1;
+		} else if (dir & SUB){
+			i--;
+			j--;
+			res1[pos] = s1[i];
+			res2[pos] = s2[j];
+			if (s1[i] == s2[j]){
+				matches++;
+				match[pos] = '|';
+			} else {
+				mismatches++;
+				match[pos] = ' ';
+			}
+			lastgap = 0;
 		}
-		count++;
+		pos++;
 	}
-	res1[count] = 0;
-	res2[count] = 0;
-	match[count] = 0;
+	res1[pos] = 0;
+	res2[pos] = 0;
+	match[pos] = 0;
 	revstring(res1);
-	revstring(match);
 	revstring(res2);
-	//printf("%s\n", res1);
-	//printf("%s\n", res2);
+	revstring(match);
 	wordwrap(res1, match, res2);
-	printf("Match: %d Mismatch: %d Gap: %d", matches, mismatches, gaps);
-
+	printf("Matches: %d Mismatches: %d Openings: %d Gaps: %d\n",
+			matches,	mismatches,	   openings,    gaps);
+	return 0;
 }
 
 
 void printarray(){
 	int i,j;
-	for (i = 0; i < strlen(s1)+1; i++) {
-		for (j = 0; j < strlen(s2)+1; j++) {
-			printf("%d\t", array[i][j].score);
+	for (i = 0; i < (int)strlen(s1)+1; i++) {
+		for (j = 0; j < (int)strlen(s2)+1; j++) {
+			printf("%d\t", dynamicarray[i][j].score);
 		}
 		printf("\n");
 	}
 	return;
 }
+
 #endif
