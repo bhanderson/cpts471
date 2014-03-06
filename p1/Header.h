@@ -471,7 +471,7 @@ int localretrace(int i, int j){ // input the position of where to start
 int dynamicretrace(){
 	int i = strlen(s1), j = strlen(s2), k = i + j;
 	int dir = 0, pos = 0, matches=0, mismatches=0, openings=0, gaps=0;
-	int lastgap = 0;
+	int lastdel = 0, lastins;
 	char res1[k], res2[k], match[k];
 	while(i > 0 && j > 0){
 		dir = dynamicarray[i][j].dir;
@@ -480,21 +480,21 @@ int dynamicretrace(){
 			res1[pos] = s1[i];
 			res2[pos] = '-';
 			match[pos] = ' ';
-			if(!lastgap){
+			if(!lastdel){
 				openings++;
 			}
 			gaps++;
-			lastgap = 1;
+			lastdel = 1;
 		} else if (dir & INS){
 			j--;
 			res1[pos] = '-';
 			res2[pos] = s2[j];
 			match[pos] = ' ';
-			if(!lastgap){
+			if(!lastins){
 				openings++;
 			}
 			gaps++;
-			lastgap = 1;
+			lastins = 1;
 		} else if (dir & SUB){
 			i--;
 			j--;
@@ -507,7 +507,8 @@ int dynamicretrace(){
 				mismatches++;
 				match[pos] = ' ';
 			}
-			lastgap = 0;
+			lastdel = 0;
+			lastins = 0;
 		}
 		pos++;
 	}
