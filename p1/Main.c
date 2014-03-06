@@ -8,11 +8,12 @@ int main(int argc, const char *argv[])
 		return -1;
 	}
 	align(s1,s2);
-
+	//printarray();
 	if(local)
 		localretrace(highscore[0],highscore[1]);
 	else
-		retrace();
+		dynamicretrace();
 	dynamicfree();
+
 	return 0;
 }

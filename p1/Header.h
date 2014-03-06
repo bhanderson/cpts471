@@ -32,8 +32,9 @@ void print_menu(){
 
 
 int dynamicfree(){
+	int i = 0;
 	if (dynamicarray){
-		for (int i=0;i< (int)strlen(s1)+1;i++){
+		for (i=0;i< (int)strlen(s1)+1;i++){
 			free(dynamicarray[i]);
 		}
 		free(dynamicarray);
@@ -165,12 +166,13 @@ int strtoint(char *str){
 
 int allarr(int m, int n){
 	DP_cell **temp;
+	int i = 0;
 	temp = malloc(m * sizeof(DP_cell*));
 	if (temp == 0){
 		printf("Error allocatign dynamic table");
 		return -1;
 	}
-	for (int i = 0; i < m; i++){
+	for (i = 0; i < m; i++){
 		temp[i] = malloc(n * sizeof(DP_cell));
 		if(temp[i] == NULL){
 			printf("Error allocating dynamic table");
@@ -301,9 +303,9 @@ int dynamicstrinput(char *path){
 				case 'G':
 				case 't':
 				case 'T':
-						*pos = c;
-						pos++;
-						break;
+					*pos = c;
+					pos++;
+					break;
 				default:
 					break;
 			} // end switch
@@ -384,8 +386,8 @@ int settings(const char *argv[]){
 	return 0;
 
 ERROR:
-//	if(fp)
-//		fclose(fp);
+	//	if(fp)
+	//		fclose(fp);
 	printf("TEST\n");
 	inputerror();
 	return -1;
@@ -393,7 +395,8 @@ ERROR:
 
 
 int localretrace(int i, int j){ // input the position of where to start
-	char revs1[strlen(s1)], revs2[strlen(s2)], match[strlen(s1)];
+	int k = strlen(s1) + strlen(s2);
+	char revs1[k], revs2[k], match[k];
 	revs1[0] = revs2[0] = match[0] = 0;
 	int count = 0, dir=0;
 
@@ -426,51 +429,61 @@ int localretrace(int i, int j){ // input the position of where to start
 	return 0;
 }
 
-
-int retrace(){
-	int i = strlen(s1), j = strlen(s2);
-	int dir = 0;
-	int count = 0;
-	int gaps = 0, matches = 0, mismatches = 0;
-	char res1[strlen(s1)], res2[strlen(s2)], match[strlen(s1)];
-	match[0]=0;
-
-	while(i !=0 && j !=0){
-		max(dynamicarray[i-1][j-1].score, dynamicarray[i-1][j].score, dynamicarray[i][j-1].score, &dir);
-		if(dir & SUB){
-			res1[count] = s1[i-1];
-			res2[count] = s2[j-1];
-			if(s1[i-1]==s2[j-1]){
+int dynamicretrace(){
+	int i = strlen(s1), j = strlen(s2), k = i + j;
+	int dir = 0, pos = 0, matches=0, mismatches=0, openings=0, gaps=0;
+	int lastgap = 0;
+	char res1[k], res2[k], match[k];
+	while(i > 0 && j > 0){
+		max(dynamicarray[i-1][j-1].score,
+			dynamicarray[i-1][j].score,
+			dynamicarray[i][j-1].score,
+			&dir);
+		if (dir & SUB){
+			i--;
+			j--;
+			res1[pos] = s1[i];
+			res2[pos] = s2[j];
+			if (s1[i] == s2[j]){
 				matches++;
-				strcat(match, "|");
-			}
-			else{
+				match[pos] = '|';
+			} else {
 				mismatches++;
-				strcat(match, " ");
+				match[pos] = ' ';
 			}
+			lastgap = 0;
+		} else if (dir & DEL){
 			i--;
-			j--;
-		} else if(dir & DEL){
-			res1[count] = s1[i-1];
-			res2[count] = '-';
-			strcat(match, " ");
+			res1[pos] = s1[i];
+			res2[pos] = '-';
+			match[pos] = ' ';
+			if(!lastgap){
+				openings++;
+			}
 			gaps++;
-			i--;
-		}else if(dir & INS){
-			res1[count] = '-';
-			res2[count] = s2[j-1];
-			strcat(match, " ");
+			lastgap = 1;
+		} else {
 			j--;
+			res1[pos] = '-';
+			res2[pos] = s2[j];
+			match[pos] = ' ';
+			if(!lastgap){
+				openings++;
+			}
+			gaps++;
+			lastgap = 1;
 		}
-		count++;
+		pos++;
 	}
-	res1[count] = 0;
-	res2[count] = 0;
-	match[count] = 0;
+	res1[pos] = 0;
+	res2[pos] = 0;
+	match[pos] = 0;
 	revstring(res1);
-	revstring(match);
 	revstring(res2);
+	revstring(match);
 	wordwrap(res1, match, res2);
+	printf("Matches: %d Mismatches: %d Openings: %d Gaps: %d\n",
+			matches, mismatches, openings, gaps);
 	return 0;
 }
 
