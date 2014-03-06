@@ -402,6 +402,7 @@ int localretrace(int i, int j){ // input the position of where to start
 
 	while(dynamicarray[i][j].score > 0){
 		max(dynamicarray[i-1][j-1].score, dynamicarray[i-1][j].score, dynamicarray[i][j-1].score, &dir);
+		dir = dynamicarray[i][j].dir;
 		if(dir & SUB){ // substitution
 			revs1[count] = s1[i-1];
 			revs2[count] = s2[j-1];
@@ -435,10 +436,11 @@ int dynamicretrace(){
 	int lastgap = 0;
 	char res1[k], res2[k], match[k];
 	while(i > 0 && j > 0){
-		max(dynamicarray[i-1][j-1].score,
-			dynamicarray[i-1][j].score,
-			dynamicarray[i][j-1].score,
-			&dir);
+		//max(dynamicarray[i-1][j-1].score,
+		//	dynamicarray[i-1][j].score,
+		//	dynamicarray[i][j-1].score,
+		//	&dir);
+		dir = dynamicarray[i][j].dir;
 		if (dir & SUB){
 			i--;
 			j--;
