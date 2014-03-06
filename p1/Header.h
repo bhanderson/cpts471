@@ -52,17 +52,16 @@ void wordwrap(char* a1, char* m, char* a2){
 	int j= 0;
 	while(a2[bpos] != 0 && a1[apos] != 0){
 		i = 0;
-		printf("s1: %05d\t", count1);
+		printf("s1: %05d ", count1);
 		for (i = 0; i < 60 && a1[apos] != 0; i++) {
 			printf("%c", a1[apos]);
-			if (a1[apos] == 'a' || a1[apos] == 'c' || a1[apos] == 'g' || a1[apos] == 't' || a1[apos] == 'A' || a1[apos] == 'C' || a1[apos] == 'G' || a1[apos] == 'T') {
+			if( a1[apos] != '-')
 				count1++;
-			}
 			apos++;
 		}
 		printf(" %d", count1-1);
 		printf("\n");
-		printf("\t\t");
+		printf("\t  ");
 		i = 0;
 		for (i = 0; i < 60 && m[mpos] != 0; i++) {
 			printf("%c", m[mpos]);
@@ -70,13 +69,12 @@ void wordwrap(char* a1, char* m, char* a2){
 		}
 		printf("\n");
 
-		printf("s2: %05d\t", count2);
+		printf("s2: %05d ", count2);
 		i = 0;
 		for (i = 0; i < 60 && a2[bpos] != 0; i++) {
 			printf("%c", a2[bpos]);
-			if (a2[bpos] == 'a' || a2[bpos] == 'c' || a2[bpos] == 'g' || a2[bpos] == 't' || a2[bpos] == 'A' || a2[bpos] == 'C' || a2[bpos] == 'G' || a2[bpos] == 'T') {
+			if( a2[bpos] != '-' )
 				count2++;
-			}
 			bpos++;
 		}
 		printf(" %d", count2-1);
@@ -108,13 +106,13 @@ void inputerror(){
 }
 
 
-int threemax(int a, int b, int c)
-{
+int threemax(int a, int b, int c){
      int m = a;
-     (m < b) && (m = b); //these are not conditional statements.
-     (m < c) && (m = c); //these are just boolean expressions.
+     (m < b) && (m = b);
+     (m < c) && (m = c);
      return m;
 }
+
 
 int maxscore(int i, int j, int *dir){
 	int su = 0, de = 0, in = 0;
@@ -235,14 +233,14 @@ int align(char *s1, char *s2){
 		if (local) {
 			dynamicarray[i][0].score = 0;
 		} else
-			dynamicarray[i][0].score = h + (g * (i-1));
+			dynamicarray[i][0].score = h + (g * (i));
 	}
 	for (j = 1; j < n+1; j++) {
 		dynamicarray[0][j].dir = INS;
 		if (local) {
 			dynamicarray[0][j].score = 0;
 		} else
-			dynamicarray[0][j].score = h + (g * (j-1));
+			dynamicarray[0][j].score = h + (g * (j));
 	}
 
 	for (i = 1; i < m+1; i++) {
