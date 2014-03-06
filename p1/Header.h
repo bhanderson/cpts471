@@ -108,6 +108,44 @@ void inputerror(){
 }
 
 
+int threemax(int a, int b, int c)
+{
+     int m = a;
+     (m < b) && (m = b); //these are not conditional statements.
+     (m < c) && (m = c); //these are just boolean expressions.
+     return m;
+}
+
+int maxscore(int i, int j, int *dir){
+	int su = 0, de = 0, in = 0;
+	int score = 0;
+	// substitution
+	if (strncmp(&s1[i-1], &s2[j-1], 1)==0)
+		su = dynamicarray[i-1][j-1].score + ma;
+	else
+		su = dynamicarray[i-1][j-1].score + mi;
+	// deletion
+	if(dynamicarray[i-1][j].dir & DEL)
+		de = dynamicarray[i-1][j].score + g;
+	else
+		de = dynamicarray[i-1][j].score + h + g;
+	// insertion
+	if(dynamicarray[i][j-1].dir & INS)
+		in = dynamicarray[i][j-1].score + g;
+	else
+		in = dynamicarray[i][j-1].score + h + g;
+
+	score = threemax(su, de, in);
+	if (score == su)
+		*dir |= SUB;
+	if (score == de)
+		*dir |= DEL;
+	if (score == in)
+		*dir |= INS;
+	return score;
+}
+
+
 int max(int s, int d, int i, int *dir){ // substitution deletion insertion
 	if(s > d && s > i){
 		*dir = SUB;
@@ -193,18 +231,18 @@ int align(char *s1, char *s2){
 		return -1;
 	dynamicarray[0][0].score = 0;
 	for (i = 1; i < m+1; i++) { // initialize the first column and row
-		dynamicarray[i][0].score = h + (g * (i-1));
 		dynamicarray[i][0].dir = DEL;
 		if (local) {
 			dynamicarray[i][0].score = 0;
-		}
+		} else
+			dynamicarray[i][0].score = h + (g * (i-1));
 	}
 	for (j = 1; j < n+1; j++) {
-		dynamicarray[0][j].score = h + (g * (j-1));
 		dynamicarray[0][j].dir = INS;
 		if (local) {
 			dynamicarray[0][j].score = 0;
-		}
+		} else
+			dynamicarray[0][j].score = h + (g * (j-1));
 	}
 
 	for (i = 1; i < m+1; i++) {
@@ -226,13 +264,14 @@ int align(char *s1, char *s2){
 				in = dynamicarray[i][j-1].score + h + g;
 
 			// set the score and the direction the score was found to the cell
-			dynamicarray[i][j].score = max(su, de, in, &dir);
+			if (local && dynamicarray[i][j].score < 0) {
+				dynamicarray[i][j].score = 0;
+			} else
+				dynamicarray[i][j].score = max(su, de, in, &dir);
+
 			if (dynamicarray[i][j].score > dynamicarray[highscore[0]][highscore[1]].score) {
 				highscore[0] = i;
 				highscore[1] = j;
-			}
-			if (local && dynamicarray[i][j].score < 0) {
-				dynamicarray[i][j].score = 0;
 			}
 			dynamicarray[i][j].dir = dir;
 		}
@@ -437,12 +476,6 @@ int dynamicretrace(){
 	int lastgap = 0;
 	char res1[k], res2[k], match[k];
 	while(i > 0 && j > 0){
-		/*
-		   max(dynamicarray[i-1][j-1].score,
-		   dynamicarray[i-1][j].score,
-		   dynamicarray[i][j-1].score,
-		   &dir);
-		 */
 		dir = dynamicarray[i][j].dir;
 		if (dir & DEL){
 			i--;
@@ -450,33 +483,33 @@ int dynamicretrace(){
 			res2[pos] = '-';
 			match[pos] = ' ';
 			if(!lastgap){
-			//	openings++;
+				openings++;
 			}
-			//gaps++;
-			//lastgap = 1;
+			gaps++;
+			lastgap = 1;
 		} else if (dir & INS){
 			j--;
 			res1[pos] = '-';
 			res2[pos] = s2[j];
 			match[pos] = ' ';
 			if(!lastgap){
-			//	openings++;
+				openings++;
 			}
-			//gaps++;
-			//lastgap = 1;
+			gaps++;
+			lastgap = 1;
 		} else if (dir & SUB){
 			i--;
 			j--;
 			res1[pos] = s1[i];
 			res2[pos] = s2[j];
 			if (s1[i] == s2[j]){
-				//matches++;
+				matches++;
 				match[pos] = '|';
 			} else {
-				//mismatches++;
+				mismatches++;
 				match[pos] = ' ';
 			}
-			//lastgap = 0;
+			lastgap = 0;
 		}
 		pos++;
 	}
@@ -487,22 +520,8 @@ int dynamicretrace(){
 	revstring(res2);
 	revstring(match);
 	wordwrap(res1, match, res2);
-	for (i = 0; i < (int)strlen(match);i++){
-		if (match[i] == '|'){
-			lastgap = 0;
-			matches++;
-		} else if ((res1[i] != '-') && (res2[i] != '-')){
-			mismatches++;
-		} else {
-			if (lastgap==0)
-				openings++;
-			lastgap = 1;
-			gaps++;
-		}
-
-	}
 	printf("Matches: %d Mismatches: %d Openings: %d Gaps: %d\n",
-			matches, mismatches, openings, gaps);
+			matches,	mismatches,	   openings,    gaps);
 	return 0;
 }
 
