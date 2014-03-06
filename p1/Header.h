@@ -430,50 +430,53 @@ int localretrace(int i, int j){ // input the position of where to start
 	return 0;
 }
 
+
 int dynamicretrace(){
 	int i = strlen(s1), j = strlen(s2), k = i + j;
 	int dir = 0, pos = 0, matches=0, mismatches=0, openings=0, gaps=0;
 	int lastgap = 0;
 	char res1[k], res2[k], match[k];
 	while(i > 0 && j > 0){
-		//max(dynamicarray[i-1][j-1].score,
-		//	dynamicarray[i-1][j].score,
-		//	dynamicarray[i][j-1].score,
-		//	&dir);
+		/*
+		   max(dynamicarray[i-1][j-1].score,
+		   dynamicarray[i-1][j].score,
+		   dynamicarray[i][j-1].score,
+		   &dir);
+		 */
 		dir = dynamicarray[i][j].dir;
-		if (dir & SUB){
-			i--;
-			j--;
-			res1[pos] = s1[i];
-			res2[pos] = s2[j];
-			if (s1[i] == s2[j]){
-				matches++;
-				match[pos] = '|';
-			} else {
-				mismatches++;
-				match[pos] = ' ';
-			}
-			lastgap = 0;
-		} else if (dir & DEL){
+		if (dir & DEL){
 			i--;
 			res1[pos] = s1[i];
 			res2[pos] = '-';
 			match[pos] = ' ';
 			if(!lastgap){
-				openings++;
+			//	openings++;
 			}
-			gaps++;
-			lastgap = 1;
-		} else {
+			//gaps++;
+			//lastgap = 1;
+		} else if (dir & INS){
 			j--;
 			res1[pos] = '-';
 			res2[pos] = s2[j];
 			match[pos] = ' ';
 			if(!lastgap){
-				openings++;
+			//	openings++;
 			}
-			gaps++;
-			lastgap = 1;
+			//gaps++;
+			//lastgap = 1;
+		} else if (dir & SUB){
+			i--;
+			j--;
+			res1[pos] = s1[i];
+			res2[pos] = s2[j];
+			if (s1[i] == s2[j]){
+				//matches++;
+				match[pos] = '|';
+			} else {
+				//mismatches++;
+				match[pos] = ' ';
+			}
+			//lastgap = 0;
 		}
 		pos++;
 	}
@@ -484,6 +487,20 @@ int dynamicretrace(){
 	revstring(res2);
 	revstring(match);
 	wordwrap(res1, match, res2);
+	for (i = 0; i < (int)strlen(match);i++){
+		if (match[i] == '|'){
+			lastgap = 0;
+			matches++;
+		} else if ((res1[i] != '-') && (res2[i] != '-')){
+			mismatches++;
+		} else {
+			if (lastgap==0)
+				openings++;
+			lastgap = 1;
+			gaps++;
+		}
+
+	}
 	printf("Matches: %d Mismatches: %d Openings: %d Gaps: %d\n",
 			matches, mismatches, openings, gaps);
 	return 0;
