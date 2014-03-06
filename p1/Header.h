@@ -414,6 +414,7 @@ int retrace(){
 	//printf("%s\n", res1);
 	//printf("%s\n", res2);
 	wordwrap(res1, match, res2);
+	printf("Match: %d Mismatch: %d Gap: %d", matches, mismatches, gaps);
 
 }
 
