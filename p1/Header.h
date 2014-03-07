@@ -19,7 +19,7 @@ int strnum = 0;
 
 typedef struct DP_cell{
 	int score;
-	int dir; // S: 1 D: 3 I: 5	and any combination of the three
+	int dir; // S: 1 D: 2 I: 4	and any combination of the three
 } DP_cell;
 
 
@@ -107,10 +107,10 @@ void inputerror(){
 
 
 int threemax(int a, int b, int c){
-     int m = a;
-     (m < b) && (m = b);
-     (m < c) && (m = c);
-     return m;
+	int m = a;
+	(m < b) && (m = b);
+	(m < c) && (m = c);
+	return m;
 }
 
 
@@ -134,6 +134,7 @@ int maxscore(int i, int j, int *dir){
 		in = dynamicarray[i][j-1].score + h + g;
 
 	score = threemax(su, de, in);
+	*dir = 0;
 	if (score == su)
 		*dir |= SUB;
 	if (score == de)
@@ -221,8 +222,7 @@ int allarr(int m, int n){
 
 
 int align(char *s1, char *s2){
-	int i,j,m,n, dir = 0;
-	int su, de, in;
+	int i,j,m,n;
 	m = strlen(s1);
 	n = strlen(s2);
 	if(allarr(m+1,n+1)<0)
@@ -243,37 +243,14 @@ int align(char *s1, char *s2){
 			dynamicarray[0][j].score = h + (g * (j));
 	}
 
-	for (i = 1; i < m+1; i++) {
-		for (j = 1; j < n+1; j++) {
-			// substitution
-			if (strncmp(&s1[i-1], &s2[j-1], 1)==0)
-				su = dynamicarray[i-1][j-1].score + ma;
-			else
-				su = dynamicarray[i-1][j-1].score + mi;
-			// deletion
-			if(dynamicarray[i-1][j].dir & DEL)
-				de = dynamicarray[i-1][j].score + g;
-			else
-				de = dynamicarray[i-1][j].score + h + g;
-			// insertion
-			if(dynamicarray[i][j-1].dir & INS)
-				in = dynamicarray[i][j-1].score + g;
-			else
-				in = dynamicarray[i][j-1].score + h + g;
-
-			// set the score and the direction the score was found to the cell
-			if (local && dynamicarray[i][j].score < 0) {
-				dynamicarray[i][j].score = 0;
-			} else
-				dynamicarray[i][j].score = max(su, de, in, &dir);
-
-			if (dynamicarray[i][j].score > dynamicarray[highscore[0]][highscore[1]].score) {
-				highscore[0] = i;
-				highscore[1] = j;
-			}
-			dynamicarray[i][j].dir = dir;
+	// start at the beginning of the array and find the score for each cell 
+	for( i=1;i<m+1; i++){
+		for (j=1;j<n+1; j++){
+			// function to find the direction of the best score and the score
+			dynamicarray[i][j].score = maxscore(i,j, &dynamicarray[i][j].dir);
 		}
 	}
+
 	if (local)
 		printf("Optimal Score: %d\n", dynamicarray[highscore[0]][highscore[1]].score);
 
@@ -423,13 +400,65 @@ int settings(const char *argv[]){
 	return 0;
 
 ERROR:
-//	if(fp)
-//		fclose(fp);
+	//	if(fp)
+	//		fclose(fp);
 	printf("TEST\n");
 	inputerror();
 	return -1;
 }
 
+int retrace(){
+	int m = strlen(s1), n = strlen(s2), o = m + n;
+	int i = m, j = n, dir =0, pos = 0;
+	int matches = 0, mismatches = 0, gaps = 0, openings = 0;
+	char res1[o], res2[o], match[o];
+	while(i>0 && j>0){
+		maxscore(i,j, &dir);
+
+		if (dir & INS){
+			j--;
+			gaps++;
+			res1[pos] = '-';
+			res2[pos] = s2[j];
+			match[pos] = ' ';
+			if(!(dynamicarray[i][j].dir & (DEL |INS)))
+				openings++;
+		} else if (dir & DEL) {
+			i--;
+			gaps++;
+			res1[pos] = s1[i];
+			res2[pos] = '-';
+			match[pos] = ' ';
+			if(!(dynamicarray[i][j].dir & (DEL | INS)))
+				openings++;
+		} else {
+			i--;
+			j--;
+			if (s1[i]==s2[j]){ // match
+				res1[pos] = s1[i];
+				res2[pos] = s2[j];
+				match[pos] = '|';
+				matches++;
+			} else { // mismatch
+				res1[pos] = s1[i];
+				res2[pos] = s2[j];
+				match[pos] = ' ';
+				mismatches++;
+			}
+		}
+		pos++;
+	}
+	printf("Matches: %d Mismatches: %d Openings: %d Gaps: %d\n",
+			matches, mismatches, openings, gaps);
+	res1[pos] = 0;
+	match[pos] = 0;
+	res2[pos] = 0;
+	revstring(res1);
+	revstring(match);
+	revstring(res2);
+	wordwrap(res1, match, res2);
+	return 0;
+}
 
 int localretrace(int i, int j){ // input the position of where to start
 	int k = strlen(s1) + strlen(s2);
@@ -464,63 +493,6 @@ int localretrace(int i, int j){ // input the position of where to start
 	revs1[count] = 0;
 	revs2[count] = 0;
 	wordwrap(revs1, match, revs2);
-	return 0;
-}
-
-
-int dynamicretrace(){
-	int i = strlen(s1), j = strlen(s2), k = i + j;
-	int dir = 0, pos = 0, matches=0, mismatches=0, openings=0, gaps=0;
-	int lastdel = 0, lastins;
-	char res1[k], res2[k], match[k];
-	while(i > 0 && j > 0){
-		dir = dynamicarray[i][j].dir;
-		if (dir & DEL){
-			i--;
-			res1[pos] = s1[i];
-			res2[pos] = '-';
-			match[pos] = ' ';
-			if(!lastdel){
-				openings++;
-			}
-			gaps++;
-			lastdel = 1;
-		} else if (dir & INS){
-			j--;
-			res1[pos] = '-';
-			res2[pos] = s2[j];
-			match[pos] = ' ';
-			if(!lastins){
-				openings++;
-			}
-			gaps++;
-			lastins = 1;
-		} else if (dir & SUB){
-			i--;
-			j--;
-			res1[pos] = s1[i];
-			res2[pos] = s2[j];
-			if (s1[i] == s2[j]){
-				matches++;
-				match[pos] = '|';
-			} else {
-				mismatches++;
-				match[pos] = ' ';
-			}
-			lastdel = 0;
-			lastins = 0;
-		}
-		pos++;
-	}
-	res1[pos] = 0;
-	res2[pos] = 0;
-	match[pos] = 0;
-	revstring(res1);
-	revstring(res2);
-	revstring(match);
-	wordwrap(res1, match, res2);
-	printf("Matches: %d Mismatches: %d Openings: %d Gaps: %d\n",
-			matches,	mismatches,	   openings,    gaps);
 	return 0;
 }
 

@@ -13,7 +13,7 @@ int main(int argc, const char *argv[])
 	if(local)
 		localretrace(highscore[0],highscore[1]);
 	else
-		dynamicretrace();
+		retrace();
 	dynamicfree();
 
 	return 0;
