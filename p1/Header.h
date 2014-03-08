@@ -461,8 +461,8 @@ int retrace(){
 }
 
 int localretrace(int i, int j){ // input the position of where to start
-	int k = strlen(s1) + strlen(s2);
-	char revs1[k], revs2[k], match[k];
+	int m = strlen(s1), n = strlen(s2), o = m + n;
+	char revs1[o], revs2[o], match[o];
 	revs1[0] = revs2[0] = match[0] = 0;
 	int count = 0, dir=0;
 
