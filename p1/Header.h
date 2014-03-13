@@ -222,7 +222,7 @@ int score_array(char *s1, char *s2){
 	for (i = 1; i <= m; i++){
 		for (j = 1; j <= n; j++){
 			// match or mismatch
-			if ((s1[i-1] ^ s2[j-1]) == 0)
+			if (s1[i-1] == s2[j-1])
 				dynamicarray[i][j].s = optimal(i-1,j-1) + MA;
 			else
 				dynamicarray[i][j].s = optimal(i-1,j-1) + MI;
@@ -427,110 +427,103 @@ ERROR:
 
 int retrace(){
 	int i = strlen(s1), j = strlen(s2);
-	int count = 0, o = i + j;
-	int matches = 0, mismatches = 0, gaps = 0, openings = 0, current = 0;
-	char res1[o], res2[o], rema[o];
+	int count = 0, o = i + j, penalty;
+	int matches = 0, mismatches = 0, gaps = 0, openings = 0, max = 0;
+	char res1[o], res2[o], rema[o], dir;
 
-	while(i > 0 && j > 0){
-		current = optimal(i,j);
-		if (current == dynamicarray[i][j].s){
-			i--; j--;
-			res1[count] = s1[i];
-			res2[count] = s2[j];
-			if (s1[i] == s2[j]){
-				rema[count] = '|'; matches++;
-			} else {
-				rema[count] = ' '; mismatches++;
-			}
-		} else if (current == dynamicarray[i][j].d){
-			i--;
-			res1[count] = s1[i];
-			res2[count] = '-';
-			rema[count] = ' ';
-			gaps++;
-			if(optimal(i,j)!=dynamicarray[i][j].d){
-				openings++;
-			}
-		} else {
-			j--;
-			res1[count] = '-';
-			res2[count] = s2[j];
-			rema[count] = ' ';
-			gaps++;
-			if(optimal(i,j)!=dynamicarray[i][j].i){
-				openings++;
-			}
+	max = optimal(i,j);
+	if(max == dynamicarray[i][j].s)
+		dir = 's';
+	else if(max == dynamicarray[i][j].d)
+		dir = 'd';
+	else
+		dir = 'i';
+
+	while(i > 0 || j > 0){
+		switch(dir){
+			case 'd':
+				// got score from deletion
+				if (dynamicarray[i][j].d == (dynamicarray[i-1][j].d+G)){
+					dir = 'd';
+				}
+				// got score from substitution
+				else if (dynamicarray[i][j].d == (dynamicarray[i-1][j].s+H+G)){
+					dir = 's';
+					openings++;
+				}
+				// got score from insertion
+				else {
+					dir = 'i';
+					openings++;
+				}
+				i--;
+				gaps++;
+				break;
+			case 's':
+				if (s1[i-1] == s2[j-1]){
+					penalty = MA;
+					matches++;
+				} else{
+					penalty = MI;
+					mismatches++;
+				}
+				// got score from deletion
+				if (dynamicarray[i][j].s ==
+					(dynamicarray[i-1][j-1].d + penalty)){
+					dir = 'd';
+					openings++;
+				}
+				// got score from substitution
+				else if (dynamicarray[i][j].s ==
+						(dynamicarray[i-1][j-1].s + penalty)){
+					dir = 's';
+				}
+				// got score from insertion
+				else {
+					dir = 'i';
+					openings++;
+				}
+				i--;
+				j--;
+				break;
+			case 'i':
+				// got score from deletion
+				if (dynamicarray[i][j].i ==
+					(dynamicarray[i][j-1].d + G + H)){
+					dir = 'd';
+					openings++;
+				}
+				// got score from substitution
+				else if (dynamicarray[i][j].i ==
+						(dynamicarray[i][j-1].s + G + H) ){
+					dir = 's';
+					openings++;
+				}
+				// got score from insertion
+				else {
+					dir = 'i';
+				}
+				j--;
+				gaps++;
+				break;
+			default:
+				return -1;
 		}
 		count ++;
 	}
-	/*
+	
 	res1[count] = 0;
 	rema[count] = 0;
 	res2[count] = 0;
 	revstring(res1);
 	revstring(rema);
 	revstring(res2);
-	wordwrap(res1, rema, res2);
-	*/
+//	wordwrap(res1, rema, res2);
+	
 	printf("Matches:%d Mismatches:%d Gaps:%d Openings:%d\n",
 			matches, mismatches, gaps, openings);
 	return 0;
 }
-
-/*
-   int retrace(){
-   int m = strlen(s1), n = strlen(s2), o = m + n;
-   int i = m, j = n, dir =0, pos = 0;
-   int matches = 0, mismatches = 0, gaps = 0, openings = 0;
-   char res1[o], res2[o], match[o];
-   while(i>0 && j>0){
-//maxscore(i,j, &dir);
-
-if (dir & INS){
-j--;
-gaps++;
-res1[pos] = '-';
-res2[pos] = s2[j];
-match[pos] = ' ';
-if(!(dynamicarray[i][j].dir & (DEL |INS)))
-openings++;
-} else if (dir & DEL) {
-i--;
-gaps++;
-res1[pos] = s1[i];
-res2[pos] = '-';
-match[pos] = ' ';
-if(!(dynamicarray[i][j].dir & (DEL | INS)))
-openings++;
-} else {
-i--;
-j--;
-if (s1[i]==s2[j]){ // match
-res1[pos] = s1[i];
-res2[pos] = s2[j];
-match[pos] = '|';
-matches++;
-} else { // mismatch
-res1[pos] = s1[i];
-res2[pos] = s2[j];
-match[pos] = ' ';
-mismatches++;
-}
-}
-pos++;
-}
-printf("Matches: %d Mismatches: %d Openings: %d Gaps: %d\n",
-matches, mismatches, openings, gaps);
-res1[pos] = 0;
-match[pos] = 0;
-res2[pos] = 0;
-revstring(res1);
-revstring(match);
-revstring(res2);
-wordwrap(res1, match, res2);
-return 0;
-}
- */
 /*
    int localretrace(int i, int j){ // input the position of where to start
    int m = strlen(s1), n = strlen(s2), o = m + n;
