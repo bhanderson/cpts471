@@ -457,6 +457,9 @@ int retrace(){
 					openings++;
 				}
 				i--;
+				res1[count] = s1[i];
+				res2[count] = '-';
+				rema[count] = ' ';
 				gaps++;
 				break;
 			case 's':
@@ -483,6 +486,9 @@ int retrace(){
 				}
 				i--;
 				j--;
+				res1[count] = s1[i];
+				res2[count] = s2[j];
+				rema[count] = penalty == MA ? '|' : ' ';
 				break;
 			case 'i':
 				// got score from deletion
@@ -502,6 +508,9 @@ int retrace(){
 					dir = 'i';
 				}
 				j--;
+				res1[count] = '-';
+				res2[count] = s2[j];
+				rema[count] = ' ';
 				gaps++;
 				break;
 			default:
@@ -516,7 +525,7 @@ int retrace(){
 	revstring(res1);
 	revstring(rema);
 	revstring(res2);
-//	wordwrap(res1, rema, res2);
+	wordwrap(res1, rema, res2);
 	
 	printf("Matches:%d Mismatches:%d Gaps:%d Openings:%d\n",
 			matches, mismatches, gaps, openings);
