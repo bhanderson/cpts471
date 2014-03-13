@@ -21,7 +21,7 @@ typedef struct DP_cell{
 	int s;
 	int d;
 	int i;
-	int dir; // S: 1 D: 2 I: 4	and any combination of the three
+	//int dir; // S: 1 D: 2 I: 4 and any combination of the three
 } DP_cell;
 
 
@@ -192,8 +192,8 @@ int score_array(char *s1, char *s2){
 		return -1;
 
 	dynamicarray[0][0].s = 0;
-	dynamicarray[0][0].d = 0;
-	dynamicarray[0][0].i = 0;
+	dynamicarray[0][0].d = -2000000000;
+	dynamicarray[0][0].i = -2000000000;
 
 	for (i=1; i <= m; i++){
 		if (LOCAL){
@@ -471,7 +471,6 @@ int retrace(){
 				if (dynamicarray[i][j].s ==
 					(dynamicarray[i-1][j-1].d + penalty)){
 					dir = 'd';
-					openings++;
 				}
 				// got score from substitution
 				else if (dynamicarray[i][j].s ==
@@ -481,7 +480,6 @@ int retrace(){
 				// got score from insertion
 				else {
 					dir = 'i';
-					openings++;
 				}
 				i--;
 				j--;
