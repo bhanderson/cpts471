@@ -21,7 +21,6 @@ typedef struct DP_cell{
 	int s;
 	int d;
 	int i;
-	//int dir; // S: 1 D: 2 I: 4 and any combination of the three
 } DP_cell;
 
 
@@ -118,49 +117,16 @@ int threemax(int a, int b, int c){
 }
 
 
-int max(int s, int d, int i, int *dir){ // substitution deletion insertion
-	if(s > d && s > i){
-		*dir = SUB;
-		return s;
-	}
-	if (d > s && d > i){
-		*dir = DEL;
-		return d;
-	}
-	if (i > d && i > s) {
-		*dir = INS;
-		return i;
-	}
-	if (s == d && s == i){
-		*dir = SUB | DEL | INS;
-		return s;
-	}
-	else if (s == d && s != i){
-		*dir = SUB | DEL;
-		return d;
-	}
-	else if (d == i && d != s){
-		*dir = DEL | INS;
-		return i;
-	}
-	else if (i == s && i != d){
-		*dir = INS | SUB;
-		return i;
-	}
-	return -1;
-}
-
-
 int allarr(int m, int n){
 	DP_cell **temp;
 	int i = 0;
-	temp = malloc(m * sizeof(DP_cell*));
+	temp = calloc(m, sizeof(DP_cell*));
 	if (temp == 0){
 		printf("Error allocatign dynamic table");
 		return -1;
 	}
 	for (i = 0; i < m; i++){
-		temp[i] = malloc(n * sizeof(DP_cell));
+		temp[i] = calloc(n, sizeof(DP_cell));
 		if(temp[i] == NULL){
 			printf("Error allocating dynamic table");
 			return -1;
@@ -182,7 +148,7 @@ int optimal(int i, int j){
 }
 
 
-int score_array(char *s1, char *s2){
+int align(char *s1, char *s2){
 	int i, j, m, n;
 	m = strlen(s1);
 	n = strlen(s2);
@@ -191,28 +157,13 @@ int score_array(char *s1, char *s2){
 	if (allarr(m+1, n+1)<0)
 		return -1;
 
-	dynamicarray[0][0].s = 0;
-	dynamicarray[0][0].d = -2000000000;
-	dynamicarray[0][0].i = -2000000000;
-
-	for (i=1; i <= m; i++){
-		if (LOCAL){
-			dynamicarray[i][0].s = 0;
-			dynamicarray[i][0].d = 0;
-			dynamicarray[i][0].i = 0;
-		} else {
+	if (!LOCAL){
+		for (i=1; i <= m; i++){
 			dynamicarray[i][0].s = -2000000000;
 			dynamicarray[i][0].d = H + (G * (i));
 			dynamicarray[i][0].i = -2000000000;
 		}
-	}
-
-	for (j=1; j <= n; j++){
-		if (LOCAL){
-			dynamicarray[0][j].s = 0;
-			dynamicarray[0][j].d = 0;
-			dynamicarray[0][j].i = 0;
-		} else {
+		for (j=1; j <= n; j++){
 			dynamicarray[0][j].s = -2000000000;
 			dynamicarray[0][j].d = -2000000000;
 			dynamicarray[0][j].i = H + (G * (j));
@@ -236,18 +187,29 @@ int score_array(char *s1, char *s2){
 					dynamicarray[i][j-1].i + G,
 					dynamicarray[i][j-1].s + G + H,
 					dynamicarray[i][j-1].d + G + H);
-			if (LOCAL){
-				if (optimal(highscore[0], highscore[1]) <
-						optimal(i,j))
-					highscore[0] = i; highscore[1] = j;
-			}
 		}
 	}
-	if (LOCAL)
-		printf("Optimal Score: %d\n", optimal(highscore[0], highscore[1]));
+	if (LOCAL){
+		for (i = 1; i <= m; i++){
+			for (j = 1; j <= n; j++){
+				if (dynamicarray[i][j].s < 0)
+					dynamicarray[i][j].s = 0;
 
-	else
-		printf("Optimal Score: %d\n", optimal(i-1,j-1));
+				if (dynamicarray[i][j].d < 0)
+					dynamicarray[i][j].d = 0;
+
+				if (dynamicarray[i][j].i < 0)
+					dynamicarray[i][j].i = 0;
+
+				if (optimal(i,j) > optimal(highscore[0], highscore[1])){
+					highscore[0] = i;
+					highscore[1] = j;
+				}
+			}
+		}
+		printf("Optimal Score: %d\n", optimal(highscore[0], highscore[1]));
+	}
+	printf("Optimal Score: %d\n", optimal(i-1,j-1));
 	return 0;
 }
 
@@ -413,8 +375,8 @@ int settings(const char *argv[]){
 	}
 
 	fclose(fp);
-	printf("S1 length: %d characters\nS2 length: %d characters\n\n",
-			(int)strlen(s1), (int)strlen(s2));
+	printf("%s length: %d characters\n%s length: %d characters\n\n",
+			s1name, (int)strlen(s1), s2name, (int)strlen(s2));
 	return 0;
 
 ERROR:
@@ -431,6 +393,11 @@ int retrace(){
 	int matches = 0, mismatches = 0, gaps = 0, openings = 0, max = 0;
 	char res1[o], res2[o], rema[o], dir;
 
+	if(LOCAL){
+		i = highscore[0];
+		j = highscore[1];
+	}
+
 	max = optimal(i,j);
 	if(max == dynamicarray[i][j].s)
 		dir = 's';
@@ -440,6 +407,10 @@ int retrace(){
 		dir = 'i';
 
 	while(i > 0 || j > 0){
+		if(LOCAL){
+			if(optimal(i,j) == 0)
+				break;
+		}
 		switch(dir){
 			case 'd':
 				// got score from deletion
@@ -472,7 +443,7 @@ int retrace(){
 				}
 				// got score from deletion
 				if (dynamicarray[i][j].s ==
-					(dynamicarray[i-1][j-1].d + penalty)){
+						(dynamicarray[i-1][j-1].d + penalty)){
 					dir = 'd';
 				}
 				// got score from substitution
@@ -493,7 +464,7 @@ int retrace(){
 			case 'i':
 				// got score from deletion
 				if (dynamicarray[i][j].i ==
-					(dynamicarray[i][j-1].d + G + H)){
+						(dynamicarray[i][j-1].d + G + H)){
 					dir = 'd';
 					openings++;
 				}
@@ -518,7 +489,7 @@ int retrace(){
 		}
 		count ++;
 	}
-	
+
 	res1[count] = 0;
 	rema[count] = 0;
 	res2[count] = 0;
@@ -526,48 +497,12 @@ int retrace(){
 	revstring(rema);
 	revstring(res2);
 	wordwrap(res1, rema, res2);
-	
+
 	printf("Matches:%d Mismatches:%d Gaps:%d Openings:%d\n",
 			matches, mismatches, gaps, openings);
 	return 0;
 }
-/*
-   int localretrace(int i, int j){ // input the position of where to start
-   int m = strlen(s1), n = strlen(s2), o = m + n;
-   char revs1[o], revs2[o], match[o];
-   revs1[0] = revs2[0] = match[0] = 0;
-   int count = 0, dir=0;
 
-   while(dynamicarray[i][j].score > 0){
-   max(dynamicarray[i-1][j-1].score, dynamicarray[i-1][j].score, dynamicarray[i][j-1].score, &dir);
-   dir = dynamicarray[i][j].dir;
-   if(dir & SUB){ // substitution
-   revs1[count] = s1[i-1];
-   revs2[count] = s2[j-1];
-   if (s1[i-1] == s2[j-1]) {
-   strcat(match, "|");
-   } else
-   strcat(match, " ");
-   i--; j--;
-   } else if (dir & DEL) { // deletion
-   revs1[count] = s1[i-1];
-   revs2[count] = '-';
-   strcat(match, " ");
-   i--;
-   } else if (dir & INS) {
-   revs1[count] = '-';
-   revs2[count] = s2[j-1];
-   strcat(match, " ");
-   j--;
-   }
-   count++;
-   }
-   revs1[count] = 0;
-   revs2[count] = 0;
-   wordwrap(revs1, match, revs2);
-   return 0;
-   }
- */
 
 void printarray(){
 	int i,j;

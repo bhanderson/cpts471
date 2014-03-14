@@ -9,7 +9,8 @@ int main(int argc, const char *argv[])
 	}
 	//printf("S1 length: %d\nS2 length: %d\n", (int)strlen(s1), (int)strlen(s2));
 	//align(s1,s2);
-	score_array(s1, s2);
+	if (align(s1, s2))
+		return -1;
 	retrace();
 //	printarray();
 //	printf("%d ", threemax(-2175646, -7, -10));
