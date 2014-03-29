@@ -14,8 +14,11 @@
 
 /* ---------- INCLUDES ---------- */
 
+#include "mc_stree.h"
+
 
 /* ---------- DEFINITIONS ------- */
+
 
 
 /* ---------- FUNCTIONS --------- */

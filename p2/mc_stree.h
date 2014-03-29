@@ -14,6 +14,9 @@
 
 /* ---------- INCLUDES ---------- */
 
+#include <cctype>
+#include <cstdio>
+
 
 /* ---------- DEFINITIONS ------- */
 
