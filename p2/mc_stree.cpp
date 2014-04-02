@@ -17,14 +17,6 @@
 #include "mc_stree.h"
 
 
-/* ---------- DEFINITIONS ------- */
+/* ---------- FUNCTION DEFS ----- */
 
-
-
-/* ---------- FUNCTIONS --------- */
-
-int main (int argc, char* argv[])
-{
-    
-    return (0);
-}
+// function definitions go here...

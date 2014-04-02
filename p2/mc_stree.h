@@ -16,12 +16,14 @@
 
 #include <cctype>
 #include <cstdio>
+#include <ctime>
 
 
 /* ---------- DEFINITIONS ------- */
 
+// classes and other defs go here...
+
 
 /* ---------- PROTOTYPES -------- */
 
-
-int main (int argc, char* argv[]);
+// function prototypes go here...
