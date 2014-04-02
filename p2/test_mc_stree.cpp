@@ -92,7 +92,7 @@ int main (int argc, char* argv[])
 	gettimeofday(&tstop, NULL);
 	// diff_time(&start, &stop) // in ms
 
-    gettimeofday(&tstart, NULL);
+	gettimeofday(&tstart, NULL);
 	// test_enumerate()
 	gettimeofday(&tstop, NULL);
 	// diff_time(&start, &stop) // in ms
