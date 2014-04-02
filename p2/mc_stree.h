@@ -16,12 +16,27 @@
 
 #include <cctype>
 #include <cstdio>
+#include <string>
 
 
 /* ---------- DEFINITIONS ------- */
 
+class Tree{
+	public:
+		Tree(string sequence, string alphabet);
+	private:
+		string sequence;
+		string alphabet;
+};
+
+// destructor
+Tree::~Tree( );
+
+// constructor
+Tree::Tree( string sequence, string alphabet ){
+
+}
 
 /* ---------- PROTOTYPES -------- */
 
 
-int main (int argc, char* argv[]);
