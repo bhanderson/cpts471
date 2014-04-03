@@ -13,7 +13,8 @@
 
 
 /* ---------- INCLUDES ---------- */
-
+#ifndef _MC_STREE_H_
+#define _MC_STREE_H_
 #include <cctype>
 #include <cstdio>
 #include <string>
@@ -23,7 +24,11 @@
 
 class Tree{
 	public:
-		Tree(string sequence, string alphabet);
+		~Tree( );
+		Tree( string sequence, string alphabet );
+		string print_children();
+		string DFS( Node *u );
+		string BWT_index( string s );
 	private:
 		string sequence;
 		string alphabet;
@@ -37,6 +42,18 @@ Tree::Tree( string sequence, string alphabet ){
 
 }
 
+
+string print_children(){
+
+}
+
+string DFS( Node *u ){
+
+}
+
+string BWT_index( string s ){
+
+}
 /* ---------- PROTOTYPES -------- */
 
-
+#endif
