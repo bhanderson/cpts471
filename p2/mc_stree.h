@@ -18,10 +18,12 @@
 #include <cctype>
 #include <cstdio>
 #include <string>
+#include <vector>
 using namespace std;
 
 
 /* ---------- DEFINITIONS ------- */
+
 
 class Node{
 	unsigned int id;
@@ -33,10 +35,22 @@ class Node{
 
 };
 
+class Edge {
+	int fist_char_index;
+	int last_char_index;
+	Node *end_node;
+	Node *start_node;
+	public:
+		Edge();
+		Edge( int first, int last, Node *parent );
+		int SplitEdge();
+};
+
 class Tree{
 	public:
-		Node * root;
+		Node *root;
 		~Tree( );
+		Tree( );
 		Tree( string sequence, string alphabet );
 		string print_children();
 		string DFS( Node *u );
@@ -47,13 +61,19 @@ class Tree{
 };
 
 // destructor
-Tree::~Tree( );
+Tree::~Tree( ){
+
+}
+
+Tree::Tree( ){
+	root = new Node;
+}
 
 // constructor
 Tree::Tree( string sequence, string alphabet ){
 
-}
 
+}
 
 string print_children(){
 
