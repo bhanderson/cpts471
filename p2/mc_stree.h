@@ -18,12 +18,24 @@
 #include <cctype>
 #include <cstdio>
 #include <string>
+using namespace std;
 
 
 /* ---------- DEFINITIONS ------- */
 
+class Node{
+	unsigned int id;
+	Node *link;
+	Node *parent;
+	string parent_edge_label;
+	vector<Node*> children;
+	int depth;
+
+};
+
 class Tree{
 	public:
+		Node * root;
 		~Tree( );
 		Tree( string sequence, string alphabet );
 		string print_children();
