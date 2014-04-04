@@ -19,20 +19,25 @@
 
 /* ---------- FUNCTION DEFS ----- */
 
+int makeNode( ){
+	return 0;
+}
+
 int suffixTree( char *input, char *alphabet ){
-	return 0;
-}
-
-
-int bfs( Node *root ){
 	
 	return 0;
 }
 
-int dfs( Node *root ){
-	
+
+int dfs( Node *node ){
+	int i;
+	for( i=0; (i < node->numChildren) && (node->children[i] != NULL); i++ ){
+		dfs( node->children[i] );
+	}
+	printf("%d", node->nodeDepth);
 	return 0;
 }
+
 
 int bwt( Node *root, char *input ){
 	return 0;
