@@ -19,13 +19,25 @@
 
 /* ---------- FUNCTION DEFS ----- */
 
+int suffixTree( char *input, char *alphabet ){
+	return 0;
+}
 
 
-/* ---------- FUNCTIONS --------- */
+int bfs( Node *root ){
+	return 0;
+}
+
+int dfs( Node *root ){
+	return 0;
+}
+
+int bwt( Node *root, char *input ){
+	return 0;
+}
 
 int main(int argc, const char *argv[])
 {
 	
 	return argc*(int)argv;
 }
-// function definitions go here...

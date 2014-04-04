@@ -33,4 +33,12 @@ typedef struct Node{		// ananth complete
 
 /* ---------- PROTOTYPES -------- */
 // function prototypes go here...
+int suffixTree( char *input, char *alphabet );
+
+int bfs( Node *root );
+
+int dfs( Node *root );
+
+int bwt( Node *root, char *input );
+
 #endif
