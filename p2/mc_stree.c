@@ -20,15 +20,52 @@
 /* ---------- FUNCTION DEFS ----- */
 
 
-int makeNode( ){
-	return 0;
+Node *makeNode( unsigned int id, Node *parent,
+		char *parentEdgeLabel, unsigned int nodeDepth){
+	Node *newnode = (Node *)malloc(sizeof(Node));
+	newnode->id = id;
+	newnode->suffixLink = newnode;
+	newnode->parent = parent == NULL ? newnode : parent;
+	if( parentEdgeLabel != NULL)
+		newnode->parentEdgeLabel = malloc(strlen(parentEdgeLabel));
+
+	strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
+	newnode->numChildren = 0;
+	newnode->children = NULL;
+	newnode->nodeDepth = nodeDepth;
+	return newnode;
 }
 
-int suffixTree( char *input, char *alphabet ){
-	
-	return 0;
+
+Node *suffixTree( char *input){
+	Node *root = makeNode(0, NULL, NULL, 0);
+	Node *currentNode = root;
+	char *currentSuffix = input;
+	unsigned int nodeId=1;
+	unsigned int nodeDepth=1;
+	int i;
+	for( i=0; i<inputLen; i++ ){
+		if( currentNode->numChildren == 0 ){
+			currentNode->numChildren += 1;
+			currentNode->children[0] = makeNode(nodeId,
+					currentNode->parent,
+					currentSuffix,
+					nodeDepth);
+
+		}
+		currentSuffix++;
+	}
+	return root;
 }
 
+
+int printChildren( Node *n ){
+	int i;
+	for( i = 0; i < n->numChildren; i++ ){
+		printf("%d", n->id);
+	}
+	return 0;
+}
 
 int dfs( Node *node ){
 	int i;
@@ -43,3 +80,4 @@ int dfs( Node *node ){
 int bwt( Node *root, char *input ){
 	return 0;
 }
+

@@ -23,8 +23,8 @@ int test_display(void);
 int test_enumerate(void);
 int test_bwt(void);
 
-double double_time(timeval *atime);
-double diff_time(timeval *tstart, timeval *tstop);
+double double_time(struct timeval *atime);
+double diff_time(struct timeval *tstart, struct timeval *tstop);
 
 
 /* ---------- DEFINITIONS ------- */
@@ -64,13 +64,13 @@ int test_bwt(void)
 
 
 // convert time to some double ms
-double double_time(timeval *atime)
+double double_time(struct timeval *atime)
 {
 	return ((atime->tv_sec + (atime->tv_usec/1000000.0)) * 1000.0);
 }
 
 // get difference of time
-double diff_time(timeval *tstart, timeval *tstop)
+double diff_time(struct timeval *tstart, struct timeval *tstop)
 {
 	return (double_time(tstop) - double_time(tstart));
 }
@@ -78,7 +78,7 @@ double diff_time(timeval *tstart, timeval *tstop)
 // where it all starts
 int main (int argc, char* argv[])
 {
-	timeval tstart, tstop;
+	struct timeval tstart, tstop;
     
 	// call some data validation first
     

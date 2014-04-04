@@ -35,20 +35,26 @@ char *sbuff;
 typedef int bool;
 enum { false, true };		// get mad, this is worth it
 
+
 typedef struct Node{		// ananth complete
-	unsigned int id = 0;
-	struct Node *suffixLink = NULL;
-	struct Node *parent = NULL;
-	char *parentEdgeLabel = NULL;
-	int numChildren = 0;
-	struct Node **children = NULL;
-	int nodeDepth = 0;
+	unsigned int id;
+	struct Node *suffixLink;
+	struct Node *parent;
+	char *parentEdgeLabel;
+	int numChildren;
+	struct Node **children;
+	int nodeDepth;
 }Node;
 
 
 /* ---------- PROTOTYPES -------- */
 
-int suffixTree( char *input, char *alphabet );
+Node *makeNode( unsigned int id, Node *parent,
+				char *parentEdgeLabel, unsigned int nodeDepth);
+
+Node *suffixTree( char *input);
+
+int printChildren( Node *n );
 
 int dfs( Node *node );
 
