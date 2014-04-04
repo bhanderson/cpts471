@@ -29,6 +29,9 @@
 int alphabetLen;
 int inputLen;
 
+char *abuff;
+char *sbuff;
+
 typedef int bool;
 enum { false, true };		// get mad, this is worth it
 
