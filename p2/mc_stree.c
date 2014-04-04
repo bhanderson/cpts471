@@ -21,7 +21,7 @@
 
 
 Node *makeNode( unsigned int id, Node *parent,
-		char *parentEdgeLabel, unsigned int nodeDepth){
+		char *parentEdgeLabel, unsigned int stringDepth){
 	Node *newnode = (Node *)malloc(sizeof(Node));
 	newnode->id = id;
 	newnode->suffixLink = newnode;
@@ -32,28 +32,69 @@ Node *makeNode( unsigned int id, Node *parent,
 	strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
 	newnode->numChildren = 0;
 	newnode->children = NULL;
-	newnode->nodeDepth = nodeDepth;
+	newnode->depth = stringDepth;
 	return newnode;
 }
 
 
-Node *suffixTree( char *input){
-	Node *root = makeNode(0, NULL, NULL, 0);
-	Node *currentNode = root;
-	char *currentSuffix = input;
-	unsigned int nodeId=1;
-	unsigned int nodeDepth=1;
-	int i;
-	for( i=0; i<inputLen; i++ ){
-		if( currentNode->numChildren == 0 ){
-			currentNode->numChildren += 1;
-			currentNode->children[0] = makeNode(nodeId,
-					currentNode->parent,
-					currentSuffix,
-					nodeDepth);
+int stringDepth(Node *u){
+	Node *temp = u;
+	int length = 0;
+	while( temp->parent != NULL ){
+		length+= strlen(temp->parentEdgeLabel);
+		temp = temp->parent;
+	}
+	return length;
+}
+
+
+int identifyCase(Node *root, Node *u){
+	if( u->suffixLink != NULL && u != root ) // case IA
+		return 0;
+	if( u->suffixLink != NULL && u == root ) // case IB
+		return 1;
+	if ( u->suffixLink == NULL && u->parent != root ) // case IIA
+		return 2;
+	if ( u->suffixLink == NULL && u->parent == root ) // case IIB
+		return 3;
+	return -1;
+}
+
+
+Node *insert( char *suffix, Node *root, Node *leaf ){
+	Node *u = leaf->parent;
+	int c = identifyCase( root, u );
+	switch(c){
+		case 0: // IA
+		{
+			unsigned int k = u->depth;
+			break;
+		}
+		case 1:
+		{
 
 		}
-		currentSuffix++;
+		case 2:
+		{
+
+		}
+		case 3:
+		{
+
+		}
+		default:
+			break;
+	}
+	return u;
+}
+
+
+Node *suffixTree( char *input ){
+	Node *root = makeNode(0, NULL, NULL, 0);
+	Node *leaf = root;
+	int i;
+	for( i=1; i <= inputLen; i++ ){
+		leaf = insert( &input[i], root, leaf);
 	}
 	return root;
 }
@@ -67,14 +108,16 @@ int printChildren( Node *n ){
 	return 0;
 }
 
+
 int dfs( Node *node ){
 	int i;
 	for( i=0; (i < node->numChildren) && (node->children[i] != NULL); i++ ){
 		dfs( node->children[i] );
 	}
-	printf("%d", node->nodeDepth);
+	printf("%d", node->depth);
 	return 0;
 }
+
 
 /* Function: bwt()
  * Input:
@@ -85,8 +128,8 @@ int dfs( Node *node ){
  * Summary: Burrows Wheeler Transform. Given an input string, construct a BWT
  */
 int bwt( char *input ){
-	
-	
+
+
 	return (0);
 }
 

@@ -1,0 +1,79 @@
+mccreights( input ){
+	for i=1 to inputlen
+		insert suffix into tree starting from leaf i-1
+	output tree
+}
+
+insert ( next suffix, tree, leaf i-1 ){
+	u = parent of leaf i-1
+	case = identify case (u)
+	switch (case){
+		case == IA
+		case == IB
+		case == IIA
+		case == IIB
+		return newly inserted leaf for suffix i
+	}
+}
+
+identify case(){
+	IA	suffix link for u is known and u is not the root{
+		go from leaf i-1 to u, k = stringdepth(u)
+		take suffix link of u to v
+		find path under v{
+			match characters stargint at S[i+k-1] against characters below the
+			node v until mismatch occurs
+			if mismatch occurs immediately after an internal node{
+				create a new child under that internal node and insert the leaf
+			} else { // mismatch ends in an edge
+				break the edge
+				create a new internal node
+				spawn a new child which is the leaf i
+			}
+		}
+	}
+	IB	suffix link for u is known and u is the root{
+		go from leaf i-1 to u
+		// same as find path of case IA
+		find path(under u) by matching characters starting at s[i]
+	}
+	IIA	suffix link for u is unknown and u' is not the root{
+		from leaf i-1 go to its parent u
+		// keep a pointer to u for later suffix link assignment
+		go to u' (parent of u) and record the edge label between u' and u (b)
+		since u' != the root, take suffix link of u' to v'
+		node hops to consume (b)
+		let r = index in b
+		current node = v'
+		while(r <= |b| ){
+			e = edge under current node that starts with the character b[r]
+			if e exists then{
+				if( (|edgelabel(e)| + r) > |b|){
+					break edge e
+					make a new internal node called v
+					set suffix link u to v
+					create leaf i as new child of v
+				} else if( (|edgelabel(e)| + r) == |b| ){
+					let v be the node at the end of e
+					set suffix link u to v
+					find path under v for matching characters starting at
+					s[i+k-1] where k = stringdepth(u)
+				} else { // (|edgelabel(e)| + r) < |b|
+					r = r + |edgelabel(e)|
+					currentnode = currentnode->child pointed by edge e
+					continue;
+				}
+			}
+		}
+	}
+	IIB	suffix link for u is unknown and u' is the root{
+		from leaf i-1 climb up to u
+		from u climb up to u' and let b = edgelabel from u' to u
+		since u' is also the root suffix link(u') = u' = v'
+		and since |b|>= 1 let us rewrite b = x b' where x is the 1st character
+		in b and b' is the remaining part of b
+		there should already exist a path labelled b' under the root
+		node hop for path b' under the root and insert suffix i under the root
+		exactly following the steps in 4 of case IIa
+	}
+}

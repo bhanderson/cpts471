@@ -43,16 +43,23 @@ typedef struct Node{		// ananth complete
 	char *parentEdgeLabel;
 	int numChildren;
 	struct Node **children;
-	int nodeDepth;
+	unsigned int depth;
 }Node;
 
 
 /* ---------- PROTOTYPES -------- */
 
 Node *makeNode( unsigned int id, Node *parent,
-				char *parentEdgeLabel, unsigned int nodeDepth);
+				char *parentEdgeLabel, unsigned int stringDepth);
+
+int stringDepth(Node *u);
+
+int identifyCase(Node *root, Node *u);
+
+Node *insert( char *suffix, Node *root, Node *leaf);
 
 Node *suffixTree( char *input);
+
 
 int printChildren( Node *n );
 
