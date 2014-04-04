@@ -11,88 +11,34 @@
  *      and a file containing the input alphabet.
  */
 
-
-/* ---------- INCLUDES ---------- */
 #ifndef _MC_STREE_H_
 #define _MC_STREE_H_
-#include <cctype>
-#include <cstdio>
-#include <string>
-#include <vector>
-using namespace std;
-#include <ctime>
 
-#include <fstream>
-#include <iostream>
-#include <string>
+
+/* ---------- INCLUDES ---------- */
 
 
 /* ---------- DEFINITIONS ------- */
 
 // classes and other defs go here...
 
-class Node{
-	unsigned int id;
-	Node *link;
-	Node *parent;
-	string parent_edge_label;
-	vector<Node*> children;
-	int depth;
+typedef struct Node{		// ananth complete
+	unsigned int id;	
+	struct Node *suffixLink;
+	struct Node *parent;
+	char *parentEdgeLabel;	
+	struct Node **children;
+	int nodeDepth;
+}Node;
 
-};
-
-class Edge {
-	int fist_char_index;
-	int last_char_index;
-	Node *end_node;
-	Node *start_node;
-	public:
-		Edge();
-		Edge( int first, int last, Node *parent );
-		int SplitEdge();
-};
-
-class Tree{
-	public:
-		Node *root;
-		~Tree( );
-		Tree( );
-		Tree( string sequence, string alphabet );
-		string print_children();
-		string DFS( Node *u );
-		string BWT_index( string s );
-	private:
-		string sequence;
-		string alphabet;
-};
-
-// destructor
-Tree::~Tree( ){
-
-}
-
-Tree::Tree( ){
-	root = new Node;
-}
-
-// constructor
-Tree::Tree( string sequence, string alphabet ){
-}
-/* ---------- PROTOTYPES -------- */
-
-
-string print_children(){
-
-}
-
-string DFS( Node *u ){
-
-}
-
-string BWT_index( string s ){
-
-}
 /* ---------- PROTOTYPES -------- */
 // function prototypes go here...
+int suffixTree( char *input, char *alphabet );
+
+int bfs( Node *root );
+
+int dfs( Node *root );
+
+int bwt( Node *root, char *input );
 
 #endif
