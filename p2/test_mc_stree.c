@@ -11,7 +11,7 @@
 
 /* ---------- INCLUDES ---------- */
 
-#include "mc_stree.cpp"
+#include "mc_stree.c"
 
 #include <sys/time.h>
 
