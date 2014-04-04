@@ -35,9 +35,3 @@ int dfs( Node *root ){
 int bwt( Node *root, char *input ){
 	return 0;
 }
-
-int main(int argc, const char *argv[])
-{
-	
-	return argc*(int)argv;
-}
