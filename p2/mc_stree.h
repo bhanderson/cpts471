@@ -27,17 +27,19 @@
 /* ---------- DEFINITIONS ------- */
 
 int alphabetLen;
+int inputLen;
 
 typedef int bool;
 enum { false, true };		// get mad, this is worth it
 
 typedef struct Node{		// ananth complete
-	unsigned int id;	
-	struct Node *suffixLink;
-	struct Node *parent;
-	char *parentEdgeLabel;	
-	struct Node **children;
-	int nodeDepth;
+	unsigned int id = 0;
+	struct Node *suffixLink = NULL;
+	struct Node *parent = NULL;
+	char *parentEdgeLabel = NULL;
+	int numChildren = 0;
+	struct Node **children = NULL;
+	int nodeDepth = 0;
 }Node;
 
 
@@ -45,9 +47,7 @@ typedef struct Node{		// ananth complete
 
 int suffixTree( char *input, char *alphabet );
 
-int bfs( Node *root );
-
-int dfs( Node *root );
+int dfs( Node *node );
 
 int bwt( Node *root, char *input );
 
