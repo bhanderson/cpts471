@@ -76,8 +76,17 @@ int dfs( Node *node ){
 	return 0;
 }
 
-
-int bwt( Node *root, char *input ){
-	return 0;
+/* Function: bwt()
+ * Input:
+ * 		*input: char poninter to beginning of string/array buffer
+ * 		iLen: int length of input string
+ * Output:
+ * 		int: returns 0 for success, -1 for failure
+ * Summary: Burrows Wheeler Transform. Given an input string, construct a BWT
+ */
+int bwt( char *input ){
+	
+	
+	return (0);
 }
 
