@@ -17,10 +17,17 @@
 
 /* ---------- INCLUDES ---------- */
 
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>   	// for getting file size
+
 
 /* ---------- DEFINITIONS ------- */
 
-// classes and other defs go here...
+typedef int bool;
+enum { false, true };		// get mad, this is worth it
 
 typedef struct Node{		// ananth complete
 	unsigned int id;	
@@ -31,8 +38,9 @@ typedef struct Node{		// ananth complete
 	int nodeDepth;
 }Node;
 
+
 /* ---------- PROTOTYPES -------- */
-// function prototypes go here...
+
 int suffixTree( char *input, char *alphabet );
 
 int bfs( Node *root );
@@ -41,4 +49,4 @@ int dfs( Node *root );
 
 int bwt( Node *root, char *input );
 
-#endif
+#endif	// _MC_STREE_H_
