@@ -47,7 +47,7 @@ int dfs( Node *node ){
  * 		int: returns 0 for success, -1 for failure
  * Summary: Burrows Wheeler Transform. Given an input string, construct a BWT
  */
-int bwt( char *input, int inLen ){
+int bwt( char *input ){
 	
 	
 	return (0);
