@@ -26,6 +26,8 @@
 
 /* ---------- DEFINITIONS ------- */
 
+int alphabetLen;
+
 typedef int bool;
 enum { false, true };		// get mad, this is worth it
 
