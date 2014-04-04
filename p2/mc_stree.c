@@ -20,17 +20,16 @@
 /* ---------- FUNCTION DEFS ----- */
 
 int suffixTree( char *input, char *alphabet ){
-	return 0;
+	
+	return (0);
 }
 
 
 int bfs( Node *root ){
-	
 	return 0;
 }
 
 int dfs( Node *root ){
-	
 	return 0;
 }
 
