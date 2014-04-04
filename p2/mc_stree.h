@@ -20,10 +20,16 @@
 #include <string>
 #include <vector>
 using namespace std;
+#include <ctime>
+
+#include <fstream>
+#include <iostream>
+#include <string>
 
 
 /* ---------- DEFINITIONS ------- */
 
+// classes and other defs go here...
 
 class Node{
 	unsigned int id;
@@ -71,9 +77,9 @@ Tree::Tree( ){
 
 // constructor
 Tree::Tree( string sequence, string alphabet ){
-
-
 }
+/* ---------- PROTOTYPES -------- */
+
 
 string print_children(){
 
@@ -87,5 +93,6 @@ string BWT_index( string s ){
 
 }
 /* ---------- PROTOTYPES -------- */
+// function prototypes go here...
 
 #endif

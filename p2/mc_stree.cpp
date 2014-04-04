@@ -17,7 +17,7 @@
 #include "mc_stree.h"
 
 
-/* ---------- DEFINITIONS ------- */
+/* ---------- FUNCTION DEFS ----- */
 
 
 
@@ -27,3 +27,4 @@ int main(int argc, const char *argv[])
 {
 	return 0;
 }
+// function definitions go here...
