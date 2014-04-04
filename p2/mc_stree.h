@@ -30,7 +30,7 @@ int alphabetLen;
 int inputLen;
 
 char *abuff;
-char *sbuff;
+char *ibuff;
 
 typedef int bool;
 enum { false, true };		// get mad, this is worth it
@@ -52,6 +52,6 @@ int suffixTree( char *input, char *alphabet );
 
 int dfs( Node *node );
 
-int bwt( Node *root, char *input );
+int bwt( char *input );
 
 #endif	// _MC_STREE_H_

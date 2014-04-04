@@ -20,7 +20,7 @@
 
 int test_construction(void);
 int test_display(void);
-int test_enumerate(void);
+int test_dfs(void);
 int test_bwt(void);
 
 double double_time(timeval *atime);
@@ -49,7 +49,7 @@ int test_display(void)
 }
 
 // run enumerate
-int test_enumerate(void)
+int test_dfs(void)
 {
 	// enumerate()
 	return (0);
@@ -93,7 +93,7 @@ int main (int argc, char* argv[])
 	// diff_time(&start, &stop) // in ms
 
 	gettimeofday(&tstart, NULL);
-	// test_enumerate()
+	test_dfs();
 	gettimeofday(&tstop, NULL);
 	// diff_time(&start, &stop) // in ms
 
