@@ -1,7 +1,7 @@
 /*
  * Author:      Bryce Handerson (bhanderson)
  *              Andrew M Bates (abates09 | andrewbates09)
- * File:        mc_stree.cpp
+ * File:        mc_stree.c
  * Project:     CptS 471 - Project 2
  * Due:         April 04, 2014
  * 
@@ -25,6 +25,7 @@
 
 int main(int argc, const char *argv[])
 {
-	return 0;
+	
+	return argc*(int)argv;
 }
 // function definitions go here...
