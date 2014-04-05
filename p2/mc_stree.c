@@ -204,7 +204,13 @@ int dfs( Node *node ){
  * Summary: Burrows Wheeler Transform. Given an input string, construct a BWT
  */
 int bwt( Node *node ){
-
+	int i;
+	for( i=0; (i < node->numChildren) && (node->children[i] != NULL); i++ ){
+		dfs( node->children[i] );
+		// check children
+		// check end bwt
+	}
+	printf("%d", node->);
 
 	return (0);
 }
