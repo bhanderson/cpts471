@@ -37,9 +37,66 @@ Node *makeNode( unsigned int id, Node *parent,
 }
 
 int findPath(Node *n, char *suffix){
-	int i, j;
-	char *current;
-	bool mismatch = false;
+	int i, j, k;
+	Node *current = NULL;
+//
+//at node current check all children's first char
+//at the child 
+
+	for (i=0; i < n->numChildren; i++){
+		if (n->children[i]->parentEdgeLabel[0] == suffix[0]){
+			current = n->children[i];
+		}
+	}
+	
+	if ( current==NULL ){ // no child matches, make a new child leaf
+		n->children[n->numChildren] = makeNode( (suffix - ibuff) +1,
+			n, suffix, (n->depth + strlen(&suffix[i])));
+		n->numChildren++;
+	} else { // a child matches!! edge split....
+		for(j=0; j < (int)strlen(suffix); j++){
+			if ( current->parentEdgeLabel[j] != suffix[j] ){
+				// copy prefix of current node into temp array for internal node
+				char prefix[j];
+				for( k=0; k < j; k++){
+					prefix[k] = suffix[j];
+				}
+				Node *newInode = makeNode( inputLen + inodes + 1,
+					current->parent, prefix, current->parent->depth + j);
+				inodes++;
+				newInode->children[0] = current;
+				newInode->numChildren++;
+
+				char *childEdge = malloc( sizeof(char)*strlen(current->parentEdgeLabel) -j);
+				memcpy(childEdge, &current->parentEdgeLabel[j], (strlen(current->parentEdgeLabel) - j));
+				free(current->parentEdgeLabel);
+				current->parentEdgeLabel = childEdge;
+				current->parent = newInode;
+
+				Node *newLeaf = makeNode( (suffix - ibuff - 1), newInode,
+					&suffix[j], (strlen(&suffix[j]) + newInode->depth));
+				newInode->children[1] = newLeaf;
+				newInode->numChildren++;
+				// sort the children
+			}
+		}
+	}
+/*
+	for ( i = 0; i < (int)strlen(suffix); i++ ){
+		for ( j = 0; j <= n->numChildren; j++ ){
+			current = &n->children[i]->parentEdgeLabel[j];
+			if ( n->children[j] == NULL ){ // create a new child
+				n->children[n->numChildren] = makeNode( (suffix - ibuff) + 1, // pointer math +1 because root is 0
+														n,
+														suffix,
+														(n->depth + strlen(&suffix[i])));
+				n->numChildren++;
+				return 0;
+			}
+		}
+	}
+
+
 	for( i=0; i < n->numChildren && !mismatch; i++){
 		for( j=0; j < (int)strlen(n->children[i]->parentEdgeLabel) && !mismatch; j++ ){
 			current = &n->children[i]->parentEdgeLabel[j];
@@ -50,6 +107,7 @@ int findPath(Node *n, char *suffix){
 		}
 	}
 	// cannot find a child that matches a 
+	*/
 	return (int)n;
 }
 

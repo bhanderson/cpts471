@@ -26,8 +26,9 @@
 
 /* ---------- DEFINITIONS ------- */
 
-int alphabetLen;
-int inputLen;
+int alphabetLen = 0;
+int inputLen = 0;
+int inodes = 0;
 
 char *abuff;
 char *ibuff;
@@ -50,7 +51,7 @@ typedef struct Node{		// ananth complete
 /* ---------- PROTOTYPES -------- */
 
 Node *makeNode( unsigned int id, Node *parent,
-				char *parentEdgeLabel, unsigned int stringDepth);
+				char *parentEdgeLabel, unsigned int Depth);
 
 int findPath(Node *n, char *suffix);
 
