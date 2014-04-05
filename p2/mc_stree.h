@@ -52,6 +52,8 @@ typedef struct Node{		// ananth complete
 Node *makeNode( unsigned int id, Node *parent,
 				char *parentEdgeLabel, unsigned int stringDepth);
 
+int findPath(Node *n, char *suffix);
+
 int stringDepth(Node *u);
 
 int identifyCase(Node *root, Node *u);

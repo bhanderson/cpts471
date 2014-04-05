@@ -36,6 +36,22 @@ Node *makeNode( unsigned int id, Node *parent,
 	return newnode;
 }
 
+int findPath(Node *n, char *suffix){
+	int i, j;
+	char *current;
+	bool mismatch = false;
+	for( i=0; i < n->numChildren && !mismatch; i++){
+		for( j=0; j < (int)strlen(n->children[i]->parentEdgeLabel) && !mismatch; j++ ){
+			current = &n->children[i]->parentEdgeLabel[j];
+			if( *current != suffix[j] )
+				break;
+			// else
+			
+		}
+	}
+	// cannot find a child that matches a 
+	return (int)n;
+}
 
 int stringDepth(Node *u){
 	Node *temp = u;
@@ -68,6 +84,9 @@ Node *insert( char *suffix, Node *root, Node *leaf ){
 		case 0: // IA
 		{
 			unsigned int k = u->depth;
+			u = u->suffixLink;
+			findpath(u);
+
 			break;
 		}
 		case 1:

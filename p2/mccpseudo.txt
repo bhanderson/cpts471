@@ -21,7 +21,7 @@ identify case(){
 		go from leaf i-1 to u, k = stringdepth(u)
 		take suffix link of u to v
 		find path under v{
-			match characters stargint at S[i+k-1] against characters below the
+			match characters starting at S[i+k-1] against characters below the
 			node v until mismatch occurs
 			if mismatch occurs immediately after an internal node{
 				create a new child under that internal node and insert the leaf
