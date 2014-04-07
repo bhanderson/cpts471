@@ -12,6 +12,7 @@
 /* ---------- INCLUDES ---------- */
 
 #include "mc_stree.c"
+#include "mc_stree.h"
 
 #include <sys/time.h>
 
@@ -20,6 +21,11 @@
 
 int test_construction(void);
 int test_display(void);
+int test_findPath(void);
+int test_IA(void);
+int test_IB(void);
+int test_IIA(void);
+int test_IIB(void);
 int test_dfs(void);
 int test_bwt(void);
 
@@ -46,6 +52,37 @@ int test_display(void)
 {
 	// display()
 	return (0);
+}
+
+int test_findPath(void){
+	Node *root = makeNode( 0, NULL, NULL, 0 );
+	Node *banana = makeNode( 1, root, "banana$", 7);
+	addChild(root, banana);
+	Node *anana = makeNode( 2, root, "anana$", 6);
+	addChild(root, anana);
+	Node *nana = makeNode( 3, root, "nana$", 5);
+	addChild(root, nana);
+	findPath(root, "ana$");
+
+	return (0);
+}
+
+int test_IA(void){
+	Node *root = makeNode( 0, NULL, NULL, 0 );
+	Node *a = makeNode( 8, root, "a", 1);
+	addChild(root, a);
+	a->suffixLink = root;
+	Node *na = makeNode( 11, root, "na", 2);
+	na->suffixLink = a;
+	addChild(root, na);
+	Node *ana = makeNode( 9, a, "na", 3);
+	addChild(a, ana);
+	Node *dollar = makeNode( 10, a, "$", 2);
+	addChild(a, dollar);
+
+	insert( "nana", root, ana);
+
+	return 0;
 }
 
 // run enumerate
@@ -76,12 +113,17 @@ double diff_time(struct timeval *tstart, struct timeval *tstop)
 }
 
 // where it all starts
-int main (int argc, char* argv[])
+int main (/*int argc, char* argv[]*/)
 {
 	struct timeval tstart, tstop;
-    
 	// call some data validation first
     
+	gettimeofday(&tstart, NULL);
+	//test_findPath();
+	test_IA();
+	gettimeofday(&tstop, NULL);
+	// diff_time(&start, &stop) // in ms
+
 	gettimeofday(&tstart, NULL);
 	// test_construction()
 	gettimeofday(&tstop, NULL);

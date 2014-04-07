@@ -50,6 +50,8 @@ typedef struct Node{		// ananth complete
 
 /* ---------- PROTOTYPES -------- */
 
+int addChild( Node *parent, Node *child);
+
 Node *makeNode( unsigned int id, Node *parent,
 				char *parentEdgeLabel, unsigned int Depth);
 
