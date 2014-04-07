@@ -223,16 +223,19 @@ int dfs( Node *node ){
  * Output:
  * 		int: returns 0 for success, -1 for failure
  * Summary: Burrows Wheeler Transform. Given an input string, construct a BWT
+ * 		and print it out.  Basically, go to leafs and find representative val.
  */
 int bwt( Node *node ){
 	int i;
 	for( i=0; (i < node->numChildren) && (node->children[i] != NULL); i++ ){
 		dfs( node->children[i] );
-		// check children
-		// check end bwt
 	}
-	//printf("%d", node->);
-
+	if (node->numChildren == 0)
+	{
+		int bwtval;
+		bwtval = inputLen - node->id;
+		printf("%c", (bwtval > 0 ? ibuff[bwtval - 1] : ibuff[inputLen - 1]));
+	}
 	return (0);
 }
 
