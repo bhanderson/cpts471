@@ -70,6 +70,6 @@ int printChildren( Node *n );
 
 int dfs( Node *node );
 
-int bwt( char *input );
+int bwt( Node *node );
 
 #endif	// _MC_STREE_H_

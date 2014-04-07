@@ -127,22 +127,22 @@ int main (/*int argc, char* argv[]*/)
 	gettimeofday(&tstart, NULL);
 	// test_construction()
 	gettimeofday(&tstop, NULL);
-	// diff_time(&start, &stop) // in ms
+	printf("ST Constructon: %d ms\n", diff_time(&tstart, &tstop));
     
 	gettimeofday(&tstart, NULL);
 	// test_display()
 	gettimeofday(&tstop, NULL);
-	// diff_time(&start, &stop) // in ms
+	printf("ST Display: %d ms\n", diff_time(&tstart, &tstop));
 
 	gettimeofday(&tstart, NULL);
 	test_dfs();
 	gettimeofday(&tstop, NULL);
-	// diff_time(&start, &stop) // in ms
+	printf("ST DFS: %d ms\n", diff_time(&tstart, &tstop));
 
 	gettimeofday(&tstart, NULL);
 	// test_bwt()
 	gettimeofday(&tstop, NULL);
-	// diff_time(&start, &stop) // in ms
+	printf("ST BWT: %d ms\n", diff_time(&tstart, &tstop));
 
 	return (0);
 }
