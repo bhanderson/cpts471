@@ -22,6 +22,7 @@ int addChild( Node *parent, Node *child){
 	parent->children = realloc(parent->children, parent->numChildren +1 * (sizeof(Node *)));
 	parent->children[parent->numChildren] = child;
 	parent->numChildren++;
+	child->parent = parent;
 	// sort the children
 	int i,j;
 	Node *temp;
@@ -85,16 +86,16 @@ Node *findPath(Node *n, char *suffix){
 						current->parent, prefix, current->parent->depth + j);
 				inodes++;
 				addChild(newInode, current);
+				newInode->parent->children[i] = newInode;
 
 				char *childEdge = malloc( sizeof(char)*strlen(current->parentEdgeLabel) -j);
 				memcpy(childEdge, &current->parentEdgeLabel[j], (strlen(current->parentEdgeLabel) - j));
 				free(current->parentEdgeLabel);
 				current->parentEdgeLabel = childEdge;
-				current->parent = newInode;
 
-				current = makeNode( (suffix - ibuff - 1), newInode,
+				Node *newLeaf = makeNode( (suffix - ibuff - 1), newInode,
 						&suffix[j], (strlen(&suffix[j]) + newInode->depth));
-				addChild(newInode, current);
+				addChild(newInode, newLeaf);
 			}
 		}
 	}
