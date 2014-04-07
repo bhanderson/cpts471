@@ -56,11 +56,16 @@ int test_display(void)
 
 int test_findPath(void){
 	Node *root = makeNode( 0, NULL, NULL, 0 );
-	findPath(root, "banana$");
-	findPath(root, "anana$");
-	findPath(root, "nana$");
-	findPath(root, "ana$");
+	ibuff = "banana$";
+	findPath(root, &ibuff[0]);
+	findPath(root, &ibuff[1]);
+	findPath(root, &ibuff[2]);
+	findPath(root, &ibuff[3]);
+	findPath(root, &ibuff[4]);
+	findPath(root, &ibuff[5]);
+	findPath(root, &ibuff[6]);
 	printChildren(root);
+	dfs(root);
 
 	return (0);
 }

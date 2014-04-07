@@ -18,7 +18,7 @@
 
 
 /* ---------- FUNCTION DEFS ----- */
-int addChild( Node *parent, Node *child){
+int addChild( Node *parent, Node *child ){
 	parent->children = realloc(parent->children, parent->numChildren +1 * (sizeof(Node *)));
 	parent->children[parent->numChildren] = child;
 	parent->numChildren++;
@@ -39,8 +39,9 @@ int addChild( Node *parent, Node *child){
 	return 0;
 }
 
+
 Node *makeNode( unsigned int id, Node *parent,
-		char *parentEdgeLabel, unsigned int stringDepth){
+		char *parentEdgeLabel, unsigned int stringDepth ){
 	Node *newnode = (Node *)malloc(sizeof(Node));
 	newnode->id = id;
 	newnode->suffixLink = NULL;
@@ -56,53 +57,67 @@ Node *makeNode( unsigned int id, Node *parent,
 	return newnode;
 }
 
-Node *findPath(Node *n, char *suffix){
-	int i, j, k;
-	Node *current = NULL;
-	//at node current check all children's first char
-	//at the child 
 
-	for (i=0; i <= n->numChildren && n->numChildren > 0; i++){
-		current = n->children[i];
-		if (!current || current->parentEdgeLabel[0] == suffix[0]){
-			break;
+Node *matchChild( Node *n, char *suffix, int *i ){
+	Node *current = NULL;
+	//at node n check all children's first char
+	//at the child 
+	for (; *i < n->numChildren && n->numChildren > 0; *i+=1){
+		current = n->children[*i];
+		if (current->parentEdgeLabel[0] == suffix[0]){
+			return current;
 		}
 	}
+	return NULL;
+}
 
+
+Node *splitEdge( Node *current, char *suffix, int *i ){
+	int j, k;
+	for(j=0; j < (int)strlen(suffix); j++){
+		if ( current->parentEdgeLabel[j] != suffix[j] ){
+			// copy prefix of current node into temp array for internal node
+			char prefix[j+1];
+			for( k=0; k < j; k++){
+				prefix[k] = suffix[k];
+			}
+			prefix[k]=0;
+			Node *newInode = makeNode( inputLen + inodes + 1,
+					current->parent, prefix, current->parent->depth + j);
+			inodes++;
+			addChild(newInode, current);
+			newInode->parent->children[*i] = newInode;
+
+			char *childEdge = malloc( sizeof(char)*strlen(current->parentEdgeLabel) -j);
+			memcpy(childEdge, &current->parentEdgeLabel[j], (strlen(current->parentEdgeLabel) - j));
+			free(current->parentEdgeLabel);
+			current->parentEdgeLabel = childEdge;
+
+			Node *newLeaf = makeNode( (suffix - ibuff - 1), newInode,
+					&suffix[j], (strlen(&suffix[j]) + newInode->depth));
+			addChild(newInode, newLeaf);
+			return newLeaf;
+		}
+	}
+	return NULL;
+}
+
+
+Node *findPath( Node *n, char *suffix ){
+	int i = 0;
+	Node *current = matchChild(n, suffix, &i);
 	if ( current==NULL ){ // no child matches, make a new child leaf
 		Node *current = makeNode( (suffix - ibuff) +1, // pointer math for id
 				n, suffix, (n->depth + strlen(&suffix[i])));
 		addChild(n, current);
 	} else { // a child matches!! edge split....
-		for(j=0; j < (int)strlen(suffix); j++){
-			if ( current->parentEdgeLabel[j] != suffix[j] ){
-				// copy prefix of current node into temp array for internal node
-				char prefix[j+1];
-				for( k=0; k < j; k++){
-					prefix[k] = suffix[k];
-				}
-				prefix[k]=0;
-				Node *newInode = makeNode( inputLen + inodes + 1,
-						current->parent, prefix, current->parent->depth + j);
-				inodes++;
-				addChild(newInode, current);
-				newInode->parent->children[i] = newInode;
-
-				char *childEdge = malloc( sizeof(char)*strlen(current->parentEdgeLabel) -j);
-				memcpy(childEdge, &current->parentEdgeLabel[j], (strlen(current->parentEdgeLabel) - j));
-				free(current->parentEdgeLabel);
-				current->parentEdgeLabel = childEdge;
-
-				Node *newLeaf = makeNode( (suffix - ibuff - 1), newInode,
-						&suffix[j], (strlen(&suffix[j]) + newInode->depth));
-				addChild(newInode, newLeaf);
-			}
-		}
+		current = splitEdge(current, suffix, &i);
 	}
 	return current;
 }
 
-int stringDepth(Node *u){
+
+int stringDepth( Node *u ){
 	Node *temp = u;
 	int length = 0;
 	while( temp->parent != NULL ){
@@ -113,7 +128,7 @@ int stringDepth(Node *u){
 }
 
 
-int identifyCase(Node *root, Node *u){
+int identifyCase( Node *root, Node *u ){
 	if( u->suffixLink != NULL && u != root ) // case IA
 		return 0;
 	if( u->suffixLink != NULL && u == root ) // case IB
@@ -185,6 +200,7 @@ Node *suffixTree( void ){
 	return root;
 }
 
+
 int printChildrenLabels( Node *n ){
 	int i;
 	if (n->parentEdgeLabel == NULL)
@@ -198,6 +214,7 @@ int printChildrenLabels( Node *n ){
 	return 0;
 }
 
+
 int printChildren( Node *n ){
 	int i;
 	for( i = 0; i < n->numChildren; i++ ){
@@ -208,12 +225,8 @@ int printChildren( Node *n ){
 
 
 int dfs( Node *node ){
-	int i;
-	for( i=0; (i < node->numChildren) && (node->children[i] != NULL); i++ ){
-		dfs( node->children[i] );
-	}
-	printf("%d", node->depth);
-	return 0;
+	// andrew pls
+	return (int)node;
 }
 
 
@@ -235,4 +248,3 @@ int bwt( Node *node ){
 
 	return (0);
 }
-

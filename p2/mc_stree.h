@@ -50,23 +50,26 @@ typedef struct Node{		// ananth complete
 
 /* ---------- PROTOTYPES -------- */
 
-int addChild( Node *parent, Node *child);
+int addChild( Node *parent, Node *child );
 
 Node *makeNode( unsigned int id, Node *parent,
-				char *parentEdgeLabel, unsigned int Depth);
+				char *parentEdgeLabel, unsigned int Depth );
 
-Node *findPath(Node *n, char *suffix);
+Node *matchChild( Node *n, char *suffix, int *i );
 
-int stringDepth(Node *u);
+Node *splitEdge( Node *current, char *suffix, int *i );
 
-int identifyCase(Node *root, Node *u);
+Node *findPath( Node *n, char *suffix );
 
-//Node *insert( char *suffix, Node *root, Node *leaf);
-Node *insert( int i, Node *root, Node *leaf);
+int stringDepth( Node *u );
 
-//Node *suffixTree( char *input);
+int identifyCase( Node *root, Node *u );
+
+Node *insert( int i, Node *root, Node *leaf );
+
 Node *suffixTree( void );
 
+int printChildrenLabels( Node *n );
 
 int printChildren( Node *n );
 
