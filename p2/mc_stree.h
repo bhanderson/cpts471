@@ -55,15 +55,17 @@ int addChild( Node *parent, Node *child);
 Node *makeNode( unsigned int id, Node *parent,
 				char *parentEdgeLabel, unsigned int Depth);
 
-int findPath(Node *n, char *suffix);
+Node *findPath(Node *n, char *suffix);
 
 int stringDepth(Node *u);
 
 int identifyCase(Node *root, Node *u);
 
-Node *insert( char *suffix, Node *root, Node *leaf);
+//Node *insert( char *suffix, Node *root, Node *leaf);
+Node *insert( int i, Node *root, Node *leaf);
 
-Node *suffixTree( char *input);
+//Node *suffixTree( char *input);
+Node *suffixTree( void );
 
 
 int printChildren( Node *n );

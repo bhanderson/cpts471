@@ -56,13 +56,11 @@ int test_display(void)
 
 int test_findPath(void){
 	Node *root = makeNode( 0, NULL, NULL, 0 );
-	Node *banana = makeNode( 1, root, "banana$", 7);
-	addChild(root, banana);
-	Node *anana = makeNode( 2, root, "anana$", 6);
-	addChild(root, anana);
-	Node *nana = makeNode( 3, root, "nana$", 5);
-	addChild(root, nana);
+	findPath(root, "banana$");
+	findPath(root, "anana$");
+	findPath(root, "nana$");
 	findPath(root, "ana$");
+	printChildren(root);
 
 	return (0);
 }
@@ -80,7 +78,7 @@ int test_IA(void){
 	Node *dollar = makeNode( 10, a, "$", 2);
 	addChild(a, dollar);
 
-	insert( "nana", root, ana);
+	//insert( "nana", root, ana);
 
 	return 0;
 }
@@ -119,30 +117,30 @@ int main (/*int argc, char* argv[]*/)
 	// call some data validation first
     
 	gettimeofday(&tstart, NULL);
-	//test_findPath();
-	test_IA();
+	test_findPath();
+	//test_IA();
 	gettimeofday(&tstop, NULL);
 	// diff_time(&start, &stop) // in ms
 
 	gettimeofday(&tstart, NULL);
 	// test_construction()
 	gettimeofday(&tstop, NULL);
-	printf("ST Constructon: %d ms\n", diff_time(&tstart, &tstop));
+	printf("ST Constructon: %f ms\n", diff_time(&tstart, &tstop));
     
 	gettimeofday(&tstart, NULL);
 	// test_display()
 	gettimeofday(&tstop, NULL);
-	printf("ST Display: %d ms\n", diff_time(&tstart, &tstop));
+	printf("ST Display: %f ms\n", diff_time(&tstart, &tstop));
 
 	gettimeofday(&tstart, NULL);
 	test_dfs();
 	gettimeofday(&tstop, NULL);
-	printf("ST DFS: %d ms\n", diff_time(&tstart, &tstop));
+	printf("ST DFS: %f ms\n", diff_time(&tstart, &tstop));
 
 	gettimeofday(&tstart, NULL);
 	// test_bwt()
 	gettimeofday(&tstop, NULL);
-	printf("ST BWT: %d ms\n", diff_time(&tstart, &tstop));
+	printf("ST BWT: %f ms\n", diff_time(&tstart, &tstop));
 
 	return (0);
 }
