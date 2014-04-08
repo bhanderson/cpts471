@@ -224,9 +224,30 @@ int printChildren( Node *n ){
 }
 
 
+/* Function: bwt()
+ * Input:
+ * 		*node: pointer to node in tree
+ * Output:
+ * 		int: returns 0 for success, -1 for failure
+ * Summary: Depth First Search (preorder). Enumerate  nodes using DFS traversal.
+ * 		This is a top down style. Print 
+ */
 int dfs( Node *node ){
-	// andrew pls
-	return (int)node;
+	printf("Depth: %d\t", node->depth);
+	printf("NID: %d\t", node->id);
+	
+	if ( parent != NULL ) {
+		printf("Parent: %d\t", node->parent->id);
+	}
+	
+	printf("SL: nope\n"); //, node->suffixLink);
+	
+	int i;
+	for ( i = 0; i < numChildren; ++i;)
+	{
+		return ( dfs(children[i]) );
+	}
+	
 }
 
 
