@@ -22,6 +22,7 @@
 int test_construction(void);
 int test_display(void);
 int test_findPath(void);
+int test_nodeHop(void);
 int test_IA(void);
 int test_IB(void);
 int test_IIA(void);
@@ -57,6 +58,7 @@ int test_display(void)
 int test_findPath(void){
 	Node *root = makeNode( 0, NULL, NULL, 0 );
 	ibuff = "banana$";
+	inputLen = strlen(ibuff);
 	findPath(root, &ibuff[0]);
 	findPath(root, &ibuff[1]);
 	findPath(root, &ibuff[2]);
@@ -68,6 +70,14 @@ int test_findPath(void){
 	dfs(root);
 
 	return (0);
+}
+int test_nodeHop(void){
+	Node *root = makeNode( 0, NULL, NULL, 0 );
+	ibuff = "hijkl$";
+	inputLen = strlen(ibuff);
+	findPath(root, ibuff);
+
+	return 0;
 }
 
 int test_IA(void){

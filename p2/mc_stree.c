@@ -4,7 +4,7 @@
  * File:        mc_stree.c
  * Project:     CptS 471 - Project 2
  * Due:         April 04, 2014
- * 
+ *
  * Notes:
  * The goal of this project is to implement the McCreight's suffix tree con-
  *      struction algorithm, given an input string s (in the FASTA file format)
@@ -61,7 +61,7 @@ Node *makeNode( unsigned int id, Node *parent,
 Node *matchChild( Node *n, char *suffix, int *i ){
 	Node *current = NULL;
 	//at node n check all children's first char
-	//at the child 
+	//at the child
 	for (; *i < n->numChildren && n->numChildren > 0; *i+=1){
 		current = n->children[*i];
 		if (current->parentEdgeLabel[0] == suffix[0]){
@@ -140,6 +140,19 @@ int identifyCase( Node *root, Node *u ){
 	return -1;
 }
 
+Node *nodeHop(Node *n, char *beta){
+	int i = 0;
+	Node *a = matchChild(n, beta, &i);
+	if( a == NULL){
+		return n;
+	}
+	if( strlen(a->parentEdgeLabel) < strlen(beta)){
+		return nodeHop(a, &beta[strlen(a->parentEdgeLabel)]);
+	}
+	return n;
+
+}
+
 
 Node *insert( int i, Node *root, Node *leaf ){
 	Node *u = leaf->parent;
@@ -162,7 +175,7 @@ Node *insert( int i, Node *root, Node *leaf ){
 			}
 			// IIA suffix link for u is unknown and uprime is not the root
 		case 2:
-			{/*
+			{
 				Node *uPrime = u->parent;
 				char beta[strlen(u->parentEdgeLabel)];
 				strncpy(beta, u->parentEdgeLabel, strlen(u->parentEdgeLabel));
@@ -170,7 +183,7 @@ Node *insert( int i, Node *root, Node *leaf ){
 				unsigned int k = vPrime->depth;
 				// node hops to consume beta
 				findPath(vPrime, &ibuff[(k-1)]);
-				*/
+
 			}
 			// IIB suffix link for u is unknown and u' is the root
 		case 3:
