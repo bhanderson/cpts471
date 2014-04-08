@@ -108,7 +108,7 @@ Node *findPath( Node *n, char *suffix ){
 	Node *current = matchChild(n, suffix, &i);
 	if ( current==NULL ){ // no child matches, make a new child leaf
 		Node *current = makeNode( (suffix - ibuff) +1, // pointer math for id
-				n, suffix, (n->depth + strlen(&suffix[i])));
+				n, suffix, (n->depth + strlen(suffix)));
 		addChild(n, current);
 	} else { // a child matches!! edge split....
 		current = splitEdge(current, suffix, &i);
@@ -243,24 +243,22 @@ int printChildren( Node *n ){
  * Output:
  * 		int: returns 0 for success, -1 for failure
  * Summary: Depth First Search (preorder). Enumerate  nodes using DFS traversal.
- * 		This is a top down style. Print 
+ * 		This is a top down style. Print
  */
 int dfs( Node *node ){
 	printf("Depth: %d\t", node->depth);
 	printf("NID: %d\t", node->id);
-	
-	if ( parent != NULL ) {
+	if ( node != NULL ) {
 		printf("Parent: %d\t", node->parent->id);
+		printf("EdgeLabel: %s\t", node->parentEdgeLabel);
 	}
-	
 	printf("SL: nope\n"); //, node->suffixLink);
-	
 	int i;
-	for ( i = 0; i < numChildren; ++i;)
+	for ( i = 0; i < node->numChildren; ++i)
 	{
-		return ( dfs(children[i]) );
+		dfs(node->children[i]);
 	}
-	
+	return 0;
 }
 
 

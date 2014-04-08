@@ -4,7 +4,7 @@
  * File:        test_mc_stree.cpp
  * Project:     CptS 471 - Project 2
  * Due:         April 04, 2014
- * 
+ *
  * Notes:
  * This is the testing driver for Project 2
  */
@@ -66,7 +66,7 @@ int test_findPath(void){
 	findPath(root, &ibuff[4]);
 	findPath(root, &ibuff[5]);
 	findPath(root, &ibuff[6]);
-	printChildren(root);
+//	printChildren(root);
 	dfs(root);
 
 	return (0);
@@ -130,7 +130,7 @@ int main (/*int argc, char* argv[]*/)
 {
 	struct timeval tstart, tstop;
 	// call some data validation first
-    
+
 	gettimeofday(&tstart, NULL);
 	test_findPath();
 	//test_IA();
@@ -141,7 +141,7 @@ int main (/*int argc, char* argv[]*/)
 	// test_construction()
 	gettimeofday(&tstop, NULL);
 	printf("ST Constructon: %f ms\n", diff_time(&tstart, &tstop));
-    
+
 	gettimeofday(&tstart, NULL);
 	// test_display()
 	gettimeofday(&tstop, NULL);
