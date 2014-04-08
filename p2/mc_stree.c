@@ -93,7 +93,7 @@ Node *splitEdge( Node *current, char *suffix, int *i ){
 			free(current->parentEdgeLabel);
 			current->parentEdgeLabel = childEdge;
 
-			Node *newLeaf = makeNode( (suffix - ibuff - 1), newInode,
+			Node *newLeaf = makeNode( (suffix - ibuff) + 1, newInode,
 					&suffix[j], (strlen(&suffix[j]) + newInode->depth));
 			addChild(newInode, newLeaf);
 			return newLeaf;
