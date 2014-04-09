@@ -140,17 +140,21 @@ int identifyCase( Node *root, Node *u ){
 	return -1;
 }
 
-Node *nodeHop(Node *n, char *beta){
-	int i = 0;
-	Node *a = matchChild(n, beta, &i);
+// given a node and a suffix find the end of the suffix by traversing down
+Node *nodeHop( Node *n, char *beta ){
+	int numChild = 0, i = 0;
+	Node *a = matchChild(n, beta, &numChild);
+	// if there isnt a child that matches return that node
 	if( a == NULL){
 		return n;
 	}
-	if( strlen(a->parentEdgeLabel) < strlen(beta)){
-		return nodeHop(a, &beta[strlen(a->parentEdgeLabel)]);
+	for( i = 0; i < (int)strlen(beta) && i < (int)strlen(a->parentEdgeLabel); i++){
+		if( beta[i] != a->parentEdgeLabel[i] ){
+			return n;
+		}
 	}
-	return n;
-
+	// not an ending leaf and the for loop has gone through the string
+	return nodeHop( a, &beta[i]);
 }
 
 
@@ -195,6 +199,7 @@ Node *insert( int i, Node *root, Node *leaf ){
 
 			}
 		default:
+			findPath(root, &ibuff[i]);
 			break;
 	}
 	return u;

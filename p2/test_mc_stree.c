@@ -73,9 +73,16 @@ int test_findPath(void){
 }
 int test_nodeHop(void){
 	Node *root = makeNode( 0, NULL, NULL, 0 );
-	ibuff = "hijkl$";
+	ibuff = "hhhhhh$";
 	inputLen = strlen(ibuff);
 	findPath(root, ibuff);
+	findPath(root, &ibuff[1]);
+	findPath(root, &ibuff[2]);
+	findPath(root, &ibuff[3]);
+	findPath(root, &ibuff[4]);
+	findPath(root, &ibuff[5]);
+	findPath(root, &ibuff[6]);
+	nodeHop(root, "hhh$");
 
 	return 0;
 }
@@ -132,8 +139,9 @@ int main (/*int argc, char* argv[]*/)
 	// call some data validation first
 
 	gettimeofday(&tstart, NULL);
-	test_findPath();
+	//test_findPath();
 	//test_IA();
+	test_nodeHop();
 	gettimeofday(&tstop, NULL);
 	// diff_time(&start, &stop) // in ms
 
