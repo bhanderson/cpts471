@@ -168,12 +168,14 @@ int setUp(const char ** argv) {
 			inchar = fgetc(inputfile);
 		}
 	} while (inchar != EOF); /*ibytes > 0 && */
+	ibuff[inputLen] = '$';
+	inputLen++;
 	ibuff[inputLen] = '\0';
 
 	// read in alphabet
 	do {
 		inchar = fgetc(alphafile);
-		if (inchar != ' ' && inchar != '\n') {
+		if (inchar != ' ' && inchar != '\n' && inchar != EOF) {
 			abuff[alphabetLen] = inchar;
 			++alphabetLen;
 		}
@@ -321,6 +323,7 @@ int main (int argc, const char *argv[])
 	//test_findPath();
 	//test_IA();
 	//test_nodeHop();
+	suffixTree();
 	gettimeofday(&tstop, NULL);
 	// diff_time(&start, &stop) // in ms
 
