@@ -14,10 +14,18 @@
 #include "mc_stree.c"
 #include "mc_stree.h"
 
+#include <errno.h>
+#include <sys/stat.h>
+#include <sys/sysinfo.h>
 #include <sys/time.h>
-
+#include <sys/types.h>
 
 /* ---------- PROTOTYPES -------- */	// testing driver prototypes go here...
+
+long long getPhysMem();
+long long getVertMem();
+
+int validateArgs( const int argc, const char **argv );
 
 int test_construction(void);
 int test_display(void);
@@ -36,10 +44,108 @@ double diff_time(struct timeval *tstart, struct timeval *tstop);
 
 /* ---------- DEFINITIONS ------- */
 
-
+struct sysinfo memInfo;
 
 
 /* ---------- FUNCTION DEFS ----- */	// testing driver function definitions go here...
+
+// get total physical memory used
+long long getPhysMem() {
+	return (0);
+}
+
+// get total virtual memory used
+long long getVirtMem() {
+	return (0);
+}
+
+// validate user input to continue, etc..
+// return 0 for success, -1 for failure
+int validateArgs(const int argc, const char **argv) {
+	if (argc < 3) {
+		printf("\nERROR: Please check your input.\n");
+		printf("Format: <test executable> <input fasta> <input alphabet>\n\n");
+		return -1;
+	}
+	
+	printf("\nPlease verify the following information:\n\n");
+	printf("Input File:\t%s\n", argv[1]);
+	printf("Input Alph:\t%s\n", argv[2]);
+	
+	printf("\nIf any of this is wrong, press Ctrl+C to panic.\nOtherwise press ENTER to continue...");
+	getchar();
+	return (0);
+}
+
+// 
+int setUp(const char ** argv) {
+	
+	char *inputname[64];
+	char *alphaname[64];
+	
+	struct stat input_st;
+	struct stat alpha_st;
+	
+	stat(argv[1], &input_st);
+	stat(argv[2], &alpha_st);
+	
+	unsigned int input_size = input_st.st_size;
+	unsigned int alpha_size = alpha_st.st_size;
+	
+	strcpy(inputname, argv[1]);
+	strcpy(alphaname, argv[2]);
+	
+	FILE *inputfile;
+	FILE *alphafile;
+	
+	if ((inputfile = fopen(inputname, "r")) == NULL) {
+		if (errno == ENOENT) {
+			printf("\nERROR: No sequence file found.\n");
+			return -1;
+		}
+		else {
+			printf("\nERROR: Unhandled sequence read error.\n");
+			return -1;
+		}
+	}
+	
+	if ((alphafile = fopen(alphaname, "r")) == NULL) {
+		if (errno == ENOENT) {
+			printf("\nERROR: No sequence file found.\n");
+			return -1;
+		}
+		else {
+			printf("\nERROR: Unhandled sequence read error.\n");
+			return -1;
+		}
+	}
+
+	ibuff = (char*)malloc(input_size);
+	if (ibuff == NULL) {
+		printf("\nERROR: Cannot allocate memory for sequence.\n");
+		return -1;
+	}
+	
+	abuff = (char*)malloc(alpha_size);
+	if (abuff == NULL) {
+		printf("\nERROR: Cannot allocate memory for alphabet.\n");
+		return -1;
+	}
+	
+	unsigned int i, a = 0;
+	
+	int ibytes = input_size;
+	int abytes = alpha_size;
+	char ichar = '\0';
+	
+	// will do read in.
+	
+	fclose(inputfile);
+	fclose(alphafile);
+	
+	return (0);
+}
+
 
 // run construction
 int test_construction(void)
@@ -133,15 +239,32 @@ double diff_time(struct timeval *tstart, struct timeval *tstop)
 }
 
 // where it all starts
-int main (/*int argc, char* argv[]*/)
+int main (int argc, const char *argv[])
 {
 	struct timeval tstart, tstop;
+	
+	long long startPMem, constructPMem, displayPMem, dfsPMem, bwtPMem = 0;
+	long long startVMem, constructVMem, displayVMem, dfsVMem, bwtVMem = 0;
+	
+	// set initial memory usage - to do comparisons of everything else
+	startPMem = getPhysMem();
+	startVMem = getVirtMem();
+	
 	// call some data validation first
-
+	if (validateArgs(argc, argv) < 0) {
+		return -1;
+	}
+	
+	// read in stuf if all validation went correctly
+	if (setUp(argv) < 0) {
+		printf("\nERROR: something went wrong.\n");
+		return -1;
+	}
+	
 	gettimeofday(&tstart, NULL);
 	//test_findPath();
 	//test_IA();
-	test_nodeHop();
+	//test_nodeHop();
 	gettimeofday(&tstop, NULL);
 	// diff_time(&start, &stop) // in ms
 
@@ -156,7 +279,7 @@ int main (/*int argc, char* argv[]*/)
 	printf("ST Display: %f ms\n", diff_time(&tstart, &tstop));
 
 	gettimeofday(&tstart, NULL);
-	test_dfs();
+	// test_dfs();
 	gettimeofday(&tstop, NULL);
 	printf("ST DFS: %f ms\n", diff_time(&tstart, &tstop));
 
