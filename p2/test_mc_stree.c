@@ -68,37 +68,37 @@ int validateArgs(const int argc, const char **argv) {
 		printf("Format: <test executable> <input fasta> <input alphabet>\n\n");
 		return -1;
 	}
-	
+
 	printf("\nPlease verify the following information:\n\n");
 	printf("Input File:\t%s\n", argv[1]);
 	printf("Input Alph:\t%s\n", argv[2]);
-	
+
 	printf("\nIf any of this is wrong, press Ctrl+C to panic.\nOtherwise press ENTER to continue...");
 	getchar();
 	return (0);
 }
 
-// 
+//
 int setUp(const char ** argv) {
-	
+
 	char *inputname[64];
 	char *alphaname[64];
-	
+
 	struct stat input_st;
 	struct stat alpha_st;
-	
+
 	stat(argv[1], &input_st);
 	stat(argv[2], &alpha_st);
-	
+
 	unsigned int input_size = input_st.st_size;
 	unsigned int alpha_size = alpha_st.st_size;
-	
+
 	strcpy(inputname, argv[1]);
 	strcpy(alphaname, argv[2]);
-	
+
 	FILE *inputfile;
 	FILE *alphafile;
-	
+
 	if ((inputfile = fopen(inputname, "r")) == NULL) {
 		if (errno == ENOENT) {
 			printf("\nERROR: No sequence file found.\n");
@@ -109,7 +109,7 @@ int setUp(const char ** argv) {
 			return -1;
 		}
 	}
-	
+
 	if ((alphafile = fopen(alphaname, "r")) == NULL) {
 		if (errno == ENOENT) {
 			printf("\nERROR: No sequence file found.\n");
@@ -126,24 +126,24 @@ int setUp(const char ** argv) {
 		printf("\nERROR: Cannot allocate memory for sequence.\n");
 		return -1;
 	}
-	
+
 	abuff = (char*)malloc(alpha_size);
 	if (abuff == NULL) {
 		printf("\nERROR: Cannot allocate memory for alphabet.\n");
 		return -1;
 	}
-	
+
 	unsigned int i, a = 0;
-	
+
 	int ibytes = input_size;
 	int abytes = alpha_size;
 	char ichar = '\0';
-	
+
 	// will do read in.
-	
+
 	fclose(inputfile);
 	fclose(alphafile);
-	
+
 	return (0);
 }
 
@@ -173,7 +173,7 @@ int test_findPath(void){
 	findPath(root, &ibuff[4]);
 	findPath(root, &ibuff[5]);
 	findPath(root, &ibuff[6]);
-//	printChildren(root);
+	//	printChildren(root);
 	dfs(root);
 
 	return (0);
@@ -258,25 +258,25 @@ double diff_time(struct timeval *tstart, struct timeval *tstop)
 int main (int argc, const char *argv[])
 {
 	struct timeval tstart, tstop;
-	
+
 	long long startPMem, constructPMem, displayPMem, dfsPMem, bwtPMem = 0;
 	long long startVMem, constructVMem, displayVMem, dfsVMem, bwtVMem = 0;
-	
+
 	// set initial memory usage - to do comparisons of everything else
 	startPMem = getPhysMem();
 	startVMem = getVirtMem();
-	
+
 	// call some data validation first
 	if (validateArgs(argc, argv) < 0) {
 		return -1;
 	}
-	
+
 	// read in stuf if all validation went correctly
 	if (setUp(argv) < 0) {
 		printf("\nERROR: something went wrong.\n");
 		return -1;
 	}
-	
+
 	gettimeofday(&tstart, NULL);
 	//test_findPath();
 	//test_IA();

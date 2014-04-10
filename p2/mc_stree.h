@@ -4,7 +4,7 @@
  * File:        mc_stree.h
  * Project:     CptS 471 - Project 2
  * Due:         April 04, 2014
- * 
+ *
  * Notes:
  * The goal of this project is to implement the McCreight's suffix tree con-
  *      struction algorithm, given an input string s (in the FASTA file format)
@@ -51,7 +51,7 @@ typedef struct Node{		// ananth complete
 int addChild( Node *parent, Node *child );
 
 Node *makeNode( unsigned int id, Node *parent,
-				char *parentEdgeLabel, unsigned int Depth );
+		char *parentEdgeLabel, unsigned int Depth );
 
 Node *matchChild( Node *n, char *suffix, int *i );
 
