@@ -31,6 +31,7 @@ int test_construction(void);
 int test_display(void);
 int test_findPath(void);
 int test_nodeHop(void);
+int test_ananthHop(void);
 int test_IA(void);
 int test_IB(void);
 int test_IIA(void);
@@ -193,6 +194,21 @@ int test_nodeHop(void){
 	return 0;
 }
 
+int test_ananthHop(void){
+	Node *root = makeNode( 0, NULL, NULL, 0 );
+	ibuff = "hhhhhh$";
+	inputLen = strlen(ibuff);
+	findPath(root, ibuff);
+	findPath(root, &ibuff[1]);
+	findPath(root, &ibuff[2]);
+	findPath(root, &ibuff[3]);
+	findPath(root, &ibuff[4]);
+	findPath(root, &ibuff[5]);
+	findPath(root, &ibuff[6]);
+	ananthHop(root, root->children[0], "hhh$", 3);
+
+	return 0;
+}
 int test_IA(void){
 	Node *root = makeNode( 0, NULL, NULL, 0 );
 	Node *a = makeNode( 8, root, "a", 1);
