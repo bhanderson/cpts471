@@ -236,6 +236,7 @@ int test_nodeHop(void){
 int test_ananthHop(void){
 	Node *root = makeNode( 0, NULL, NULL, 0 );
 	ibuff = "hhhhhh$";
+	int ijk = 3;
 	inputLen = strlen(ibuff);
 	findPath(root, ibuff);
 	findPath(root, &ibuff[1]);
@@ -244,7 +245,7 @@ int test_ananthHop(void){
 	findPath(root, &ibuff[4]);
 	findPath(root, &ibuff[5]);
 	findPath(root, &ibuff[6]);
-	ananthHop(root, root->children[0], "hhh$", 3);
+	ananthHop(root, root->children[0], "hhh$", &ijk);
 
 	return 0;
 }
