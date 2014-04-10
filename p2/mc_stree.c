@@ -168,7 +168,6 @@ Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
 		current = matchChild( current, &b[r], &z);
 		if( current ){
 			e = current->parentEdgeLabel;
-
 			if( (strlen(e) + r) > strlen(b) ){
 				leaf = splitEdge( current, &ibuff[*i], &z);
 				Node *v = leaf->parent;
@@ -183,6 +182,7 @@ Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
 				r = r + strlen(e);
 			}
 		}
+		return NULL;
 	}
 	return leaf;
 }
@@ -200,13 +200,13 @@ Node *insert( int i, Node *root, Node *leaf ){
 				return findPath( v, &ibuff[i+k-1] );
 				break;
 			}
-		// IB suffix link for u is known and u is the root
+			// IB suffix link for u is known and u is the root
 		case 1:
 			{
 				return findPath(u, &ibuff[i]);
 				break;
 			}
-		// IIA suffix link for u is unknown and uprime is not the root
+			// IIA suffix link for u is unknown and uprime is not the root
 		case 2:
 			{
 				Node *uPrime = u->parent;
@@ -217,13 +217,18 @@ Node *insert( int i, Node *root, Node *leaf ){
 				return ananthHop(vPrime, u, beta, &i);
 				break;
 			}
-		// IIB suffix link for u is unknown and u' is the root
+			// IIB suffix link for u is unknown and u' is the root
 		case 3:
 			{
 				Node *uPrime = u->parent;
 				char *beta = u->parentEdgeLabel;
 				char *betaPrime = &beta[1];
-				return ananthHop(uPrime, u, betaPrime, &i);
+				Node *v = ananthHop(uPrime, u, betaPrime, &i);
+				if( !v ){
+					u->suffixLink = uPrime;
+					return findPath(uPrime, &ibuff[i]);
+				}
+				return v;
 				break;
 			}
 		default:
@@ -238,7 +243,7 @@ Node *suffixTree( void ){
 	root->suffixLink = root;
 	Node *leaf = root;
 	int i;
-	for( i=0; i <= inputLen; i++ ){
+	for( i=0; i < inputLen; i++ ){
 		//leaf = insert( &input[i], root, leaf);
 		leaf = insert( i, root, leaf);
 	}
