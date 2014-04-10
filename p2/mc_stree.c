@@ -161,15 +161,16 @@ Node *nodeHop( Node *n, char *beta ){
 Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
 	Node *current = vPrime;
 	Node *leaf = NULL;
+	Node *child = NULL;
 	char *e;
 	char *b = beta;
 	int r = 0, z = 0;
+	child = matchChild( current, &b[r], &z);
 	while( r <= (int)strlen(b) ){
-		current = matchChild( current, &b[r], &z);
-		if( current ){
-			e = current->parentEdgeLabel;
+		if( child ){
+			e = child->parentEdgeLabel;
 			if( (strlen(e) + r) > strlen(b) ){
-				leaf = splitEdge( current, &ibuff[*i], &z);
+				leaf = splitEdge( child, &ibuff[*i], &z);
 				Node *v = leaf->parent;
 				u->suffixLink = v;
 				return leaf;
@@ -180,6 +181,7 @@ Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
 				return leaf;
 			} else {
 				r = r + strlen(e);
+
 			}
 		}
 		return NULL;
@@ -281,7 +283,10 @@ int dfs( Node *node ){
 		printf("Parent: %d\t", node->parent->id);
 		printf("EdgeLabel: %s\t", node->parentEdgeLabel);
 	}
-	printf("SL: nope\n"); //, node->suffixLink);
+	if( node->suffixLink )
+		printf("SL->ID: %d\n", node->suffixLink->id); //, node->suffixLink);
+	else
+		printf("SL->ID: NULL\n");
 	int i;
 	for ( i = 0; i < node->numChildren; ++i)
 	{
