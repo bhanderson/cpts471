@@ -42,6 +42,7 @@ int test_bwt(void);
 double double_time(struct timeval *atime);
 double diff_time(struct timeval *tstart, struct timeval *tstop);
 
+void cleanupTime(void);
 
 /* ---------- DEFINITIONS ------- */
 
@@ -296,6 +297,12 @@ double diff_time(struct timeval *tstart, struct timeval *tstop)
 	return (double_time(tstop) - double_time(tstart));
 }
 
+// cleanup mess
+void cleanupTime(void) {
+	free(ibuff);
+	free(abuff);
+}
+
 // where it all starts
 int main (int argc, const char *argv[])
 {
@@ -346,6 +353,8 @@ int main (int argc, const char *argv[])
 	// test_bwt()
 	gettimeofday(&tstop, NULL);
 	printf("ST BWT: %f ms\n", diff_time(&tstart, &tstop));
+
+	cleanupTime();
 
 	return (0);
 }
