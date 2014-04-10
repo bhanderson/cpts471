@@ -30,6 +30,7 @@ int inodes = 0;
 
 char *abuff;
 char *ibuff;
+char iname[16];
 
 typedef int bool;
 enum { false, true };		// get mad, this is worth it

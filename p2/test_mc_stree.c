@@ -81,8 +81,8 @@ int validateArgs(const int argc, const char **argv) {
 //
 int setUp(const char ** argv) {
 
-	char *inputname[64];
-	char *alphaname[64];
+	char inputname[64];
+	char alphaname[64];
 
 	struct stat input_st;
 	struct stat alpha_st;
@@ -133,13 +133,52 @@ int setUp(const char ** argv) {
 		return -1;
 	}
 
-	unsigned int i, a = 0;
+	unsigned int i = 0;
 
 	int ibytes = input_size;
 	int abytes = alpha_size;
-	char ichar = '\0';
+	char inchar = '\0';
 
-	// will do read in.
+	// read in name of sequence
+	 do {
+		inchar = fgetc(inputfile);
+		if (inchar == '>') {
+			inchar = fgetc(inputfile);
+			while (inchar != '\n'  && inchar == '|') {
+				if (i < 15) {
+					iname[i] = inchar;
+					++i;
+				}
+				inchar = fgetc(inputfile);
+			}
+			iname[i] = '\0';
+		}
+	} while (inchar != '\n' && inchar != EOF);
+
+	// read in the sequence and ++inputLen
+	do {
+		inchar = fgetc(inputfile);
+		while (inchar != EOF) {
+			if (inchar != ' ' && inchar != '\n') {
+				ibuff[inputLen] = inchar;
+				++inputLen;
+				//++i;
+				//ibytes--;
+			}
+			inchar = fgetc(inputfile);
+		}
+	} while (inchar != EOF); /*ibytes > 0 && */
+	ibuff[inputLen] = '\0';
+
+	// read in alphabet
+	do {
+		inchar = fgetc(alphafile);
+		if (inchar != ' ' && inchar != '\n') {
+			abuff[alphabetLen] = inchar;
+			++alphabetLen;
+		}
+	} while (abytes > 0 && inchar != EOF);
+	abuff[alphabetLen] = '\0';
 
 	fclose(inputfile);
 	fclose(alphafile);
