@@ -18,6 +18,7 @@
 
 
 /* ---------- FUNCTION DEFS ----- */
+// add a child to the given node and sort the children alphabetically
 int addChild( Node *parent, Node *child ){
 	parent->children = realloc(parent->children, parent->numChildren +1 * (sizeof(Node *)));
 	parent->children[parent->numChildren] = child;
@@ -39,7 +40,7 @@ int addChild( Node *parent, Node *child ){
 	return 0;
 }
 
-
+// constructor for creating a node
 Node *makeNode( unsigned int id, Node *parent,
 		char *parentEdgeLabel, unsigned int stringDepth ){
 	Node *newnode = (Node *)malloc(sizeof(Node));
@@ -58,6 +59,7 @@ Node *makeNode( unsigned int id, Node *parent,
 }
 
 
+// find the child that matches the first character of the suffix
 Node *matchChild( Node *n, char *suffix, int *i ){
 	Node *current = NULL;
 	//at node n check all children's first char
@@ -71,7 +73,7 @@ Node *matchChild( Node *n, char *suffix, int *i ){
 	return NULL;
 }
 
-
+// split an edge to insert a node
 Node *splitEdge( Node *current, char *suffix, int *i ){
 	int j, k;
 	for(j=0; j < (int)strlen(suffix); j++){
@@ -102,7 +104,7 @@ Node *splitEdge( Node *current, char *suffix, int *i ){
 	return NULL;
 }
 
-
+// find where to input suffix given a node
 Node *findPath( Node *n, char *suffix ){
 	int i = 0;
 	Node *current = matchChild(n, suffix, &i);
@@ -116,7 +118,7 @@ Node *findPath( Node *n, char *suffix ){
 	return current;
 }
 
-
+// what is the depth of the given node
 int stringDepth( Node *u ){
 	Node *temp = u;
 	int length = 0;
@@ -127,7 +129,7 @@ int stringDepth( Node *u ){
 	return length;
 }
 
-
+// find the type of node to insert
 int identifyCase( Node *root, Node *u ){
 	if( u->suffixLink != NULL && u != root ) // case IA
 		return 0;
@@ -157,6 +159,33 @@ Node *nodeHop( Node *n, char *beta ){
 	return nodeHop( a, &beta[i]);
 }
 
+Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
+	Node *current = vPrime;
+	Node *leaf = NULL;
+	char *e;
+	char *b = beta;
+	int r = 0, z = 0;
+	while( r <= (int)strlen(b) ){
+		current = matchChild( current, &b[r], &z);
+		if( current ){
+			e = current->parentEdgeLabel;
+
+			if( (strlen(e) + r) > strlen(b) ){
+				leaf = splitEdge( current, &ibuff[*i], &z);
+				Node *v = leaf->parent;
+				u->suffixLink = v;
+
+			} else if( (strlen(e) + r) == strlen(b) ){
+				Node *v = current;
+				u->suffixLink = v;
+				leaf = findPath(v, &ibuff[*i + u->depth - 1]);
+			} else {
+				r = r + strlen(e);
+			}
+		}
+	}
+	return leaf;
+}
 
 Node *insert( int i, Node *root, Node *leaf ){
 	Node *u = leaf->parent;
@@ -174,35 +203,34 @@ Node *insert( int i, Node *root, Node *leaf ){
 			// IB suffix link for u is known and u is the root
 		case 1:
 			{
-				findPath(u, &ibuff[i]);
+				return findPath(u, &ibuff[i]);
 				break;
 			}
 			// IIA suffix link for u is unknown and uprime is not the root
 		case 2:
 			{
 				Node *uPrime = u->parent;
-				char beta[strlen(u->parentEdgeLabel)];
-				strncpy(beta, u->parentEdgeLabel, strlen(u->parentEdgeLabel));
+				//char beta[strlen(u->parentEdgeLabel)];
+				//strncpy(beta, u->parentEdgeLabel, strlen(u->parentEdgeLabel));
+				char *beta = u->parentEdgeLabel;
 				Node *vPrime = uPrime->suffixLink;
-				unsigned int k = vPrime->depth;
-				// node hops to consume beta
-				findPath(vPrime, &ibuff[(k-1)]);
-
+				return ananthHop(vPrime, u, beta, &i);
+				break;
 			}
 			// IIB suffix link for u is unknown and u' is the root
 		case 3:
 			{
-				//	Node *uPrime = u->parent;
-				//	char beta[strlen(u->parentEdgeLabel)];
-				//	strncpy(beta, u->parentEdgeLabel, strlen(u->parentEdgeLabel));
-				//Node *vPrime = uPrime->suffixLink;
-
+				Node *uPrime = u->parent;
+				char *beta = u->parentEdgeLabel;
+				char *betaPrime = &beta[1];
+				return ananthHop(uPrime, u, betaPrime, &i);
+				break;
 			}
 		default:
-			findPath(root, &ibuff[i]);
+			return findPath(root, &ibuff[i]);
 			break;
 	}
-	return u;
+	return NULL;
 }
 
 
@@ -242,14 +270,6 @@ int printChildren( Node *n ){
 }
 
 
-/* Function: bwt()
- * Input:
- * 		*node: pointer to node in tree
- * Output:
- * 		int: returns 0 for success, -1 for failure
- * Summary: Depth First Search (preorder). Enumerate  nodes using DFS traversal.
- * 		This is a top down style. Print
- */
 int dfs( Node *node ){
 	printf("Depth: %d\t", node->depth);
 	printf("NID: %d\t", node->id);

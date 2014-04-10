@@ -65,6 +65,8 @@ int stringDepth( Node *u );
 
 int identifyCase( Node *root, Node *u );
 
+Node *ananthHop( Node *vPrime, Node *u, char *beta, int *i);
+
 Node *insert( int i, Node *root, Node *leaf );
 
 Node *suffixTree( void );
