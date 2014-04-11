@@ -22,10 +22,9 @@
 
 /* ---------- PROTOTYPES -------- */	// testing driver prototypes go here...
 
-long long getPhysMem();
-long long getVertMem();
+long long getMemUsage();
 
-int validateArgs( const int argc, const char **argv );
+int validateArgs(const int argc, const char **argv);
 
 int test_construction(void);
 int test_display(void);
@@ -51,14 +50,26 @@ struct sysinfo memInfo;
 
 /* ---------- FUNCTION DEFS ----- */	// testing driver function definitions go here...
 
-// get total physical memory used
-long long getPhysMem() {
-	return (0);
-}
+// get total physical memory used in Kib
+long long getMemUsage() {
+	int info = sysinfo(&memInfo);
+	if (info == EFAULT)
+	{
+		printf("\nERROR: Invalid system info call.");
+		return -1;
+	}
 
-// get total virtual memory used
-long long getVirtMem() {
-	return (0);
+	long long physMemUsed = memInfo.totalram;
+	physMemUsed -= memInfo.freeram;
+	physMemUsed *= (memInfo.mem_unit / 1024);
+	//printf("PRAM:\t%llu\n", physMemUsed);
+
+	long long virtMemUsed = memInfo.totalswap;;
+	virtMemUsed -= memInfo.freeswap;
+	virtMemUsed *= (memInfo.mem_unit / 1024);
+	//printf("VRAM:\t%llu\n", virtMemUsed);
+
+	return (physMemUsed + virtMemUsed);
 }
 
 // validate user input to continue, etc..
@@ -308,12 +319,10 @@ int main (int argc, const char *argv[])
 {
 	struct timeval tstart, tstop;
 
-	long long startPMem, constructPMem, displayPMem, dfsPMem, bwtPMem = 0;
-	long long startVMem, constructVMem, displayVMem, dfsVMem, bwtVMem = 0;
+	long long startMem, setupMem, constructMem, displayMem, dfsMem, bwtMem = 0;
 
-	// set initial memory usage - to do comparisons of everything else
-	startPMem = getPhysMem();
-	startVMem = getVirtMem();
+	// set initial memory usage
+	startMem = getMemUsage();
 
 	// call some data validation first
 	if (validateArgs(argc, argv) < 0) {
@@ -321,40 +330,56 @@ int main (int argc, const char *argv[])
 	}
 
 	// read in stuf if all validation went correctly
+	gettimeofday(&tstart, NULL);
 	if (setUp(argv) < 0) {
 		printf("\nERROR: something went wrong.\n");
 		return -1;
 	}
+	gettimeofday(&tstop, NULL);
+	setupMem = getMemUsage();
+	
+	printf("\nInput memory time: \t%f (ms)\n", diff_time(&tstart, &tstop));
+	printf("Input memory space:\t%llu (Kib)\n", setupMem - startMem);
+	printf("Press ENTER to continue...");
+	getchar();
 
 	gettimeofday(&tstart, NULL);
 	//test_findPath();
 	//test_IA();
 	//test_nodeHop();
-	suffixTree();
+	//suffixTree();
 	gettimeofday(&tstop, NULL);
 	// diff_time(&start, &stop) // in ms
 
+	// suffix tree construction
 	gettimeofday(&tstart, NULL);
-	// test_construction()
+	test_construction();
 	gettimeofday(&tstop, NULL);
-	printf("ST Constructon: %f ms\n", diff_time(&tstart, &tstop));
+	printf("ST Construction Time: %f ms\n", diff_time(&tstart, &tstop));
+	printf("ST Construction Space: \tllu\n", constructMem - );
 
+	// suffix tree dispaly
 	gettimeofday(&tstart, NULL);
-	// test_display()
+	test_display();
 	gettimeofday(&tstop, NULL);
 	printf("ST Display: %f ms\n", diff_time(&tstart, &tstop));
 
+	// depth first search
 	gettimeofday(&tstart, NULL);
-	// test_dfs();
+	test_dfs();;
 	gettimeofday(&tstop, NULL);
 	printf("ST DFS: %f ms\n", diff_time(&tstart, &tstop));
 
+	// burrows wheeler transform
 	gettimeofday(&tstart, NULL);
 	// test_bwt()
 	gettimeofday(&tstop, NULL);
 	printf("ST BWT: %f ms\n", diff_time(&tstart, &tstop));
 
 	cleanupTime();
+
+	//printf("PRAM:\t%llu\n", getPhysMem());
+	//printf("VRAM:\t%llu\n", getVirtMem());
 
 	return (0);
 }
