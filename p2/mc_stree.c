@@ -73,10 +73,15 @@ Node *matchChild( Node *n, char *suffix, int *i ){
 }
 
 // split an edge to insert a node
+// make this recursive yo
 Node *splitEdge( Node *current, char *suffix, int *i ){
 	int j, k;
 	for(j=0; j < (int)strlen(suffix); j++){
-		if ( j >= (int)strlen(current->parentEdgeLabel) ){
+		if ( current->parentEdgeLabel[j] == '\0'){ // >= (int)strlen(current->parentEdgeLabel) ){
+			Node *temp = matchChild(current, &suffix[j], i);
+			if (temp){
+				return splitEdge(temp, &suffix[j], i);
+			}
 			Node *child = makeNode( (&suffix[j] - ibuff) + 1, current,
 									&suffix[j], (strlen(&suffix[j]) + current->depth));
 			addChild(current, child);
