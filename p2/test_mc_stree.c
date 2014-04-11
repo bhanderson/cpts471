@@ -357,9 +357,9 @@ int main (int argc, const char *argv[])
 	gettimeofday(&tstart, NULL);
 	test_construction();
 	gettimeofday(&tstop, NULL);
-	constructionMem = getMemUsage();
+	constructMem = getMemUsage();
 	printf("ST Construction Time: %f ms\n", diff_time(&tstart, &tstop));
-	printf("ST Construction Space: \tllu\n", constructMem - startMem);
+	printf("ST Construction Space: \t%llu\n", constructMem - startMem);
 
 	// suffix tree dispaly
 	gettimeofday(&tstart, NULL);
