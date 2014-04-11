@@ -56,7 +56,7 @@ Node *makeNode( unsigned int id, Node *parent,
 
 Node *matchChild( Node *n, char *suffix, int *i );
 
-Node *splitEdge( Node *current, char *suffix, int *i );
+Node *splitEdge( Node *current, char *suffix);
 
 Node *findPath( Node *n, char *suffix );
 
