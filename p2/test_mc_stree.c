@@ -348,6 +348,7 @@ int main (int argc, const char *argv[])
 	//test_IA();
 	//test_nodeHop();
 	//suffixTree();
+	dfs(suffixTree());
 	gettimeofday(&tstop, NULL);
 	// diff_time(&start, &stop) // in ms
 

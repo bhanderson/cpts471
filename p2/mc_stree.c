@@ -20,7 +20,7 @@
 /* ---------- FUNCTION DEFS ----- */
 // add a child to the given node and sort the children alphabetically
 int addChild( Node *parent, Node *child ){
-	parent->children = realloc(parent->children, parent->numChildren +1 * (sizeof(Node *)));
+	//parent->children = realloc(parent->children, parent->numChildren +1 * (sizeof(Node *)));
 	parent->children[parent->numChildren] = child;
 	parent->numChildren++;
 	child->parent = parent;
@@ -52,7 +52,7 @@ Node *makeNode( unsigned int id, Node *parent,
 		strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
 	}
 	newnode->numChildren = 0;
-	newnode->children = NULL;
+	newnode->children = malloc(alphabetLen * sizeof(Node *));
 	newnode->depth = stringDepth;
 	return newnode;
 }
@@ -76,6 +76,12 @@ Node *matchChild( Node *n, char *suffix, int *i ){
 Node *splitEdge( Node *current, char *suffix, int *i ){
 	int j, k;
 	for(j=0; j < (int)strlen(suffix); j++){
+		if ( j >= (int)strlen(current->parentEdgeLabel) ){
+			Node *child = makeNode( (&suffix[j] - ibuff) + 1, current,
+									&suffix[j], (strlen(&suffix[j]) + current->depth));
+			addChild(current, child);
+			return child;
+		}
 		if ( current->parentEdgeLabel[j] != suffix[j] ){
 			// copy prefix of current node into temp array for internal node
 			char prefix[j+1];
@@ -161,15 +167,17 @@ Node *nodeHop( Node *n, char *beta ){
 Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
 	Node *current = vPrime;
 	Node *leaf = NULL;
+	Node *child = NULL;
 	char *e;
 	char *b = beta;
 	int r = 0, z = 0;
 	while( r <= (int)strlen(b) ){
-		current = matchChild( current, &b[r], &z);
-		if( current ){
-			e = current->parentEdgeLabel;
+		z = 0;
+		child = matchChild( current, &b[r], &z);
+		if( child ){
+			e = child->parentEdgeLabel;
 			if( (strlen(e) + r) > strlen(b) ){
-				leaf = splitEdge( current, &ibuff[*i], &z);
+				leaf = splitEdge( child, &ibuff[*i+r], &z);
 				Node *v = leaf->parent;
 				u->suffixLink = v;
 				return leaf;
@@ -180,9 +188,10 @@ Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
 				return leaf;
 			} else {
 				r = r + strlen(e);
+				current = current->children[z];
 			}
-		}
-		return NULL;
+		} else
+			return NULL;
 	}
 	return leaf;
 }
@@ -220,14 +229,16 @@ Node *insert( int i, Node *root, Node *leaf ){
 			// IIB suffix link for u is unknown and u' is the root
 		case 3:
 			{
+				Node *v = NULL;
 				Node *uPrime = u->parent;
 				char *beta = u->parentEdgeLabel;
 				char *betaPrime = &beta[1];
-				Node *v = ananthHop(uPrime, u, betaPrime, &i);
-				if( !v ){
+
+				if (strlen(betaPrime) == 0){
 					u->suffixLink = uPrime;
-					return findPath(uPrime, &ibuff[i]);
-				}
+					v = findPath(uPrime, &ibuff[i]);
+				} else
+					v = ananthHop(uPrime, u, betaPrime, &i);
 				return v;
 				break;
 			}
@@ -281,7 +292,10 @@ int dfs( Node *node ){
 		printf("Parent: %d\t", node->parent->id);
 		printf("EdgeLabel: %s\t", node->parentEdgeLabel);
 	}
-	printf("SL: nope\n"); //, node->suffixLink);
+	if( node->suffixLink )
+		printf("SL->ID: %d\n", node->suffixLink->id); //, node->suffixLink);
+	else
+		printf("SL->ID: NULL\n");
 	int i;
 	for ( i = 0; i < node->numChildren; ++i)
 	{
