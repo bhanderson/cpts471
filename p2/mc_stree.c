@@ -48,8 +48,11 @@ Node *makeNode( unsigned int id, Node *parent,
 	newnode->suffixLink = NULL;
 	newnode->parent = parent == NULL ? newnode : parent;
 	if( parentEdgeLabel != NULL){
-		newnode->parentEdgeLabel = calloc(1, sizeof(char) * strlen(parentEdgeLabel));
-		strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
+		//newnode->parentEdgeLabel = calloc(1, sizeof(char) * strlen(parentEdgeLabel));
+		//strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
+		newnode->parentEdgeLabel = malloc(sizeof(char) * strlen(parentEdgeLabel));
+		strcpy(newnode->parentEdgeLabel, parentEdgeLabel);
+		newnode->parentEdgeLabel[strlen(parentEdgeLabel)] = '\0';
 	}
 	newnode->numChildren = 0;
 	newnode->children = malloc(alphabetLen * sizeof(Node *));
@@ -202,6 +205,10 @@ Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
 }
 
 Node *insert( int i, Node *root, Node *leaf ){
+	if (leaf == NULL){
+		printf("ERROR Leaf returned null: i = %d",i);
+		return NULL;
+	}
 	Node *u = leaf->parent;
 	int c = identifyCase( root, u );
 	switch(c){
@@ -262,6 +269,8 @@ Node *suffixTree( void ){
 	for( i=0; i < inputLen; i++ ){
 		//leaf = insert( &input[i], root, leaf);
 		leaf = insert( i, root, leaf);
+		if (leaf == NULL)
+			return NULL;
 	}
 	return root;
 }
