@@ -337,7 +337,7 @@ int main (int argc, const char *argv[])
 	}
 	gettimeofday(&tstop, NULL);
 	setupMem = getMemUsage();
-	
+
 	printf("\nInput memory time: \t%f (ms)\n", diff_time(&tstart, &tstop));
 	printf("Input memory space:\t%llu (Kib)\n", setupMem - startMem);
 	printf("Press ENTER to continue...");
@@ -353,11 +353,13 @@ int main (int argc, const char *argv[])
 	// diff_time(&start, &stop) // in ms
 
 	// suffix tree construction
+	startMem = getMemUsage();
 	gettimeofday(&tstart, NULL);
 	test_construction();
 	gettimeofday(&tstop, NULL);
+	constructionMem = getMemUsage();
 	printf("ST Construction Time: %f ms\n", diff_time(&tstart, &tstop));
-	printf("ST Construction Space: \tllu\n", constructMem - );
+	printf("ST Construction Space: \tllu\n", constructMem - startMem);
 
 	// suffix tree dispaly
 	gettimeofday(&tstart, NULL);
