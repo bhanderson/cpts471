@@ -66,7 +66,7 @@ Node *matchChild( Node *n, char *suffix, int *i ){
 	Node *current = NULL;
 	//at node n check all children's first char
 	//at the child
-	for (; *i < n->numChildren && n->numChildren > 0; *i+=1){
+	for (*i = 0; *i < n->numChildren && n->numChildren > 0; *i+=1){
 		current = n->children[*i];
 		if (current->parentEdgeLabel[0] == suffix[0]){
 			return current;
@@ -75,10 +75,10 @@ Node *matchChild( Node *n, char *suffix, int *i ){
 	return NULL;
 }
 
-// split an edge to insert a node
-// returns new leaf created
-Node *splitEdge( Node *current, char *suffix){
-	int i, j;
+// split the current nodes parent edge with the suffix return the leaf
+Node *splitEdge( Node *current, char *suffix ){
+	int i, j, z;
+	matchChild(current->parent, suffix, &z);
 	for( i=0; i < (int)strlen(suffix); i++ ){
 		if( current->parentEdgeLabel[i] != suffix[i] ){
 			char prefix[i+1];
@@ -88,13 +88,10 @@ Node *splitEdge( Node *current, char *suffix){
 			prefix[j] = '\0';
 
 			Node *newInode = makeNode( inputLen + inodes +1,
-					current->parent, prefix, current->parent->depth + i);
+					current->parent, prefix, current->depth + i);
 			inodes++;
 			// need to set the current children to the new inodes children
 			addChild(newInode, current);
-
-			int z = 0;
-			matchChild(newInode->parent, suffix, &z);
 			newInode->parent->children[z] = newInode;
 			char *childEdge = malloc( sizeof(char) *
 					strlen(current->parentEdgeLabel) -j);
@@ -109,45 +106,7 @@ Node *splitEdge( Node *current, char *suffix){
 			return newLeaf;
 		}
 	}
-	/*	int j, k;
-		for(j=0; j < (int)strlen(suffix); j++){
-		if ( current->parentEdgeLabel[j] == '\0'){ // >= (int)strlen(current->parentEdgeLabel) ){
-		Node *temp = matchChild(current, &suffix[j], i);
-		if (temp){
-		return splitEdge(temp, &suffix[j], i);
-		}
-		Node *child = makeNode( (&suffix[j] - ibuff) + 1, current,
-		&suffix[j], (strlen(&suffix[j]) + current->depth));
-		addChild(current, child);
-		return child;
-		}
-		if ( current->parentEdgeLabel[j] != suffix[j] ){
-	// copy prefix of current node into temp array for internal node
-	char prefix[j+1];
-	for( k=0; k < j; k++){
-	prefix[k] = suffix[k];
-	}
-	prefix[k]=0;
-	Node *newInode = makeNode( inputLen + inodes + 1,
-	current->parent, prefix, current->parent->depth + j);
-	inodes++;
-	addChild(newInode, current);
-	newInode->parent->children[*i] = newInode;
-
-	char *childEdge = calloc(1, sizeof(char)*strlen(current->parentEdgeLabel) -j);
-	memcpy(childEdge, &current->parentEdgeLabel[j], (strlen(current->parentEdgeLabel) - j));
-	free(current->parentEdgeLabel);
-	current->parentEdgeLabel = childEdge;
-
-	Node *newLeaf = makeNode( (suffix - ibuff) + 1, newInode,
-	&suffix[j], (strlen(&suffix[j]) + newInode->depth));
-	addChild(newInode, newLeaf);
-	return newLeaf;
-	}
-	}
-	return NULL;
-	*/
-	return NULL;
+	return current;
 }
 
 // find where to input suffix given a node
@@ -159,7 +118,7 @@ Node *findPath( Node *n, char *suffix ){
 				n, suffix, (n->depth + strlen(suffix)));
 		addChild(n, current);
 	} else { // a child matches!! edge split....
-		current = splitEdge(current, suffix, &i);
+		current = splitEdge(current, suffix);
 	}
 	return current;
 }
@@ -189,23 +148,26 @@ int identifyCase( Node *root, Node *u ){
 }
 
 // given a node and a suffix find the end of the suffix by traversing down
-// returns the child that mismatches
+// returns the parent that mismatches
 Node *nodeHop( Node *n, char *beta ){
-	int numChild = 0, i = 0;
+	int numChild = 0, i = 0, x, y, max;
 	Node *a = matchChild(n, beta, &numChild);
 	// if there isnt a child that matches return that node
 	if( a == NULL){
 		return n;
 	}
-	for( i = 0; i < (int)strlen(beta) && i < (int)strlen(a->parentEdgeLabel); i++){
+	x = (int)strlen(beta);
+	y = (int)strlen(a->parentEdgeLabel);
+	max = x ^ ((x ^ y) & -(x < y));
+	for( i = 0; i < max; i++){
 		if( beta[i] != a->parentEdgeLabel[i] ){
-			return a;
+			return n;
 		}
 	}
 	// not an ending leaf and the for loop has gone through the string
 	return nodeHop( a, &beta[i]);
 }
-
+/*
 Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
 	Node *current = vPrime;
 	Node *leaf = NULL;
@@ -237,7 +199,7 @@ Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
 	}
 	return leaf;
 }
-
+*/
 Node *insert( int i, Node *root, Node *leaf ){
 	if (leaf == NULL){
 		printf("ERROR Leaf returned null: i = %d",i);
@@ -259,40 +221,37 @@ Node *insert( int i, Node *root, Node *leaf ){
 			// IB suffix link for u is known and u is the root
 		case 1:
 			{
-				return findPath(u, &ibuff[i]);
+				Node *n = nodeHop(u, &ibuff[i]);
+				return findPath(n, &ibuff[i]);
 				break;
 			}
 			// IIA suffix link for u is unknown and uprime is not the root
 		case 2:
 			{
 				Node *uPrime = u->parent;
-				//char beta[strlen(u->parentEdgeLabel)];
-				//strncpy(beta, u->parentEdgeLabel, strlen(u->parentEdgeLabel));
 				char *beta = u->parentEdgeLabel;
 				Node *vPrime = uPrime->suffixLink;
-				return ananthHop(vPrime, u, beta, &i);
+				Node *n = nodeHop(vPrime, beta);
+				int k = n->depth;
+				return findPath(n, &ibuff[i + k - 1]);
 				break;
 			}
 			// IIB suffix link for u is unknown and u' is the root
 		case 3:
 			{
-				Node *v = NULL;
 				Node *uPrime = u->parent;
 				char *beta = u->parentEdgeLabel;
 				char *betaPrime = &beta[1];
-
-				if (strlen(betaPrime) == 0){
-					u->suffixLink = uPrime;
-					v = findPath(uPrime, &ibuff[i]);
-				} else
-					v = ananthHop(uPrime, u, betaPrime, &i);
-				return v;
+				Node *n = nodeHop(uPrime, betaPrime);
+				Node *m = findPath(n, &ibuff[i]);
+				u->suffixLink = m;
 				break;
 			}
 		default:
 			return findPath(root, &ibuff[i]);
 			break;
 	}
+	return 0;
 }
 
 

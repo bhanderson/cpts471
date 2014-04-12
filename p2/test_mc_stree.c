@@ -31,6 +31,7 @@ int test_display(void);
 int test_findPath(void);
 int test_nodeHop(void);
 int test_ananthHop(void);
+int test_splitEdge(void);
 int test_IA(void);
 int test_IB(void);
 int test_IIA(void);
@@ -147,7 +148,7 @@ int setUp(const char ** argv) {
 
 	unsigned int i = 0;
 
-	int ibytes = input_size;
+	//int ibytes = input_size;
 	int abytes = alpha_size;
 	char inchar = '\0';
 
@@ -250,7 +251,7 @@ int test_nodeHop(void){
 int test_ananthHop(void){
 	Node *root = makeNode( 0, NULL, NULL, 0 );
 	ibuff = "hhhhhh$";
-	int ijk = 3;
+	//int ijk = 3;
 	inputLen = strlen(ibuff);
 	findPath(root, ibuff);
 	findPath(root, &ibuff[1]);
@@ -259,10 +260,21 @@ int test_ananthHop(void){
 	findPath(root, &ibuff[4]);
 	findPath(root, &ibuff[5]);
 	findPath(root, &ibuff[6]);
-	ananthHop(root, root->children[0], "hhh$", &ijk);
+	//ananthHop(root, root->children[0], "hhh$", &ijk);
 
 	return 0;
 }
+
+int test_splitEdge(void){
+	Node *root = makeNode(0, NULL, NULL, 0);
+	ibuff = "aaaaa$";
+	findPath(root, &ibuff[1]);
+	findPath(root, &ibuff[2]);
+	findPath(root, &ibuff[2]);
+	return 0;
+}
+
+
 int test_IA(void){
 	Node *root = makeNode( 0, NULL, NULL, 0 );
 	Node *a = makeNode( 8, root, "a", 1);
@@ -319,7 +331,7 @@ int main (int argc, const char *argv[])
 {
 	struct timeval tstart, tstop;
 
-	long long startMem, setupMem, constructMem, displayMem, dfsMem, bwtMem = 0;
+	long long startMem, setupMem, constructMem; //, displayMem, dfsMem, bwtMem = 0;
 
 	// set initial memory usage
 	startMem = getMemUsage();
@@ -348,6 +360,7 @@ int main (int argc, const char *argv[])
 	//test_IA();
 	//test_nodeHop();
 	//suffixTree();
+	//test_splitEdge();
 	dfs(suffixTree());
 	gettimeofday(&tstop, NULL);
 	// diff_time(&start, &stop) // in ms
