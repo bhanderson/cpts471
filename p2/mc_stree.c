@@ -55,7 +55,7 @@ Node *makeNode( unsigned int id, Node *parent,
 		newnode->parentEdgeLabel[strlen(parentEdgeLabel)] = '\0';
 	}
 	newnode->numChildren = 0;
-	newnode->children = malloc(alphabetLen * sizeof(Node *));
+	newnode->children = calloc(1, alphabetLen * sizeof(Node *));
 	newnode->depth = stringDepth;
 	return newnode;
 }
@@ -112,11 +112,12 @@ Node *splitEdge( Node *current, char *suffix ){
 // find where to input suffix given a node
 Node *findPath( Node *n, char *suffix ){
 	int i = 0;
-	Node *current = matchChild(n, suffix, &i);
+	Node *hopped = nodeHop(n, suffix);
+	Node *current = matchChild(hopped, suffix, &i);
 	if ( current==NULL ){ // no child matches, make a new child leaf
 		current = makeNode( (suffix - ibuff) +1, // pointer math for id
-				n, suffix, (n->depth + strlen(suffix)));
-		addChild(n, current);
+				hopped, suffix, (hopped->depth + strlen(suffix)));
+		addChild(hopped, current);
 	} else { // a child matches!! edge split....
 		current = splitEdge(current, suffix);
 	}
@@ -154,7 +155,7 @@ Node *nodeHop( Node *n, char *beta ){
 	Node *a = matchChild(n, beta, &numChild);
 	// if there isnt a child that matches return that node
 	if( a == NULL){
-		return n;
+		return n->parent;
 	}
 	x = (int)strlen(beta);
 	y = (int)strlen(a->parentEdgeLabel);
@@ -214,15 +215,15 @@ Node *insert( int i, Node *root, Node *leaf ){
 				//unsigned int k = u->depth;
 				Node *v = u->suffixLink;
 				unsigned int k = u->depth;
-				Node *n = nodeHop(v, &ibuff[i + k -1]);
-				return findPath( n, &ibuff[i+k-1] );
+				Node *n = nodeHop(v, &ibuff[i]);
+				return findPath( n, &ibuff[i] );
 				break;
 			}
 			// IB suffix link for u is known and u is the root
+			// WORKING DO NOT TOUCH UNLESS A KNOWN BUG
 		case 1:
 			{
-				Node *n = nodeHop(u, &ibuff[i]);
-				return findPath(n, &ibuff[i]);
+				return findPath(u, &ibuff[i]);
 				break;
 			}
 			// IIA suffix link for u is unknown and uprime is not the root
@@ -237,14 +238,13 @@ Node *insert( int i, Node *root, Node *leaf ){
 				break;
 			}
 			// IIB suffix link for u is unknown and u' is the root
+			// WORKING DO NOT TOUCH UNLESS A KNOWN BUG
 		case 3:
 			{
 				Node *uPrime = u->parent;
-				char *beta = u->parentEdgeLabel;
-				char *betaPrime = &beta[1];
-				Node *n = nodeHop(uPrime, betaPrime);
-				Node *m = findPath(n, &ibuff[i]);
-				u->suffixLink = m;
+				Node *m = findPath(uPrime, &ibuff[i]);
+				u->suffixLink = m->parent;
+				return m;
 				break;
 			}
 		default:
