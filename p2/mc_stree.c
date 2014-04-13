@@ -88,7 +88,7 @@ Node *splitEdge( Node *current, char *suffix ){
 			prefix[j] = '\0';
 
 			Node *newInode = makeNode( inputLen + inodes +1,
-					current->parent, prefix, current->depth + i);
+					current->parent, prefix, current->parent->depth + i);
 			inodes++;
 			// need to set the current children to the new inodes children
 			addChild(newInode, current);
@@ -113,13 +113,13 @@ Node *splitEdge( Node *current, char *suffix ){
 Node *findPath( Node *n, char *suffix ){
 	int i = 0;
 	Node *hopped = nodeHop(n, suffix);
-	Node *current = matchChild(hopped, suffix, &i);
+	Node *current = matchChild(hopped, &suffix[hopped->depth], &i);
 	if ( current==NULL ){ // no child matches, make a new child leaf
 		current = makeNode( (suffix - ibuff) +1, // pointer math for id
 				hopped, suffix, (hopped->depth + strlen(suffix)));
 		addChild(hopped, current);
 	} else { // a child matches!! edge split....
-		current = splitEdge(current, suffix);
+		current = splitEdge(current, &suffix[hopped->depth]);
 	}
 	return current;
 }
@@ -151,7 +151,7 @@ int identifyCase( Node *root, Node *u ){
 // given a node and a suffix find the end of the suffix by traversing down
 // returns the parent that mismatches
 Node *nodeHop( Node *n, char *beta ){
-	int numChild = 0, i = 0, x, y, max;
+	int numChild = 0, i = 0, x, y, min;
 	Node *a = matchChild(n, beta, &numChild);
 	// if there isnt a child that matches return that node
 	if( a == NULL){
@@ -159,8 +159,8 @@ Node *nodeHop( Node *n, char *beta ){
 	}
 	x = (int)strlen(beta);
 	y = (int)strlen(a->parentEdgeLabel);
-	max = x ^ ((x ^ y) & -(x < y));
-	for( i = 0; i < max; i++){
+	min = y ^ ((x ^ y) & -(x < y));
+	for( i = 0; i < min; i++){
 		if( beta[i] != a->parentEdgeLabel[i] ){
 			return n;
 		}
@@ -212,15 +212,12 @@ Node *insert( int i, Node *root, Node *leaf ){
 		// IA suffix link for u is known and u is not the root
 		case 0:
 			{
-				//unsigned int k = u->depth;
-				Node *v = u->suffixLink;
 				unsigned int k = u->depth;
-				Node *n = nodeHop(v, &ibuff[i]);
-				return findPath( n, &ibuff[i] );
+				Node *v = u->suffixLink;
+				return findPath( v, &ibuff[i + k -1] );
 				break;
 			}
 			// IB suffix link for u is known and u is the root
-			// WORKING DO NOT TOUCH UNLESS A KNOWN BUG
 		case 1:
 			{
 				return findPath(u, &ibuff[i]);
@@ -238,12 +235,16 @@ Node *insert( int i, Node *root, Node *leaf ){
 				break;
 			}
 			// IIB suffix link for u is unknown and u' is the root
-			// WORKING DO NOT TOUCH UNLESS A KNOWN BUG
 		case 3:
 			{
 				Node *uPrime = u->parent;
+				int iold = inodes;
 				Node *m = findPath(uPrime, &ibuff[i]);
-				u->suffixLink = m->parent;
+				if ( iold < inodes ){ // a new inode has been made
+					u->suffixLink = m->parent;
+				} else { // a child has been made
+					u->suffixLink = uPrime;
+				}
 				return m;
 				break;
 			}
