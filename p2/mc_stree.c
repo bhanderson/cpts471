@@ -290,6 +290,7 @@ int printChildren( Node *n ){
 }
 
 
+// depth first search - preorder
 int dfs( Node *node ){
 	printf("Depth: %d\t", node->depth);
 	printf("NID: %d\t", node->id);
@@ -306,7 +307,7 @@ int dfs( Node *node ){
 	{
 		dfs(node->children[i]);
 	}
-	return 0;
+	return (0);
 }
 
 
@@ -321,13 +322,13 @@ int dfs( Node *node ){
 int bwt( Node *node ){
 	int i;
 	for( i=0; (i < node->numChildren) && (node->children[i] != NULL); i++ ){
-		dfs( node->children[i] );
+		bwt( node->children[i] );
 	}
 	if (node->numChildren == 0)
 	{
 		int bwtval;
-		bwtval = inputLen - node->id;
-		printf("%c", (bwtval > 0 ? ibuff[bwtval - 1] : ibuff[inputLen - 1]));
+		bwtval = node->id - 1;
+		printf("%c ", (bwtval > 0 ? ibuff[bwtval-1] : ibuff[inputLen - 1]));
 	}
 	return (0);
 }
