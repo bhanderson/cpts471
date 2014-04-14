@@ -58,17 +58,17 @@ Node *makeNode( unsigned int id, Node *parent,
 
 Node *matchChild( Node *n, unsigned int suffix, unsigned int *i );
 
-Node *splitEdge( Node *current, unsigned int suffix);
+Node *splitEdge( Node *current, unsigned int suffixHead, unsigned int suffixTail);
 
-Node *findPath( Node *n, unsigned int suffix );
+Node *findPath( Node *n, unsigned int head );
 
 int stringDepth( Node *u );
 
 int identifyCase( Node *root, Node *u );
 
-Node *nodeHop( Node *n, char *beta );
+Node *nodeHop( Node *n, unsigned int head , unsigned int tail);
 
-Node *insert( int i, Node *root, Node *leaf );
+Node *insert( unsigned int i, Node *root, Node *leaf );
 
 Node *suffixTree( void );
 
