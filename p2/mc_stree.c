@@ -199,8 +199,15 @@ Node *insert( int i, Node *root, Node *leaf ){
 			{
 				Node *uPrime = u->parent;
 				Node *vPrime = uPrime->suffixLink;
+				char *beta = u->parentEdgeLabel;
+				int old = inodes;
 				Node *n = findPath(vPrime, &ibuff[i]);
-				u->suffixLink = n->parent;
+				//u->suffixLink = n->parent;
+				if ( strlen(beta) && (old < inodes) ){
+					u->suffixLink = n->parent;
+				} else {
+					u->suffixLink = uPrime;
+				}
 				return n;
 				break;
 			}
