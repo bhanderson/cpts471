@@ -90,11 +90,14 @@ Node *matchChild( Node *n, unsigned int suffix, unsigned int *i ){
 }
 
 // split the current nodes parent edge with the suffix return the leaf
-Node *splitEdge( Node *current, unsigned int suffixHead, unsigned int suffixTail ){
-	unsigned int i, z;
-	matchChild(current->parent, suffixHead, &z);
-	for( i = current->suffixHead; i < current->suffixTail; ++i ) {//(int)strlen(suffix); ++i ){
-		if( ibuff[current->suffixHead + i] != ibuff[suffixHead + i] ){
+Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
+	unsigned int i, min, x, y, z;
+	matchChild(current->parent, head, &z);
+	x = tail;
+	y = current->suffixTail;
+	min = y ^ ((x ^ y) & -(x < y));
+	for( i = current->suffixHead; i <= tail; ++i ) {//(int)strlen(suffix); ++i ){
+		if( ibuff[current->suffixHead + i] != ibuff[head + (i-current->suffixHead)] ){
 			//unsigned int prefix;
 			//char prefix[i+1];
 			//for( j=0; j < i; j++ ){
@@ -103,7 +106,7 @@ Node *splitEdge( Node *current, unsigned int suffixHead, unsigned int suffixTail
 			//prefix[j] = '\0';
 
 			Node *newInode = makeNode( inputLen + inodes +1, current->parent,
-					current->suffixHead, current->suffixHead + i,
+					current->suffixHead, current->suffixHead + i - 1,
 					current->parent->depth + i);
 			inodes++;
 			// need to set the current children to the new inodes children
@@ -118,16 +121,17 @@ Node *splitEdge( Node *current, unsigned int suffixHead, unsigned int suffixTail
 			strcpy(childEdge, &current->parentEdgeLabel[j]);
 			free(current->parentEdgeLabel);
 			current->parentEdgeLabel = childEdge;*/
-			current->suffixHead = i+1;
+			current->suffixHead += newInode->suffixTail - newInode->suffixHead + 1;
 			//current->suffixTail = current->suffixTail;
 			Node *newLeaf = makeNode( leafs,
-					newInode, suffixHead + i, suffixTail,
-					newInode->depth + suffixTail - suffixHead);
+					newInode, head + i, tail,
+					newInode->depth + tail - head);
 			leafs ++;
 			addChild(newInode, newLeaf);
 			return (newLeaf);
 		}
 	}
+	exit(1);
 	return (current);
 }
 
@@ -136,7 +140,7 @@ Node *findPath( Node *n, unsigned int head) { //}char *suffix ){
 	unsigned int i = 0;
 	unsigned int tail = inputLen -1;
 	Node *hopped = nodeHop(n, head, tail);
-	Node *current = matchChild(hopped, head, &i);
+	Node *current = matchChild(hopped, head+hopped->depth, &i);
 	if ( current==NULL ){ // no child matches, make a new child leaf
 		current = makeNode( leafs, // pointer math for id
 				hopped, head, tail, tail-head+hopped->depth);
@@ -183,12 +187,12 @@ Node *nodeHop( Node *n,unsigned int head, unsigned int tail){
 	if( a == NULL){
 		//if ( strlen(beta) == 1 )
 		//	return n;
-		return (n);
+		return (n->parent);
 	}
 	//x = (int)strlen(beta);
 	//y = (int)strlen(a->parentEdgeLabel);
 	x = tail - head;
-	y = a->suffixTail - a->suffixHead;
+	y = a->suffixTail - a->suffixHead + 1;
 	min = y ^ ((x ^ y) & -(x < y));
 	for( i = 0; i < min; i++){
 		if( ibuff[head + i] != ibuff[a->suffixHead + i] ){
@@ -231,12 +235,13 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 			// IIA suffix link for u is unknown and uprime is not the root
 		case 2:
 			{
+				unsigned int j=0;
 				Node *uPrime = u->parent;
 				Node *vPrime = uPrime->suffixLink;
-				int old = inodes;
 				Node *n = findPath(vPrime, i);
 				//u->suffixLink = n->parent;
-				if ( (u->suffixTail - u->suffixHead) && (old <= inodes) ){
+				Node *m = matchChild(vPrime, i, &j);
+				if ( !(u->suffixTail - u->suffixHead) && m ){
 					u->suffixLink = n->parent;
 				} else {
 					u->suffixLink = uPrime;
@@ -251,7 +256,7 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				//unsigned betaPrime = &u->parentEdgeLabel[1];
 				int old = inodes;
 				Node *n = findPath(uPrime, i);
-				if ( (u->suffixTail - (u->suffixHead + 1)) && (old <= inodes) ){
+				if ( (u->suffixTail - u->suffixHead) && (old < inodes) ){
 					u->suffixLink = n->parent;
 				} else {
 					u->suffixLink = uPrime;
@@ -314,7 +319,7 @@ int dfs( Node *node ){
 		printf("Parent: %d\t", node->parent->id);
 		//printf("EdgeLabel: %s\t", node->parentEdgeLabel);
 		printf("EdgeLabel: ");
-		for(i = node->suffixHead; i < node->suffixTail; i++){
+		for(i = node->suffixHead; i <= node->suffixTail; i++){
 			printf("%c", ibuff[i]);
 		}
 		printf("\t");

@@ -58,7 +58,7 @@ Node *makeNode( unsigned int id, Node *parent,
 
 Node *matchChild( Node *n, unsigned int suffix, unsigned int *i );
 
-Node *splitEdge( Node *current, unsigned int suffixHead, unsigned int suffixTail);
+Node *splitEdge( Node *current, unsigned int head, unsigned int tail);
 
 Node *findPath( Node *n, unsigned int head );
 
