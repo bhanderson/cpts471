@@ -332,3 +332,13 @@ int bwt( Node *node ){
 	}
 	return (0);
 }
+
+// free memory
+void doNotBeLikeFirefox( Node *node ) {
+	if (node) { 
+		for (int i = 0; i < node->numChildren; ++i)
+			doNotBeLikeFirefox(node->children[i]);
+		if (node->numChildren == 0)
+			free(node);
+	}
+}
