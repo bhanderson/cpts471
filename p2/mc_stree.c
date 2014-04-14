@@ -27,22 +27,24 @@ int addChild( Node *parent, Node *child ){
 	// sort the children
 	int i,j;
 	Node *temp;
-	for( i=0; i < parent->numChildren - 1; i++ ){
-		for( j=0; j < parent->numChildren - 1 - i; j++ ){
-			if( parent->children[j]->parentEdgeLabel[0] >
-					parent->children[j+1]->parentEdgeLabel[0] ){
+	for( i=0; i < parent->numChildren - 1; ++i ){
+		for( j=0; j < parent->numChildren - 1 - i; ++j ){
+			if( ibuff[parent->children[j]->suffixHead] >
+					ibuff[parent->children[j+1]->suffixHead]) {
+				/* parent->children[j]->parentEdgeLabel[0] >
+					parent->children[j+1]->parentEdgeLabel[0] ){*/
 				temp = parent->children[j+1];
 				parent->children[j+1] = parent->children[j];
 				parent->children[j] = temp;
 			}
 		}
 	}
-	return 0;
+	return (0);
 }
 
 // constructor for creating a node
 Node *makeNode( unsigned int id, Node *parent,
-		char *parentEdgeLabel, unsigned int stringDepth ){
+		unsigned int suffixHead, unsigned int suffixTail, unsigned int stringDepth ){
 	Node *newnode = (Node *)malloc(sizeof(Node));
 	if (newnode == NULL) {
 		printf("\nERROR: could not malloc new node\n");
@@ -51,7 +53,9 @@ Node *makeNode( unsigned int id, Node *parent,
 	newnode->id = id;
 	newnode->suffixLink = NULL;
 	newnode->parent = parent == NULL ? newnode : parent;
-	if( parentEdgeLabel != NULL){
+	newnode->suffixHead = suffixHead;
+	newnode->suffixTail = suffixTail;
+	/*if( parentEdgeLabel != NULL){
 		//newnode->parentEdgeLabel = calloc(1, sizeof(char) * strlen(parentEdgeLabel));
 		//strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
 		newnode->parentEdgeLabel = malloc(sizeof(char) * strlen(parentEdgeLabel));
@@ -61,69 +65,73 @@ Node *makeNode( unsigned int id, Node *parent,
 		}
 		strcpy(newnode->parentEdgeLabel, parentEdgeLabel);
 		newnode->parentEdgeLabel[strlen(parentEdgeLabel)] = '\0';
-	}
+		
+	}*/
 	newnode->numChildren = 0;
 	newnode->children = calloc(1, alphabetLen * sizeof(Node *));
-	newnode->depth = stringDepth;
-	return newnode;
+	// newnode->depth = stringDepth;
+	newnode->depth = parent->stringDepth + suffixHead - suffixTail;
+	return (newnode);
 }
 
 
 // find the child that matches the first character of the suffix
-Node *matchChild( Node *n, char *suffix, int *i ){
+Node *matchChild( Node *n, unsigned int suffix, unsigned int *i ){
 	Node *current = NULL;
 	//at node n check all children's first char
 	//at the child
 	for (*i = 0; *i < n->numChildren && n->numChildren > 0; *i+=1){
 		current = n->children[*i];
-		if (current->parentEdgeLabel[0] == suffix[0]){
-			return current;
+		if (ibuff[current->suffixHead] == ibuff[suffix]){
+			return (current);
 		}
 	}
-	return NULL;
+	return (NULL);
 }
 
 // split the current nodes parent edge with the suffix return the leaf
-Node *splitEdge( Node *current, char *suffix ){
-	int i, j, z;
+Node *splitEdge( Node *current, unsigned int suffix ){
+	unsigned int i, j, z;
 	matchChild(current->parent, suffix, &z);
-	for( i=0; i < (int)strlen(suffix); i++ ){
-		if( current->parentEdgeLabel[i] != suffix[i] ){
-			char prefix[i+1];
-			for( j=0; j < i; j++ ){
-				prefix[j] = suffix[j];
-			}
-			prefix[j] = '\0';
+	for( i = current->suffixHead; i < current->suffixTail; ++i ) {//(int)strlen(suffix); ++i ){
+		if( ibuff[current->suffixHead + i] != ibuff[suffix] ){
+			//unsigned int prefix;
+			//char prefix[i+1];
+			//for( j=0; j < i; j++ ){
+			//	prefix[j] = ibuff[suffix + j];
+			//}
+			//prefix[j] = '\0';
 
 			Node *newInode = makeNode( inputLen + inodes +1,
-					current->parent, prefix, current->parent->depth + i);
+					current->suffixHead, i, current->parent->depth + i);
 			inodes++;
 			// need to set the current children to the new inodes children
 			addChild(newInode, current);
 			newInode->parent->children[z] = newInode;
-			char *childEdge = malloc( sizeof(char) *
+			/*char *childEdge = malloc( sizeof(char) *
 					strlen(current->parentEdgeLabel) -j);
 			if (childEdge == NULL) {
 				printf("\nERROR: could not malloc childEdge in splitEdge\n");
 				exit (1);
 			}
 			strcpy(childEdge, &current->parentEdgeLabel[j]);
-			free(current->parentEdgeLabel);
+			free(current->parentEdgeLabel);*/
 			current->parentEdgeLabel = childEdge;
-
+			current->suffixHead = i;
+			current->suffixTail = current->
 			Node *newLeaf = makeNode( leafs,
 					newInode, &suffix[j],
-					(strlen(&suffix[j]) + newInode->depth));
+					(strlen(&suffix[j]) + newInode->depth ));
 			leafs ++;
 			addChild(newInode, newLeaf);
-			return newLeaf;
+			return (newLeaf);
 		}
 	}
-	return current;
+	return (current);
 }
 
 // find where to input suffix given a node
-Node *findPath( Node *n, char *suffix ){
+Node *findPath( Node *n, unsigned int suffix) { //}char *suffix ){
 	int i = 0;
 	Node *hopped = nodeHop(n, suffix);
 	Node *current = matchChild(hopped, &suffix[hopped->depth], &i);
@@ -151,15 +159,16 @@ int stringDepth( Node *u ){
 
 // find the type of node to insert
 int identifyCase( Node *root, Node *u ){
-	if( u->suffixLink != NULL && u != root ) // case IA
-		return 0;
-	if( u->suffixLink != NULL && u == root ) // case IB
-		return 1;
-	if ( u->suffixLink == NULL && u->parent != root ) // case IIA
-		return 2;
-	if ( u->suffixLink == NULL && u->parent == root ) // case IIB
-		return 3;
-	return -1;
+	if( u->suffixLink != NULL )
+		if ( u != root )			// case IA
+			return (0);
+		else 						// case IB
+			return (1);
+	else if ( u->parent != root )	// case IIA
+		return (2);
+	else							// case IIB
+		return (3);
+	return (-1);
 }
 
 // given a node and a suffix find the end of the suffix by traversing down
@@ -171,25 +180,25 @@ Node *nodeHop( Node *n, char *beta ){
 	if( a == NULL){
 		//if ( strlen(beta) == 1 )
 		//	return n;
-		return n;
+		return (n);
 	}
 	x = (int)strlen(beta);
 	y = (int)strlen(a->parentEdgeLabel);
 	min = y ^ ((x ^ y) & -(x < y));
 	for( i = 0; i < min; i++){
 		if( beta[i] != a->parentEdgeLabel[i] ){
-			return n;
+			return (n);
 		}
 	}
 	// not an ending leaf and the for loop has gone through the string
-	return nodeHop( a, &beta[i]);
+	return (nodeHop( a, &beta[i]));
 }
 
 
 Node *insert( int i, Node *root, Node *leaf ){
 	if (leaf == NULL){
 		printf("ERROR Leaf returned null: i = %d",i);
-		return NULL;
+		return (NULL);
 	}
 	Node *u = leaf->parent;
 	int c = identifyCase( root, u );
