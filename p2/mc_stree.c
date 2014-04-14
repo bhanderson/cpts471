@@ -208,9 +208,9 @@ Node *insert( int i, Node *root, Node *leaf ){
 		case 3:
 			{
 				Node *uPrime = u->parent;
-				Node *m = findPath(uPrime, &ibuff[i]);
-				u->suffixLink = uPrime;
-				return m;
+				Node *n = findPath(uPrime, &ibuff[i]);
+				u->suffixLink = n->parent;
+				return n;
 				break;
 			}
 		default:
