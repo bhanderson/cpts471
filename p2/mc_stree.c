@@ -44,6 +44,10 @@ int addChild( Node *parent, Node *child ){
 Node *makeNode( unsigned int id, Node *parent,
 		char *parentEdgeLabel, unsigned int stringDepth ){
 	Node *newnode = (Node *)malloc(sizeof(Node));
+	if (newnode == NULL) {
+		printf("\nERROR: could not malloc new node\n");
+		exit (1);
+	}
 	newnode->id = id;
 	newnode->suffixLink = NULL;
 	newnode->parent = parent == NULL ? newnode : parent;
@@ -51,6 +55,10 @@ Node *makeNode( unsigned int id, Node *parent,
 		//newnode->parentEdgeLabel = calloc(1, sizeof(char) * strlen(parentEdgeLabel));
 		//strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
 		newnode->parentEdgeLabel = malloc(sizeof(char) * strlen(parentEdgeLabel));
+		if (!newnode->parentEdgeLabel) {
+			printf("\nERROR: could not malloc new node edge label\n");
+			exit (1);
+		}
 		strcpy(newnode->parentEdgeLabel, parentEdgeLabel);
 		newnode->parentEdgeLabel[strlen(parentEdgeLabel)] = '\0';
 	}
@@ -95,6 +103,10 @@ Node *splitEdge( Node *current, char *suffix ){
 			newInode->parent->children[z] = newInode;
 			char *childEdge = malloc( sizeof(char) *
 					strlen(current->parentEdgeLabel) -j);
+			if (childEdge == NULL) {
+				printf("\nERROR: could not malloc childEdge in splitEdge\n");
+				exit (1);
+			}
 			strcpy(childEdge, &current->parentEdgeLabel[j]);
 			free(current->parentEdgeLabel);
 			current->parentEdgeLabel = childEdge;
@@ -187,9 +199,9 @@ Node *insert( int i, Node *root, Node *leaf ){
 			{
 				int k = u->depth;
 				Node *v = u->suffixLink;
-		//		if (v->id == 0)
-		//			return findPath(v, &ibuff[i]);
-		//		else
+				if (v->id == 0)
+					return findPath(v, &ibuff[i]);
+				else
 					return findPath(v, &ibuff[i + k - 1]);
 				//return findPath(v, &ibuff[i + k - 1]);
 				break;
