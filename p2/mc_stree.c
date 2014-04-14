@@ -157,9 +157,9 @@ Node *nodeHop( Node *n, char *beta ){
 	Node *a = matchChild(n, beta, &numChild);
 	// if there isnt a child that matches return that node
 	if( a == NULL){
-		if ( strlen(beta) == 1 )
-			return n;
-		return n->parent;
+		//if ( strlen(beta) == 1 )
+		//	return n;
+		return n;
 	}
 	x = (int)strlen(beta);
 	y = (int)strlen(a->parentEdgeLabel);
