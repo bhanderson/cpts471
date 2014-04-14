@@ -117,7 +117,7 @@ Node *findPath( Node *n, char *suffix ){
 	Node *current = matchChild(hopped, &suffix[hopped->depth], &i);
 	if ( current==NULL ){ // no child matches, make a new child leaf
 		current = makeNode( leafs, // pointer math for id
-				hopped, suffix, (hopped->depth + strlen(suffix)));
+				hopped, &suffix[hopped->depth], (hopped->depth + strlen(suffix)));
 		leafs++;
 		addChild(hopped, current);
 	} else { // a child matches!! edge split....
