@@ -157,6 +157,8 @@ Node *nodeHop( Node *n, char *beta ){
 	Node *a = matchChild(n, beta, &numChild);
 	// if there isnt a child that matches return that node
 	if( a == NULL){
+		if ( strlen(beta) == 1 )
+			return n;
 		return n->parent;
 	}
 	x = (int)strlen(beta);
@@ -185,7 +187,11 @@ Node *insert( int i, Node *root, Node *leaf ){
 			{
 				int k = u->depth;
 				Node *v = u->suffixLink;
-				return findPath(v, &ibuff[i + k - 1]);
+		//		if (v->id == 0)
+		//			return findPath(v, &ibuff[i]);
+		//		else
+					return findPath(v, &ibuff[i + k - 1]);
+				//return findPath(v, &ibuff[i + k - 1]);
 				break;
 			}
 			// IB suffix link for u is known and u is the root
