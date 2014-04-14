@@ -205,6 +205,7 @@ Node *nodeHop( Node *n,unsigned int head, unsigned int tail){
 
 
 Node *insert( unsigned int i, Node *root, Node *leaf ){
+	// ananth is right we are wrong
 	if (leaf == NULL){
 		printf("ERROR Leaf returned null: i = %d",i);
 		return (NULL);
@@ -219,11 +220,8 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				Node *v = u->suffixLink;
 				if (v->id == 0)
 					return (findPath(v, i));
-					//return findPath(v, &ibuff[i]);
 				else
-					return (findPath(v, i +k - 1));
-					//return findPath(v, &ibuff[i + k - 1]);
-				//return findPath(v, &ibuff[i + k - 1]);
+					return (findPath(v, i + k - 1));
 				break;
 			}
 			// IB suffix link for u is known and u is the root
