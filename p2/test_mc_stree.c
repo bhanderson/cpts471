@@ -26,18 +26,9 @@ long long getMemUsage();
 
 int validateArgs(const int argc, const char **argv);
 
-int test_construction(void);
-int test_display(void);
-int test_findPath(void);
-int test_nodeHop(void);
-int test_ananthHop(void);
-int test_splitEdge(void);
-int test_IA(void);
-int test_IB(void);
-int test_IIA(void);
-int test_IIB(void);
-int test_dfs(void);
-int test_bwt(void);
+Node * test_construction(void);
+void test_dfs(Node *node);
+void test_bwt(Node *node);
 
 double double_time(struct timeval *atime);
 double diff_time(struct timeval *tstart, struct timeval *tstop);
@@ -148,7 +139,7 @@ int setUp(const char ** argv) {
 
 	unsigned int i = 0;
 
-	//int ibytes = input_size;
+	int ibytes = input_size;
 	int abytes = alpha_size;
 	char inchar = '\0';
 
@@ -203,108 +194,27 @@ int setUp(const char ** argv) {
 
 
 // run construction
-int test_construction(void)
+Node * test_construction()
 {
 	// construct()
-	return (0);
-}
-
-// run display
-int test_display(void)
-{
-	// display()
-	return (0);
-}
-
-int test_findPath(void){
-	Node *root = makeNode( 0, NULL, NULL, 0 );
-	ibuff = "banana$";
-	inputLen = strlen(ibuff);
-	findPath(root, &ibuff[0]);
-	findPath(root, &ibuff[1]);
-	findPath(root, &ibuff[2]);
-	findPath(root, &ibuff[3]);
-	findPath(root, &ibuff[4]);
-	findPath(root, &ibuff[5]);
-	findPath(root, &ibuff[6]);
-	//	printChildren(root);
-	dfs(root);
-
-	return (0);
-}
-int test_nodeHop(void){
-	Node *root = makeNode( 0, NULL, NULL, 0 );
-	ibuff = "hhhhhh$";
-	inputLen = strlen(ibuff);
-	findPath(root, ibuff);
-	findPath(root, &ibuff[1]);
-	findPath(root, &ibuff[2]);
-	findPath(root, &ibuff[3]);
-	findPath(root, &ibuff[4]);
-	findPath(root, &ibuff[5]);
-	findPath(root, &ibuff[6]);
-	nodeHop(root, "hhh$");
-
-	return 0;
-}
-
-int test_ananthHop(void){
-	Node *root = makeNode( 0, NULL, NULL, 0 );
-	ibuff = "hhhhhh$";
-	//int ijk = 3;
-	inputLen = strlen(ibuff);
-	findPath(root, ibuff);
-	findPath(root, &ibuff[1]);
-	findPath(root, &ibuff[2]);
-	findPath(root, &ibuff[3]);
-	findPath(root, &ibuff[4]);
-	findPath(root, &ibuff[5]);
-	findPath(root, &ibuff[6]);
-	//ananthHop(root, root->children[0], "hhh$", &ijk);
-
-	return 0;
-}
-
-int test_splitEdge(void){
-	Node *root = makeNode(0, NULL, NULL, 0);
-	ibuff = "aaaaa$";
-	findPath(root, &ibuff[1]);
-	findPath(root, &ibuff[2]);
-	findPath(root, &ibuff[2]);
-	return 0;
-}
-
-
-int test_IA(void){
-	Node *root = makeNode( 0, NULL, NULL, 0 );
-	Node *a = makeNode( 8, root, "a", 1);
-	addChild(root, a);
-	a->suffixLink = root;
-	Node *na = makeNode( 11, root, "na", 2);
-	na->suffixLink = a;
-	addChild(root, na);
-	Node *ana = makeNode( 9, a, "na", 3);
-	addChild(a, ana);
-	Node *dollar = makeNode( 10, a, "$", 2);
-	addChild(a, dollar);
-
-	//insert( "nana", root, ana);
-
-	return 0;
+	return (suffixTree());
 }
 
 // run enumerate
-int test_dfs(void)
+void test_dfs(Node *node)
 {
 	// enumerate()
-	return (0);
+	int test = dfs(node);
+	//return (0);
 }
 
 // run bwt
-int test_bwt(void)
+void test_bwt(Node *node)
 {
-	// bwt()
-	return (0);
+	printf("\nBWT:\t");
+	int test = bwt(node);
+	printf("\n");
+	//return (0);
 }
 
 
@@ -331,7 +241,9 @@ int main (int argc, const char *argv[])
 {
 	struct timeval tstart, tstop;
 
-	long long startMem, setupMem, constructMem; //, displayMem, dfsMem, bwtMem = 0;
+	long long startMem, setupMem, constructMem, dfsMem, bwtMem = 0;
+
+	Node *testTree;
 
 	// set initial memory usage
 	startMem = getMemUsage();
@@ -355,43 +267,32 @@ int main (int argc, const char *argv[])
 	printf("Press ENTER to continue...");
 	getchar();
 
-	gettimeofday(&tstart, NULL);
-	//test_findPath();
-	//test_IA();
-	//test_nodeHop();
-	//suffixTree();
-	//test_splitEdge();
-	dfs(suffixTree());
-	gettimeofday(&tstop, NULL);
-	// diff_time(&start, &stop) // in ms
-
 	// suffix tree construction
 	startMem = getMemUsage();
 	gettimeofday(&tstart, NULL);
-	test_construction();
+	testTree = test_construction();		// build ST
 	gettimeofday(&tstop, NULL);
 	constructMem = getMemUsage();
-	printf("ST Construction Time: %f ms\n", diff_time(&tstart, &tstop));
-	printf("ST Construction Space: \t%llu\n", constructMem - startMem);
-
-	// suffix tree dispaly
-	gettimeofday(&tstart, NULL);
-	test_display();
-	gettimeofday(&tstop, NULL);
-	printf("ST Display: %f ms\n", diff_time(&tstart, &tstop));
+	printf("\nST Construction Time: %f ms\n", diff_time(&tstart, &tstop));
+	printf("ST Construction Space: \t%llu (Kib)\n", constructMem - startMem);
 
 	// depth first search
 	gettimeofday(&tstart, NULL);
-	test_dfs();;
+	test_dfs(testTree);
 	gettimeofday(&tstop, NULL);
-	printf("ST DFS: %f ms\n", diff_time(&tstart, &tstop));
-
+	printf("\nST DFS: %f ms\n", diff_time(&tstart, &tstop));
+	getchar();
+	
 	// burrows wheeler transform
 	gettimeofday(&tstart, NULL);
-	// test_bwt()
+	printf("\nSEQ:\t");
+	for ( int it = 0; it < inputLen; ++it)
+		printf("%c ", ibuff[it]);
+	test_bwt(testTree);	
 	gettimeofday(&tstop, NULL);
-	printf("ST BWT: %f ms\n", diff_time(&tstart, &tstop));
+	printf("\nST BWT: %f ms\n\n", diff_time(&tstart, &tstop));
 
+	doNotBeLikeFirefox(testTree);
 	cleanupTime();
 
 	//printf("PRAM:\t%llu\n", getPhysMem());
