@@ -99,9 +99,10 @@ Node *splitEdge( Node *current, char *suffix ){
 			free(current->parentEdgeLabel);
 			current->parentEdgeLabel = childEdge;
 
-			Node *newLeaf = makeNode( (suffix - ibuff) +1,
+			Node *newLeaf = makeNode( leafs,
 					newInode, &suffix[j],
 					(strlen(&suffix[j]) + newInode->depth));
+			leafs ++;
 			addChild(newInode, newLeaf);
 			return newLeaf;
 		}
@@ -115,8 +116,9 @@ Node *findPath( Node *n, char *suffix ){
 	Node *hopped = nodeHop(n, suffix);
 	Node *current = matchChild(hopped, &suffix[hopped->depth], &i);
 	if ( current==NULL ){ // no child matches, make a new child leaf
-		current = makeNode( (suffix - ibuff) +1, // pointer math for id
+		current = makeNode( leafs, // pointer math for id
 				hopped, suffix, (hopped->depth + strlen(suffix)));
+		leafs++;
 		addChild(hopped, current);
 	} else { // a child matches!! edge split....
 		current = splitEdge(current, &suffix[hopped->depth]);
@@ -168,39 +170,8 @@ Node *nodeHop( Node *n, char *beta ){
 	// not an ending leaf and the for loop has gone through the string
 	return nodeHop( a, &beta[i]);
 }
-/*
-Node *ananthHop( Node *vPrime, Node *u, char *beta , int *i){
-	Node *current = vPrime;
-	Node *leaf = NULL;
-	Node *child = NULL;
-	char *e;
-	char *b = beta;
-	int r = 0, z = 0;
-	while( r <= (int)strlen(b) ){
-		z = 0;
-		child = matchChild( current, &b[r], &z);
-		if( child ){
-			e = child->parentEdgeLabel;
-			if( (strlen(e) + r) > strlen(b) ){
-				leaf = splitEdge( child, &ibuff[*i+r], &z);
-				Node *v = leaf->parent;
-				u->suffixLink = v;
-				return leaf;
-			} else if( (strlen(e) + r) == strlen(b) ){
-				Node *v = current;
-				u->suffixLink = v;
-				leaf = findPath(v, &ibuff[*i + u->depth - 1]);
-				return leaf;
-			} else {
-				r = r + strlen(e);
-				current = current->children[z];
-			}
-		} else
-			return NULL;
-	}
-	return leaf;
-}
-*/
+
+
 Node *insert( int i, Node *root, Node *leaf ){
 	if (leaf == NULL){
 		printf("ERROR Leaf returned null: i = %d",i);
@@ -238,13 +209,8 @@ Node *insert( int i, Node *root, Node *leaf ){
 		case 3:
 			{
 				Node *uPrime = u->parent;
-				int iold = inodes;
 				Node *m = findPath(uPrime, &ibuff[i]);
-				if ( iold < inodes ){ // a new inode has been made
-					u->suffixLink = m->parent;
-				} else { // a child has been made
-					u->suffixLink = uPrime;
-				}
+				leaf->parent->suffixLink = m->parent;
 				return m;
 				break;
 			}

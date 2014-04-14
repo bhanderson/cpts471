@@ -27,6 +27,7 @@
 int alphabetLen = 0;
 int inputLen = 0;
 int inodes = 0;
+int leafs = 1;
 
 char *abuff;
 char *ibuff;
