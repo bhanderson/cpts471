@@ -43,7 +43,7 @@ int addChild( Node *parent, Node *child ){
 // constructor for creating a node
 Node *makeNode( unsigned int id, Node *parent,
 		char *parentEdgeLabel, unsigned int stringDepth ){
-	Node *newnode = (Node *)malloc(sizeof(Node));
+	Node *newnode = (Node *)calloc(1, sizeof(Node));
 	if (newnode == NULL) {
 		perror("\nERROR: could not malloc new node\n");
 		exit (1);
@@ -54,12 +54,13 @@ Node *makeNode( unsigned int id, Node *parent,
 	if( parentEdgeLabel != NULL){
 		//newnode->parentEdgeLabel = calloc(1, sizeof(char) * strlen(parentEdgeLabel));
 		//strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
-		newnode->parentEdgeLabel = malloc(sizeof(char) * strlen(parentEdgeLabel));
+		//newnode->parentEdgeLabel = malloc(sizeof(char) * strlen(parentEdgeLabel));
+		newnode->parentEdgeLabel = calloc(strlen(parentEdgeLabel) + 1, sizeof(char));
 		if (!newnode->parentEdgeLabel) {
 			perror("\nERROR: could not malloc new node edge label\n");
 			exit (1);
 		}
-		strcpy(newnode->parentEdgeLabel, parentEdgeLabel);
+		strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
 		newnode->parentEdgeLabel[strlen(parentEdgeLabel)] = '\0';
 	}
 	newnode->numChildren = 0;
@@ -340,9 +341,18 @@ int bwt( Node *node ){
 // free memory
 void doNotBeLikeFirefox( Node *node ) {
 	if (node) { 
-		for (int i = 0; i < node->numChildren; ++i)
+		for (int i = node->numChildren-1; i > 0; --i)
 			doNotBeLikeFirefox(node->children[i]);
-		if (node->numChildren == 0)
+
+		if (node->numChildren == 0){
+			node->parent->numChildren--;
+			if(node->parentEdgeLabel)
+				free(node->parentEdgeLabel);
+			if(node->suffixLink)
+				free(node->suffixLink);
+			if(node->parent && node->parent != node)
+				free(node->parent);
 			free(node);
+		}
 	}
 }
