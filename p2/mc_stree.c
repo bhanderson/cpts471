@@ -45,7 +45,7 @@ Node *makeNode( unsigned int id, Node *parent,
 		char *parentEdgeLabel, unsigned int stringDepth ){
 	Node *newnode = (Node *)malloc(sizeof(Node));
 	if (newnode == NULL) {
-		printf("\nERROR: could not malloc new node\n");
+		perror("\nERROR: could not malloc new node\n");
 		exit (1);
 	}
 	newnode->id = id;
@@ -56,7 +56,7 @@ Node *makeNode( unsigned int id, Node *parent,
 		//strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
 		newnode->parentEdgeLabel = malloc(sizeof(char) * strlen(parentEdgeLabel));
 		if (!newnode->parentEdgeLabel) {
-			printf("\nERROR: could not malloc new node edge label\n");
+			perror("\nERROR: could not malloc new node edge label\n");
 			exit (1);
 		}
 		strcpy(newnode->parentEdgeLabel, parentEdgeLabel);
@@ -64,6 +64,10 @@ Node *makeNode( unsigned int id, Node *parent,
 	}
 	newnode->numChildren = 0;
 	newnode->children = calloc(1, alphabetLen * sizeof(Node *));
+	if (!newnode->children){
+		perror("\nERROR: could not calloc new node children\n");
+		exit (1);
+	}
 	newnode->depth = stringDepth;
 	return newnode;
 }
@@ -104,11 +108,11 @@ Node *splitEdge( Node *current, char *suffix ){
 			char *childEdge = malloc( sizeof(char) *
 					strlen(current->parentEdgeLabel) - j);
 			if (childEdge == NULL) {
-				printf("\nERROR: could not malloc childEdge in splitEdge\n");
+				perror("\nERROR: could not malloc childEdge in splitEdge\n");
 				exit (1);
 			}
 			strcpy(childEdge, &current->parentEdgeLabel[j]);
-			//free(current->parentEdgeLabel);
+			free(current->parentEdgeLabel);
 			current->parentEdgeLabel = childEdge;
 
 			Node *newLeaf = makeNode( leafs,
