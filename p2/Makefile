@@ -1,2 +1,2 @@
 main:
-	clang test_mc_stree.c -ggdb
+	clang test_mc_stree.c -ggdb -Wall

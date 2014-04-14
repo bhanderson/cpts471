@@ -102,13 +102,13 @@ Node *splitEdge( Node *current, char *suffix ){
 			addChild(newInode, current);
 			newInode->parent->children[z] = newInode;
 			char *childEdge = malloc( sizeof(char) *
-					strlen(current->parentEdgeLabel) -j);
+					strlen(current->parentEdgeLabel) - j);
 			if (childEdge == NULL) {
 				printf("\nERROR: could not malloc childEdge in splitEdge\n");
 				exit (1);
 			}
 			strcpy(childEdge, &current->parentEdgeLabel[j]);
-			free(current->parentEdgeLabel);
+			//free(current->parentEdgeLabel);
 			current->parentEdgeLabel = childEdge;
 
 			Node *newLeaf = makeNode( leafs,
