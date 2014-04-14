@@ -221,7 +221,7 @@ Node *insert( int i, Node *root, Node *leaf ){
 				int old = inodes;
 				Node *n = findPath(vPrime, &ibuff[i]);
 				//u->suffixLink = n->parent;
-				if ( strlen(beta) && (old < inodes) ){
+				if ( strlen(beta) && (old <= inodes) ){
 					u->suffixLink = n->parent;
 				} else {
 					u->suffixLink = uPrime;
