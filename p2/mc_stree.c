@@ -90,11 +90,11 @@ Node *matchChild( Node *n, unsigned int suffix, unsigned int *i ){
 }
 
 // split the current nodes parent edge with the suffix return the leaf
-Node *splitEdge( Node *current, unsigned int suffix ){
+Node *splitEdge( Node *current, unsigned int suffixHead, unsigned int suffixTail ){
 	unsigned int i, j, z;
-	matchChild(current->parent, suffix, &z);
+	matchChild(current->parent, suffixHead, &z);
 	for( i = current->suffixHead; i < current->suffixTail; ++i ) {//(int)strlen(suffix); ++i ){
-		if( ibuff[current->suffixHead + i] != ibuff[suffix] ){
+		if( ibuff[current->suffixHead + i] != ibuff[suffixHead + i] ){
 			//unsigned int prefix;
 			//char prefix[i+1];
 			//for( j=0; j < i; j++ ){
@@ -103,7 +103,8 @@ Node *splitEdge( Node *current, unsigned int suffix ){
 			//prefix[j] = '\0';
 
 			Node *newInode = makeNode( inputLen + inodes +1,
-					current->suffixHead, i, current->parent->depth + i);
+					current->suffixHead, current->suffixHead + i,
+					current->parent->depth + i);
 			inodes++;
 			// need to set the current children to the new inodes children
 			addChild(newInode, current);
@@ -115,12 +116,12 @@ Node *splitEdge( Node *current, unsigned int suffix ){
 				exit (1);
 			}
 			strcpy(childEdge, &current->parentEdgeLabel[j]);
-			free(current->parentEdgeLabel);*/
-			current->parentEdgeLabel = childEdge;
-			current->suffixHead = i;
-			current->suffixTail = current->
+			free(current->parentEdgeLabel);
+			current->parentEdgeLabel = childEdge;*/
+			current->suffixHead = i+1;
+			current->suffixTail = current->suffixTail;
 			Node *newLeaf = makeNode( leafs,
-					newInode, &suffix[j],
+					newInode, ,
 					(strlen(&suffix[j]) + newInode->depth ));
 			leafs ++;
 			addChild(newInode, newLeaf);
