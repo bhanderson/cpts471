@@ -183,9 +183,9 @@ Node *insert( int i, Node *root, Node *leaf ){
 		// IA suffix link for u is known and u is not the root
 		case 0:
 			{
-				unsigned int k = u->depth;
+				int k = u->depth;
 				Node *v = u->suffixLink;
-				return findPath( v, &ibuff[i + k -1] );
+				return findPath(v, &ibuff[i + k - 1]);
 				break;
 			}
 			// IB suffix link for u is known and u is the root
@@ -198,11 +198,10 @@ Node *insert( int i, Node *root, Node *leaf ){
 		case 2:
 			{
 				Node *uPrime = u->parent;
-				char *beta = u->parentEdgeLabel;
 				Node *vPrime = uPrime->suffixLink;
-				Node *n = nodeHop(vPrime, beta);
-				int k = n->depth;
-				return findPath(n, &ibuff[i + k - 1]);
+				Node *n = findPath(vPrime, &ibuff[i]);
+				u->suffixLink = n->parent;
+				return n;
 				break;
 			}
 			// IIB suffix link for u is unknown and u' is the root
@@ -210,7 +209,7 @@ Node *insert( int i, Node *root, Node *leaf ){
 			{
 				Node *uPrime = u->parent;
 				Node *m = findPath(uPrime, &ibuff[i]);
-				leaf->parent->suffixLink = m->parent;
+				u->suffixLink = uPrime;
 				return m;
 				break;
 			}
