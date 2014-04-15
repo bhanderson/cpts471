@@ -121,6 +121,54 @@ Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 	return (current);
 }
 
+Node *ananthFindPath( Node *v, unsigned int head ){
+	unsigned int childNum, tail = inputLen -1;
+	Node *hopped = nodeHop(v, head, inputLen -1);
+	Node *child = matchChild(hopped, head, &childNum);
+	if ( child == NULL){
+		child = makeNode(leafs, hopped,
+				hopped->depth + (tail - head), tail,
+				hopped->depth + (tail - head));
+	} else { // a child exists
+		child = splitEdge(child, head + hopped->depth, tail);
+	}
+	return child;
+}
+
+Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead, unsigned int bEnd, unsigned int suffix){
+	unsigned int r = 0, childNum = 0, bLen = (bHead - bEnd + 1);
+	Node *currNode = vPrime;
+	Node *e = NULL, *i = NULL, *v = NULL;
+
+	while(r <= (bLen)){ // r <= beta len
+		// let e be the edge under currnode that starts with the character b[r]
+		e = matchChild(currNode, bHead+r, &childNum);
+		if(e){ // if e exists
+			unsigned int edgeLen = (e->suffixTail - e->suffixHead + 1);
+			if( edgeLen+r > bLen ){
+				i = splitEdge(e, suffix, inputLen -1);
+				v = i->parent;
+				u->suffixLink = v;
+				return i;
+			} else if( edgeLen+r == bLen ){
+				v = e;
+				u->suffixLink = v;
+				unsigned int k = u->depth;
+				i = ananthFindPath(v, suffix + k -1);
+				return i;
+			} else {
+				r += edgeLen;
+				currNode = e;
+				continue;
+			}
+		}
+	}
+	return i;
+}
+
+
+
+
 // find where to input suffix given a node
 Node *findPath( Node *n, unsigned int head, int c) { //}char *suffix ){
 	unsigned int i = 0;
@@ -218,21 +266,32 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 		// IA suffix link for u is known and u is not the root
 		case 0:
 			{
-				int k = u->depth;
+				unsigned int k = u->depth;
+				Node *v = u->suffixLink;
+				return ananthFindPath(v, i+k-1);
+				/*int k = u->depth;
 				Node *v = u->suffixLink;
 				return (findPath(v, i + k - 1, c));
+				*/
 				break;
 			}
 			// IB suffix link for u is known and u is the root
 		case 1:
 			{
-				return findPath(u, i, c);
+				return ananthFindPath(u, i);
+				//return findPath(u, i, c);
 				break;
 			}
 			// IIA suffix link for u is unknown and uprime is not the root
 		case 2:
 			{
 				//unsigned int j=0;
+				Node *uPrime = u->parent;
+				unsigned int bHead = u->suffixHead, bTail = u->suffixTail;
+				Node *vPrime = uPrime->suffixLink;
+				return ananthNodeHops(vPrime, u, bHead, bTail, i);
+
+				/*
 				Node *uPrime = u->parent;
 				Node *vPrime = uPrime->suffixLink;
 				unsigned int old = inodes;
@@ -243,11 +302,17 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 					u->suffixLink = uPrime;
 				}
 				return n;
+				*/
 				break;
 			}
 			// IIB suffix link for u is unknown and u' is the root
 		case 3:
 			{
+				Node *uPrime = u->parent;
+				unsigned int bHead = u->suffixHead, bTail = u->suffixTail;
+				unsigned int bPrimeHead = bHead+1;
+				return ananthNodeHops(uPrime, u, bPrimeHead, bTail, i);
+				/*
 				Node *uPrime = u->parent;
 				Node *n;
 				//unsigned betaPrime = &u->parentEdgeLabel[1];
@@ -265,10 +330,12 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				//	u->suffixLink = uPrime;
 				//}
 				return n;
+				*/
 				break;
 			}
 		default:
-			return findPath(root, i, c);
+			perror("Exiting in insert\n");
+			exit(1);
 			break;
 	}
 	return 0;
