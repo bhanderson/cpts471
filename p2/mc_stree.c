@@ -128,11 +128,11 @@ Node *findPath( Node *n, unsigned int head) { //}char *suffix ){
 	Node *current = matchChild(hopped, head+hopped->depth, &i);
 	if ( current==NULL){ // no child matches, make a new child leaf
 		current = makeNode( leafs,
-				hopped, head, tail, hopped->depth + (tail - head) +1);
+				hopped, head + hopped->depth, tail, hopped->depth + (tail - head) +1);
 		leafs++;
 		addChild(hopped, current);
 		return current;
-	} else if(tail - head == 1){
+	} else if( NULL/*tail - head == 1*/){
 		head += current->depth;
 		Node *leaf = makeNode( leafs,
 				current, head, tail, current->depth + 1);
@@ -180,7 +180,7 @@ Node *nodeHop( Node *n,unsigned int head, unsigned int tail){
 	if( a == NULL){
 		//if ( strlen(beta) == 1 )
 		//	return n;
-		return (n->parent);
+		return (n);
 	}
 	//x = (int)strlen(beta);
 	//y = (int)strlen(a->parentEdgeLabel);
