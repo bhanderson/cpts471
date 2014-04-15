@@ -24,10 +24,10 @@
 
 /* ---------- DEFINITIONS ------- */
 
-int alphabetLen = 0;
-int inputLen = 0;
-int inodes = 0;
-int leafs = 1;
+unsigned int alphabetLen = 0;
+unsigned int inputLen = 0;
+unsigned int inodes = 0;
+unsigned int leafs = 1;
 
 char *abuff;
 char *ibuff;
@@ -39,12 +39,13 @@ enum { false, true };		// get mad, this is worth it
 
 typedef struct Node{		// ananth complete
 	unsigned int id;
-	struct Node *suffixLink;
-	struct Node *parent;
-	char *parentEdgeLabel;
-	int numChildren;
-	struct Node **children;
 	unsigned int depth;
+	unsigned int numChildren;
+	unsigned int suffixHead;
+	unsigned int suffixTail;
+	struct Node *parent;
+	struct Node *suffixLink;
+	struct Node **children;
 }Node;
 
 
@@ -53,23 +54,21 @@ typedef struct Node{		// ananth complete
 int addChild( Node *parent, Node *child );
 
 Node *makeNode( unsigned int id, Node *parent,
-		char *parentEdgeLabel, unsigned int Depth );
+		unsigned int suffixHead, unsigned int suffixTail, unsigned int Depth );
 
-Node *matchChild( Node *n, char *suffix, int *i );
+Node *matchChild( Node *n, unsigned int suffix, unsigned int *i );
 
-Node *splitEdge( Node *current, char *suffix);
+Node *splitEdge( Node *current, unsigned int head, unsigned int tail);
 
-Node *findPath( Node *n, char *suffix );
+Node *findPath( Node *n, unsigned int head);
 
 int stringDepth( Node *u );
 
 int identifyCase( Node *root, Node *u );
 
-Node *nodeHop( Node *n, char *beta );
+Node *nodeHop( Node *n, unsigned int head , unsigned int tail);
 
-Node *ananthHop( Node *vPrime, Node *u, char *beta, int *i);
-
-Node *insert( int i, Node *root, Node *leaf );
+Node *insert( unsigned int i, Node *root, Node *leaf );
 
 Node *suffixTree( void );
 
