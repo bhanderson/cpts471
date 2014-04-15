@@ -24,10 +24,10 @@
 
 /* ---------- DEFINITIONS ------- */
 
-int alphabetLen = 0;
-int inputLen = 0;
-int inodes = 0;
-int leafs = 1;
+unsigned int alphabetLen = 0;
+unsigned int inputLen = 0;
+unsigned int inodes = 0;
+unsigned int leafs = 1;
 
 char *abuff;
 char *ibuff;
@@ -60,7 +60,7 @@ Node *matchChild( Node *n, unsigned int suffix, unsigned int *i );
 
 Node *splitEdge( Node *current, unsigned int head, unsigned int tail);
 
-Node *findPath( Node *n, unsigned int head );
+Node *findPath( Node *n, unsigned int head);
 
 int stringDepth( Node *u );
 
