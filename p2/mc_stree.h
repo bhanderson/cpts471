@@ -60,7 +60,7 @@ Node *matchChild( Node *n, unsigned int suffix, unsigned int *i );
 
 Node *splitEdge( Node *current, unsigned int head, unsigned int tail);
 
-Node *findPath( Node *n, unsigned int head);
+Node *findPath( Node *n, unsigned int head, int c);
 
 int stringDepth( Node *u );
 

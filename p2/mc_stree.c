@@ -116,20 +116,28 @@ Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 			return (newLeaf);
 		}
 	}
+	printf("splitEdge");
 	exit(1);
 	return (current);
 }
 
 // find where to input suffix given a node
-Node *findPath( Node *n, unsigned int head) { //}char *suffix ){
+Node *findPath( Node *n, unsigned int head, int c) { //}char *suffix ){
 	unsigned int i = 0;
 	unsigned int tail = inputLen -1;
 	Node *hopped = nodeHop(n, head, tail);
 	Node *current = matchChild(hopped, head+hopped->depth, &i);
 	if ( current==NULL){ // no child matches, make a new child leaf
-		current = makeNode( leafs,
-				hopped, head + hopped->depth, tail,
-				hopped->depth + (tail - (head + hopped->depth)) +1);
+		if( c == 0 ){
+			current = makeNode( leafs,
+					hopped, head + (n->depth - hopped->depth), tail,
+					tail - head +1 + hopped->depth);
+		} else {
+			current = makeNode( leafs,
+					hopped, head+hopped->depth, tail,
+					hopped->depth + (tail - (head + hopped->depth)) +1);
+		}
+
 		leafs++;
 		addChild(hopped, current);
 		return current;
@@ -210,15 +218,15 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 		// IA suffix link for u is known and u is not the root
 		case 0:
 			{
-				//int k = u->depth;
+				int k = u->depth;
 				Node *v = u->suffixLink;
-				return (findPath(v, i));
+				return (findPath(v, i + k - 1, c));
 				break;
 			}
 			// IB suffix link for u is known and u is the root
 		case 1:
 			{
-				return findPath(u, i);
+				return findPath(u, i, c);
 				break;
 			}
 			// IIA suffix link for u is unknown and uprime is not the root
@@ -228,8 +236,8 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				Node *uPrime = u->parent;
 				Node *vPrime = uPrime->suffixLink;
 				unsigned int old = inodes;
-				Node *n = findPath(vPrime, i);
-				if (old <= inodes){
+				Node *n = findPath(vPrime, u->suffixHead, c);
+				if (old < inodes){
 					u->suffixLink = n->parent;
 				} else {
 					u->suffixLink = uPrime;
@@ -245,8 +253,8 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				//unsigned betaPrime = &u->parentEdgeLabel[1];
 				unsigned int betaPrimeLen = u->suffixTail - u->suffixHead;
 				unsigned int old = inodes;
-				n = findPath(uPrime, i);
-				if (betaPrimeLen && (old <= inodes)){
+				n = findPath(uPrime, i, c);
+				if (betaPrimeLen && (old < inodes)){// may need to be <= probably not
 					u->suffixLink = n->parent;
 				} else {
 					u->suffixLink = uPrime;
@@ -260,7 +268,7 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				break;
 			}
 		default:
-			return findPath(root, i);
+			return findPath(root, i, c);
 			break;
 	}
 	return 0;
