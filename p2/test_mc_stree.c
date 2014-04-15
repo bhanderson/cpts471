@@ -281,12 +281,12 @@ int main (int argc, const char *argv[])
 	test_dfs(testTree);
 	gettimeofday(&tstop, NULL);
 	printf("\nST DFS: %f ms\n", diff_time(&tstart, &tstop));
-	getchar();
+	//getchar();
 	
 	// burrows wheeler transform
 	gettimeofday(&tstart, NULL);
 	printf("\nSEQ:\t");
-	for ( int it = 0; it < inputLen; ++it)
+	for ( unsigned int it = 0; it < inputLen; ++it)
 		printf("%c ", ibuff[it]);
 	test_bwt(testTree);	
 	gettimeofday(&tstop, NULL);

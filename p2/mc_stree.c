@@ -20,19 +20,16 @@
 /* ---------- FUNCTION DEFS ----- */
 // add a child to the given node and sort the children alphabetically
 int addChild( Node *parent, Node *child ){
-	//parent->children = realloc(parent->children, parent->numChildren +1 * (sizeof(Node *)));
+	unsigned int i=0,j=0;
 	parent->children[parent->numChildren] = child;
 	parent->numChildren++;
 	child->parent = parent;
 	// sort the children
-	unsigned int i,j;
 	Node *temp;
 	for( i=0; i < parent->numChildren - 1; ++i ){
 		for( j=0; j < parent->numChildren - 1 - i; ++j ){
 			if( ibuff[parent->children[j]->suffixHead] >
 					ibuff[parent->children[j+1]->suffixHead]) {
-				/* parent->children[j]->parentEdgeLabel[0] >
-					parent->children[j+1]->parentEdgeLabel[0] ){*/
 				temp = parent->children[j+1];
 				parent->children[j+1] = parent->children[j];
 				parent->children[j] = temp;
@@ -55,21 +52,8 @@ Node *makeNode( unsigned int id, Node *parent,
 	newnode->parent = parent == NULL ? newnode : parent;
 	newnode->suffixHead = suffixHead;
 	newnode->suffixTail = suffixTail;
-	/*if( parentEdgeLabel != NULL){
-		//newnode->parentEdgeLabel = calloc(1, sizeof(char) * strlen(parentEdgeLabel));
-		//strncpy(newnode->parentEdgeLabel, parentEdgeLabel, strlen(parentEdgeLabel));
-		newnode->parentEdgeLabel = malloc(sizeof(char) * strlen(parentEdgeLabel));
-		if (!newnode->parentEdgeLabel) {
-			printf("\nERROR: could not malloc new node edge label\n");
-			exit (1);
-		}
-		strcpy(newnode->parentEdgeLabel, parentEdgeLabel);
-		newnode->parentEdgeLabel[strlen(parentEdgeLabel)] = '\0';
-		
-	}*/
 	newnode->numChildren = 0;
 	newnode->children = calloc(1, alphabetLen * sizeof(Node *));
-	// newnode->depth = stringDepth;
 	newnode->depth = stringDepth;
 	return (newnode);
 }
@@ -91,7 +75,7 @@ Node *matchChild( Node *n, unsigned int suffix, unsigned int *i ){
 
 // split the current nodes parent edge with the suffix return the leaf
 Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
-	unsigned int i, min, x, y, z;
+	unsigned int i = 0, min = 0, x = 0, y = 0, z = 0;
 	matchChild(current->parent, head, &z);
 	x = tail;
 	y = current->suffixTail;
@@ -116,7 +100,7 @@ Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 			return (newLeaf);
 		}
 	}
-	printf("splitEdge");
+	perror("splitEdge\n");
 	exit(1);
 	return (current);
 }
@@ -124,10 +108,11 @@ Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 Node *ananthFindPath( Node *v, unsigned int head ){
 	unsigned int childNum, tail = inputLen -1;
 	Node *hopped = nodeHop(v, head, inputLen -1);
-	Node *child = matchChild(hopped, head, &childNum);
+	unsigned int hops = hopped->depth - v->depth;
+	Node *child = matchChild(hopped, head+hops, &childNum);
 	if ( child == NULL){
 		child = makeNode(leafs, hopped,
-				hopped->depth + head, tail,
+				head + hops, tail,
 				hopped->depth + (tail - head)+1);
 		addChild(hopped, child);
 		leafs++;
@@ -166,8 +151,8 @@ Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead,
 			}
 		} else {
 			i = makeNode(leafs, currNode, bHead, bEnd, currNode->depth + bLen);
-			leafs++;
 			addChild(currNode, i);
+			leafs++;
 			v = i->parent;
 			u->suffixLink = v;
 			return i;
@@ -231,7 +216,11 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 			{
 				unsigned int k = u->depth;
 				Node *v = u->suffixLink;
-				return ananthFindPath(v, i+k-1);
+				//if (v->id == 0){
+				//	return ananthFindPath(v, i);
+				//} else {
+					return ananthFindPath(v, i + k-1);
+				//}
 				break;
 			}
 			// IB suffix link for u is known and u is the root
@@ -256,11 +245,16 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				Node *uPrime = u->parent;
 				unsigned int bHead = u->suffixHead, bTail = u->suffixTail;
 				unsigned int bPrimeHead = bHead+1;
+				if ((bTail - bPrimeHead + 1) == 0){
+					u->suffixLink = uPrime;
+					return ananthFindPath(uPrime, i);
+				} else{
+					return ananthNodeHops(uPrime, u, bPrimeHead, bTail, i);
+				}
 				//if (bPrimeHead > bTail){
 				//	bPrimeHead = i;
 				//	bTail = inputLen - 1;
 				//}
-				return ananthNodeHops(uPrime, u, bPrimeHead, bTail, i);
 				break;
 			}
 		default:
@@ -335,4 +329,20 @@ int bwt( Node *node ){
 		printf("%c ", (bwtval > 0 ? ibuff[bwtval-1] : ibuff[inputLen - 1]));
 	}
 	return (0);
+}
+
+
+// free memory
+void doNotBeLikeFirefox( Node *node ) {
+	unsigned int i;//,j;
+	if (node){
+		for(i=0; i < node->numChildren; i++){
+			doNotBeLikeFirefox(node->children[i]);
+		}
+		//for(j=0;j<alphabetLen;j++)
+		//	free(node->children[j]);
+		//	node->children[j] = NULL;
+		free(node->children);
+		free(node);
+	}
 }

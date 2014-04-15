@@ -77,4 +77,6 @@ int dfs( Node *node );
 
 int bwt( Node *node );
 
+void doNotBeLikeFirefox( Node *node );
+
 #endif	// _MC_STREE_H_
