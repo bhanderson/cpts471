@@ -322,7 +322,6 @@ int dfs( Node *node ){
 		printf("SL->ID: %d\n", node->suffixLink->id); //, node->suffixLink);
 	else
 		printf("SL->ID: NULL\n");
-	int i;
 	for ( i = 0; i < node->numChildren; ++i)
 	{
 		dfs(node->children[i]);
