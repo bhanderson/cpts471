@@ -128,7 +128,8 @@ Node *findPath( Node *n, unsigned int head) { //}char *suffix ){
 	Node *current = matchChild(hopped, head+hopped->depth, &i);
 	if ( current==NULL){ // no child matches, make a new child leaf
 		current = makeNode( leafs,
-				hopped, head + hopped->depth, tail, hopped->depth + (tail - head) +1);
+				hopped, head + hopped->depth, tail,
+				hopped->depth + (tail - (head + hopped->depth)) +1);
 		leafs++;
 		addChild(hopped, current);
 		return current;
@@ -209,7 +210,7 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 		// IA suffix link for u is known and u is not the root
 		case 0:
 			{
-				int k = u->depth;
+				//int k = u->depth;
 				Node *v = u->suffixLink;
 				return (findPath(v, i));
 				break;
