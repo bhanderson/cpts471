@@ -60,26 +60,21 @@ Node *matchChild( Node *n, unsigned int suffix, unsigned int *i );
 
 Node *splitEdge( Node *current, unsigned int head, unsigned int tail);
 
-Node *findPath( Node *n, unsigned int head, int c);
+Node *ananthFindPath( Node *v, unsigned int head );
 
-int stringDepth( Node *u );
+Node *ananthNodeHops( Node *vPrime, Node *u, unsigned int bHead,
+		unsigned int bTail, unsigned int suffix);
 
 int identifyCase( Node *root, Node *u );
 
-Node *nodeHop( Node *n, unsigned int head , unsigned int tail);
+Node *nodeHop( Node *n, unsigned int head, unsigned int tail);
 
 Node *insert( unsigned int i, Node *root, Node *leaf );
 
 Node *suffixTree( void );
 
-int printChildrenLabels( Node *n );
-
-int printChildren( Node *n );
-
 int dfs( Node *node );
 
 int bwt( Node *node );
-
-void doNotBeLikeFirefox(Node *node);
 
 #endif	// _MC_STREE_H_

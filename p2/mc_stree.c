@@ -127,16 +127,19 @@ Node *ananthFindPath( Node *v, unsigned int head ){
 	Node *child = matchChild(hopped, head, &childNum);
 	if ( child == NULL){
 		child = makeNode(leafs, hopped,
-				hopped->depth + (tail - head), tail,
-				hopped->depth + (tail - head));
+				hopped->depth + head, tail,
+				hopped->depth + (tail - head)+1);
+		addChild(hopped, child);
+		leafs++;
 	} else { // a child exists
 		child = splitEdge(child, head + hopped->depth, tail);
 	}
 	return child;
 }
 
-Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead, unsigned int bEnd, unsigned int suffix){
-	unsigned int r = 0, childNum = 0, bLen = (bHead - bEnd + 1);
+Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead,
+		unsigned int bEnd, unsigned int suffix){
+	unsigned int r = 0, childNum = 0, bLen = (bEnd - bHead + 1);
 	Node *currNode = vPrime;
 	Node *e = NULL, *i = NULL, *v = NULL;
 
@@ -161,59 +164,19 @@ Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead, unsigned int bEn
 				currNode = e;
 				continue;
 			}
+		} else {
+			i = makeNode(leafs, currNode, bHead, bEnd, currNode->depth + bLen);
+			leafs++;
+			addChild(currNode, i);
+			v = i->parent;
+			u->suffixLink = v;
+			return i;
 		}
 	}
 	return i;
 }
 
 
-
-
-// find where to input suffix given a node
-Node *findPath( Node *n, unsigned int head, int c) { //}char *suffix ){
-	unsigned int i = 0;
-	unsigned int tail = inputLen -1;
-	Node *hopped = nodeHop(n, head, tail);
-	Node *current = matchChild(hopped, head+hopped->depth, &i);
-	if ( current==NULL){ // no child matches, make a new child leaf
-		if( c == 0 ){
-			current = makeNode( leafs,
-					hopped, head + (n->depth - hopped->depth), tail,
-					tail - head +1 + hopped->depth);
-		} else {
-			current = makeNode( leafs,
-					hopped, head+hopped->depth, tail,
-					hopped->depth + (tail - (head + hopped->depth)) +1);
-		}
-
-		leafs++;
-		addChild(hopped, current);
-		return current;
-	} else if( NULL/*tail - head == 1*/){
-		head += current->depth;
-		Node *leaf = makeNode( leafs,
-				current, head, tail, current->depth + 1);
-		leafs++;
-		addChild(current, leaf);
-		current = leaf;
-	} else { // a child matches!! edge split....
-		//current = splitEdge(current, &suffix[hopped->depth]);
-		current = splitEdge(current, head + hopped->depth, tail);
-	}
-	return current;
-}
-
-// what is the depth of the given node
-/*int stringDepth( Node *u ){
-	Node *temp = u;
-	int length = 0;
-	while( temp->parent != NULL ){
-		length+= strlen(temp->parentEdgeLabel);
-		temp = temp->parent;
-	}
-	return length;
-}
-*/
 // find the type of node to insert
 int identifyCase( Node *root, Node *u ){
 	if( u->suffixLink != NULL )
@@ -269,17 +232,12 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				unsigned int k = u->depth;
 				Node *v = u->suffixLink;
 				return ananthFindPath(v, i+k-1);
-				/*int k = u->depth;
-				Node *v = u->suffixLink;
-				return (findPath(v, i + k - 1, c));
-				*/
 				break;
 			}
 			// IB suffix link for u is known and u is the root
 		case 1:
 			{
 				return ananthFindPath(u, i);
-				//return findPath(u, i, c);
 				break;
 			}
 			// IIA suffix link for u is unknown and uprime is not the root
@@ -290,19 +248,6 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				unsigned int bHead = u->suffixHead, bTail = u->suffixTail;
 				Node *vPrime = uPrime->suffixLink;
 				return ananthNodeHops(vPrime, u, bHead, bTail, i);
-
-				/*
-				Node *uPrime = u->parent;
-				Node *vPrime = uPrime->suffixLink;
-				unsigned int old = inodes;
-				Node *n = findPath(vPrime, u->suffixHead, c);
-				if (old < inodes){
-					u->suffixLink = n->parent;
-				} else {
-					u->suffixLink = uPrime;
-				}
-				return n;
-				*/
 				break;
 			}
 			// IIB suffix link for u is unknown and u' is the root
@@ -311,26 +256,11 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				Node *uPrime = u->parent;
 				unsigned int bHead = u->suffixHead, bTail = u->suffixTail;
 				unsigned int bPrimeHead = bHead+1;
-				return ananthNodeHops(uPrime, u, bPrimeHead, bTail, i);
-				/*
-				Node *uPrime = u->parent;
-				Node *n;
-				//unsigned betaPrime = &u->parentEdgeLabel[1];
-				unsigned int betaPrimeLen = u->suffixTail - u->suffixHead;
-				unsigned int old = inodes;
-				n = findPath(uPrime, i, c);
-				if (betaPrimeLen && (old < inodes)){// may need to be <= probably not
-					u->suffixLink = n->parent;
-				} else {
-					u->suffixLink = uPrime;
-				}
-				//if ( (u->suffixTail - u->suffixHead) && (old < inodes) ){
-				//	u->suffixLink = n->parent;
-				//} else {
-				//	u->suffixLink = uPrime;
+				//if (bPrimeHead > bTail){
+				//	bPrimeHead = i;
+				//	bTail = inputLen - 1;
 				//}
-				return n;
-				*/
+				return ananthNodeHops(uPrime, u, bPrimeHead, bTail, i);
 				break;
 			}
 		default:
@@ -356,29 +286,6 @@ Node *suffixTree( void ){
 	return root;
 }
 
-/*
-int printChildrenLabels( Node *n ){
-	int i;
-	if (n->parentEdgeLabel == NULL)
-		printf("root's children: ");
-	else
-		printf("%s's children: ", n->parentEdgeLabel);
-	for( i=0; i <n->numChildren; i++ ){
-		printf("%s ", n->children[i]->parentEdgeLabel);
-	}
-	printf("\n");
-	return 0;
-}
-*/
-/*
-int printChildren( Node *n ){
-	int i;
-	for( i = 0; i < n->numChildren; i++ ){
-		printf("%d", n->id);
-	}
-	return 0;
-}
-*/
 
 // depth first search - preorder
 int dfs( Node *node ){
@@ -414,6 +321,8 @@ int dfs( Node *node ){
  * Summary: Burrows Wheeler Transform. Given an input string, construct a BWT
  * 		and print it out.  Basically, go to leafs and find representative val.
  */
+
+
 int bwt( Node *node ){
 	unsigned int i;
 	for( i=0; (i < node->numChildren) && (node->children[i] != NULL); i++ ){
@@ -426,15 +335,4 @@ int bwt( Node *node ){
 		printf("%c ", (bwtval > 0 ? ibuff[bwtval-1] : ibuff[inputLen - 1]));
 	}
 	return (0);
-}
-
-// free memory
-void doNotBeLikeFirefox( Node *node ) {
-	unsigned int i;
-	if (node) { 
-		for (i = 0; i < node->numChildren; ++i)
-			doNotBeLikeFirefox(node->children[i]);
-		if (node->numChildren == 0)
-			free(node);
-	}
 }
