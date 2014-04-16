@@ -134,7 +134,9 @@ Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead,
 		if(e){ // if e exists
 			unsigned int edgeLen = (e->suffixTail - e->suffixHead + 1);
 			if( edgeLen+r > bLen ){
-				i = splitEdge(e, suffix, inputLen -1);
+				i = splitEdge(e, suffix + r, inputLen -1);
+				// possibly suffix + e->parent->depth
+				//i = ananthFindPath(e, suffix);
 				v = i->parent;
 				u->suffixLink = v;
 				return i;
@@ -150,12 +152,8 @@ Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead,
 				continue;
 			}
 		} else {
-			i = makeNode(leafs, currNode, bHead, bEnd, currNode->depth + bLen);
-			addChild(currNode, i);
-			leafs++;
-			v = i->parent;
-			u->suffixLink = v;
-			return i;
+			printf("NO EDGE IN ANANTHNODEHOPS: %s\n", &ibuff[suffix]);
+			exit(-1);
 		}
 	}
 	return i;
@@ -216,11 +214,11 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 			{
 				unsigned int k = u->depth;
 				Node *v = u->suffixLink;
-				//if (v->id == 0){
-				//	return ananthFindPath(v, i);
-				//} else {
+				if (v->id == 0){
+					return ananthFindPath(v, i);
+				} else {
 					return ananthFindPath(v, i + k-1);
-				//}
+				}
 				break;
 			}
 			// IB suffix link for u is known and u is the root
