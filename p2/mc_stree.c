@@ -47,6 +47,10 @@ Node *makeNode( unsigned int id, Node *parent,
 		printf("\nERROR: could not malloc new node\n");
 		exit (1);
 	}
+	if (suffixHead > suffixTail){
+		printf("Error making node %d Head %d Tail %d", id, suffixHead, suffixTail);
+		exit (-1);
+	}
 	newnode->id = id;
 	newnode->suffixLink = NULL;
 	newnode->parent = parent == NULL ? newnode : parent;
@@ -117,7 +121,7 @@ Node *ananthFindPath( Node *v, unsigned int head ){
 		addChild(hopped, child);
 		leafs++;
 	} else { // a child exists
-		child = splitEdge(child, head + hopped->depth, tail);
+		child = splitEdge(child, head + hops, tail);
 	}
 	return child;
 }
@@ -134,7 +138,7 @@ Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead,
 		if(e){ // if e exists
 			unsigned int edgeLen = (e->suffixTail - e->suffixHead + 1);
 			if( edgeLen+r > bLen ){
-				i = splitEdge(e, suffix + r, inputLen -1);
+				i = splitEdge(e, suffix + currNode->depth, inputLen -1);
 				// possibly suffix + e->parent->depth
 				//i = ananthFindPath(e, suffix);
 				v = i->parent;
@@ -243,7 +247,7 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 				Node *uPrime = u->parent;
 				unsigned int bHead = u->suffixHead, bTail = u->suffixTail;
 				unsigned int bPrimeHead = bHead+1;
-				if ((bTail - bPrimeHead + 1) == 0){
+				if (bTail == bHead){ // the lenght of u is 0
 					u->suffixLink = uPrime;
 					return ananthFindPath(uPrime, i);
 				} else{
