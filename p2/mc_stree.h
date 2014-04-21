@@ -28,6 +28,7 @@ unsigned int alphabetLen = 0;
 unsigned int inputLen = 0;
 unsigned int inodes = 0;
 unsigned int leafs = 1;
+unsigned int maxDepth = 0;
 
 char *abuff;
 char *ibuff;

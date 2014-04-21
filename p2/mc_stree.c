@@ -91,6 +91,9 @@ Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 					current->suffixHead, i - 1,
 					current->parent->depth + i - current->suffixHead);
 			inodes++;
+			if (newInode->depth > maxDepth){
+				maxDepth = newInode->depth;
+			}
 			// need to set the current children to the new inodes children
 			addChild(newInode, current);
 			newInode->parent->children[z] = newInode;

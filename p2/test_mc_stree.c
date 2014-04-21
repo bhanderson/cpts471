@@ -78,7 +78,7 @@ int validateArgs(const int argc, const char **argv) {
 	printf("Input Alph:\t%s\n", argv[2]);
 
 	printf("\nIf any of this is wrong, press Ctrl+C to panic.\nOtherwise press ENTER to continue...");
-	//getchar();
+	getchar();
 	return (0);
 }
 
@@ -265,7 +265,7 @@ int main (int argc, const char *argv[])
 	printf("\nInput memory time: \t%f (ms)\n", diff_time(&tstart, &tstop));
 	printf("Input memory space:\t%llu (Kib)\n", setupMem - startMem);
 	printf("Press ENTER to continue...");
-//	getchar();
+	getchar();
 
 	// suffix tree construction
 	startMem = getMemUsage();
@@ -279,9 +279,10 @@ int main (int argc, const char *argv[])
 	// depth first search
 	gettimeofday(&tstart, NULL);
 	//test_dfs(testTree);
+	printf("Max Depth: %d\n", maxDepth);
 	gettimeofday(&tstop, NULL);
 	printf("\nST DFS: %f ms\n", diff_time(&tstart, &tstop));
-	//getchar();
+	getchar();
 	
 	// burrows wheeler transform
 	gettimeofday(&tstart, NULL);
