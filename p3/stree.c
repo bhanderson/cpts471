@@ -62,7 +62,6 @@ Node *makeNode( unsigned int id, Node *parent,
 	return (newnode);
 }
 
-
 // find the child that matches the first character of the suffix
 Node *matchChild( Node *n, unsigned int suffix, unsigned int *i ){
 	Node *current = NULL;
@@ -163,7 +162,6 @@ Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead,
 	return i;
 }
 
-
 // find the type of node to insert
 int identifyCase( Node *root, Node *u ){
 	if( u->suffixLink != NULL )
@@ -202,7 +200,6 @@ Node *nodeHop( Node *n,unsigned int head, unsigned int tail){
 	// not an ending leaf and the for loop has gone through the string
 	return (nodeHop( a, head+i, tail));
 }
-
 
 Node *insert( unsigned int i, Node *root, Node *leaf ){
 	// ananth is right we are wrong
@@ -267,7 +264,6 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 	return 0;
 }
 
-
 Node *suffixTree( void ){
 	Node *root = makeNode(0, NULL, 0, 0, 0);
 	root->suffixLink = root;
@@ -281,7 +277,6 @@ Node *suffixTree( void ){
 	}
 	return root;
 }
-
 
 // depth first search - preorder
 int dfs( Node *node ){
@@ -308,7 +303,6 @@ int dfs( Node *node ){
 	return (0);
 }
 
-
 /* Function: bwt()
  * Input:
  * 		*node: pointer to node in tree
@@ -317,7 +311,6 @@ int dfs( Node *node ){
  * Summary: Burrows Wheeler Transform. Given an input string, construct a BWT
  * 		and print it out.  Basically, go to leafs and find representative val.
  */
-
 
 int bwt( Node *node ){
 	unsigned int i;
@@ -333,7 +326,6 @@ int bwt( Node *node ){
 	return (0);
 }
 
-
 // free memory
 void doNotBeLikeFirefox( Node *node ) {
 	unsigned int i;//,j;
@@ -346,5 +338,37 @@ void doNotBeLikeFirefox( Node *node ) {
 		//	node->children[j] = NULL;
 		free(node->children);
 		free(node);
+	}
+}
+
+void prepareST(Node *root){
+	unsigned int A[inputLen + 1];
+	unsigned int i = 0;
+	for(i=0; i < inputLen+1; i++){
+		A[i] = -1;
+	}
+	DFS_PrepareST(root, A);
+}
+
+void DFS_PrepareST(Node *T, unsigned int A[]){
+	if(T==NULL) return;
+
+	if (T->numChildren == 0){ // is a leaf node
+		A[nextIndex] = T->id;
+		if(T->depth >= 1){
+			T->start_index = nextIndex;
+			T->end_index = nextIndex;
+		}
+		nextIndex++;
+		return;
+	} else {
+		unsigned int i = 0;
+		for(i=0; i < T->numChildren; i++){
+			DFS_PrepareST(T->children[i], A);
+		}
+		if(T->depth >= 1){
+			T->start_index = T->children[0]->start_index;
+			T->end_index = T->children[T->numChildren -1]->end_index;
+		}
 	}
 }

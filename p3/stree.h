@@ -28,10 +28,12 @@ unsigned int alphabetLen = 0;
 unsigned int inputLen = 0;
 unsigned int inodes = 0;
 unsigned int leafs = 1;
+unsigned int nextIndex = 0;
 
 char *abuff;
 char *ibuff;
 char iname[16];
+
 
 typedef int bool;
 enum { false, true };		// get mad, this is worth it
@@ -43,6 +45,8 @@ typedef struct Node{		// ananth complete
 	unsigned int numChildren;
 	unsigned int suffixHead;
 	unsigned int suffixTail;
+	unsigned int start_index;
+	unsigned int end_index;
 	struct Node *parent;
 	struct Node *suffixLink;
 	struct Node **children;
@@ -78,5 +82,9 @@ int dfs( Node *node );
 int bwt( Node *node );
 
 void doNotBeLikeFirefox( Node *node );
+
+void prepareST(Node *root);
+
+void DFS_PrepareST(Node *T, unsigned int A[]);
 
 #endif	// _STREE_H_
