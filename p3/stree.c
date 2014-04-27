@@ -63,13 +63,13 @@ Node *makeNode( unsigned int id, Node *parent,
 }
 
 // find the child that matches the first character of the suffix
-Node *matchChild( Node *n, unsigned int suffix, unsigned int *i ){
+Node *matchChild( Node *n, char *buff, unsigned int suffix, unsigned int *i ){
 	Node *current = NULL;
 	//at node n check all children's first char
 	//at the child
 	for (*i = 0; *i < n->numChildren && n->numChildren > 0; *i+=1){
 		current = n->children[*i];
-		if (ibuff[current->suffixHead] == ibuff[suffix]){
+		if (buff[current->suffixHead] == buff[suffix]){
 			return (current);
 		}
 	}
@@ -79,7 +79,7 @@ Node *matchChild( Node *n, unsigned int suffix, unsigned int *i ){
 // split the current nodes parent edge with the suffix return the leaf
 Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 	unsigned int i = 0, min = 0, x = 0, y = 0, z = 0;
-	matchChild(current->parent, head, &z);
+	matchChild(current->parent, ibuff, head, &z);
 	x = tail;
 	y = current->suffixTail;
 	min = y ^ ((x ^ y) & -(x < y));
@@ -110,9 +110,9 @@ Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 
 Node *ananthFindPath( Node *v, unsigned int head ){
 	unsigned int childNum, tail = inputLen -1;
-	Node *hopped = nodeHop(v, head, inputLen -1);
+	Node *hopped = nodeHop(v, ibuff, head, inputLen -1);
 	unsigned int hops = hopped->depth - v->depth;
-	Node *child = matchChild(hopped, head+hops, &childNum);
+	Node *child = matchChild(hopped, ibuff, head+hops, &childNum);
 	if ( child == NULL){
 		child = makeNode(leafs, hopped,
 				head + hops, tail,
@@ -133,7 +133,7 @@ Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead,
 
 	while(r <= (bLen)){ // r <= beta len
 		// let e be the edge under currnode that starts with the character b[r]
-		e = matchChild(currNode, bHead+r, &childNum);
+		e = matchChild(currNode, ibuff, bHead+r, &childNum);
 		if(e){ // if e exists
 			unsigned int edgeLen = (e->suffixTail - e->suffixHead + 1);
 			if( edgeLen+r > bLen ){
@@ -178,9 +178,9 @@ int identifyCase( Node *root, Node *u ){
 
 // given a node and a suffix find the end of the suffix by traversing down
 // returns the parent that mismatches
-Node *nodeHop( Node *n,unsigned int head, unsigned int tail){ 
+Node *nodeHop( Node *n, char *buff, unsigned int head, unsigned int tail){ 
 	unsigned int numChild = 0, i = 0, x, y, min;
-	Node *a = matchChild(n, head, &numChild);
+	Node *a = matchChild(n, buff, head, &numChild);
 	// if there isnt a child that matches return that node
 	if( a == NULL){
 		//if ( strlen(beta) == 1 )
@@ -193,12 +193,12 @@ Node *nodeHop( Node *n,unsigned int head, unsigned int tail){
 	y = a->suffixTail - a->suffixHead + 1;
 	min = y ^ ((x ^ y) & -(x < y));
 	for( i = 0; i < min; i++){
-		if( ibuff[head + i] != ibuff[a->suffixHead + i] ){
+		if( buff[head + i] != buff[a->suffixHead + i] ){
 			return (n);
 		}
 	}
 	// not an ending leaf and the for loop has gone through the string
-	return (nodeHop( a, head+i, tail));
+	return (nodeHop( a, buff, head+i, tail));
 }
 
 Node *insert( unsigned int i, Node *root, Node *leaf ){
@@ -340,7 +340,7 @@ void doNotBeLikeFirefox( Node *node ) {
 		free(node);
 	}
 }
-
+/*
 void prepareST(Node *root){
 	unsigned int A[inputLen + 1];
 	unsigned int i = 0;
@@ -372,3 +372,38 @@ void DFS_PrepareST(Node *T, unsigned int A[]){
 		}
 	}
 }
+
+void mapReads(){
+	unsigned int i = 0;
+	for( i = 0; i < numReads; i++){
+		int l = strlen(rbuff[i]);
+		// findLoc
+	}
+}
+
+void findLoc(Node *root, char *r){
+	Node *T = root;
+	int read_ptr = 1;
+	int i = 0;
+	bool mismatch = false;
+	Node *currentChild = NULL;
+	char *childChar = NULL;
+	// starting at T find path below the node T in the tree that
+	// spells out as many remaining characters of r starting at read_ptr
+	while(!mismatch){
+		currentChild = NULL;
+		for(i=0; i<T->numChildren && currentChild == NULL; i++){
+			childChar = ibuff[T->children[i]->start_index];
+			if (childChar == r[0]){// a match has been found
+				currentChild = T->children[i];
+				break;
+			}
+		}
+		// if a child has not been found
+		if (currentChild == NULL){
+			mismatch = true;
+			break;
+		}
+	}
+}
+*/
