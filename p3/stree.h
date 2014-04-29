@@ -26,14 +26,17 @@
 
 unsigned int alphabetLen = 0;
 unsigned int inputLen = 0;
+unsigned int readsLen = 0;
 unsigned int inodes = 0;
 unsigned int leafs = 1;
 unsigned int nextIndex = 0;
 unsigned int numReads = 0;
+unsigned int maxReadIndex = 0;
 
 char *abuff;
 char *ibuff;
-char **rbuff;
+char *rbuff;
+char **readsList;
 char iname[16];
 
 

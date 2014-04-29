@@ -340,7 +340,8 @@ void doNotBeLikeFirefox( Node *node ) {
 		free(node);
 	}
 }
-/*
+
+
 void prepareST(Node *root){
 	unsigned int A[inputLen + 1];
 	unsigned int i = 0;
@@ -380,7 +381,8 @@ void mapReads(){
 		// findLoc
 	}
 }
-
+// find the longest common substring between an input read r and a reference
+// genome G and return all its starting positions along the reference genome.
 void findLoc(Node *root, char *r){
 	Node *T = root;
 	int read_ptr = 1;
@@ -390,6 +392,8 @@ void findLoc(Node *root, char *r){
 	char *childChar = NULL;
 	// starting at T find path below the node T in the tree that
 	// spells out as many remaining characters of r starting at read_ptr
+	Node *nodePtr = nodeHop(T, r, 0, strlen(r)-1);
+	
 	while(!mismatch){
 		currentChild = NULL;
 		for(i=0; i<T->numChildren && currentChild == NULL; i++){
@@ -406,4 +410,4 @@ void findLoc(Node *root, char *r){
 		}
 	}
 }
-*/
+
