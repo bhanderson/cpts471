@@ -178,7 +178,7 @@ int identifyCase( Node *root, Node *u ){
 
 // given a node and a suffix find the end of the suffix by traversing down
 // returns the parent that mismatches
-Node *nodeHop( Node *n, char *buff, unsigned int head, unsigned int tail){ 
+Node *nodeHop( Node *n, char *buff, unsigned int head, unsigned int tail){
 	unsigned int numChild = 0, i = 0, x, y, min;
 	Node *a = matchChild(n, buff, head, &numChild);
 	// if there isnt a child that matches return that node
@@ -342,8 +342,7 @@ void doNotBeLikeFirefox( Node *node ) {
 }
 
 
-void prepareST(Node *root){
-	unsigned int A[inputLen + 1];
+void prepareST(Node *root, unsigned int A[]){
 	unsigned int i = 0;
 	for(i=0; i < inputLen+1; i++){
 		A[i] = -1;
@@ -374,40 +373,48 @@ void DFS_PrepareST(Node *T, unsigned int A[]){
 	}
 }
 
-void mapReads(){
-	unsigned int i = 0;
-	for( i = 0; i < numReads; i++){
-		int l = strlen(rbuff[i]);
-		// findLoc
+Node *readNodeHop( Node *n, char *buff, unsigned int head, unsigned int tail){
+	unsigned int numChild = 0, i = 0, x, y, min;
+	Node *a = matchChild(n, buff, head, &numChild);
+	// if there isnt a child that matches return that node
+	if( a == NULL){
+		//if ( strlen(beta) == 1 )
+		//	return n;
+		return (a);
 	}
-}
-// find the longest common substring between an input read r and a reference
-// genome G and return all its starting positions along the reference genome.
-void findLoc(Node *root, char *r){
-	Node *T = root;
-	int read_ptr = 1;
-	int i = 0;
-	bool mismatch = false;
-	Node *currentChild = NULL;
-	char *childChar = NULL;
-	// starting at T find path below the node T in the tree that
-	// spells out as many remaining characters of r starting at read_ptr
-	Node *nodePtr = nodeHop(T, r, 0, strlen(r)-1);
-	
-	while(!mismatch){
-		currentChild = NULL;
-		for(i=0; i<T->numChildren && currentChild == NULL; i++){
-			childChar = ibuff[T->children[i]->start_index];
-			if (childChar == r[0]){// a match has been found
-				currentChild = T->children[i];
-				break;
-			}
-		}
-		// if a child has not been found
-		if (currentChild == NULL){
-			mismatch = true;
-			break;
+	//x = (int)strlen(beta);
+	//y = (int)strlen(a->parentEdgeLabel);
+	x = tail - head + 1;
+	y = a->suffixTail - a->suffixHead + 1;
+	min = y ^ ((x ^ y) & -(x < y));
+	for( i = 0; i < min; i++){
+		if( buff[head + i] != buff[a->suffixHead + i] ){
+			return (n);
 		}
 	}
+	// not an ending leaf and the for loop has gone through the string
+	return (nodeHop( a, buff, head+i, tail));
 }
 
+void findLoc(Node *root, char *r, unsigned int *A[], unsigned int *start, unsigned int *end){
+	Node *T = root;
+	unsigned int read_ptr = 1;
+	Node *deepestNode = NULL;
+	while(T){
+		Node *u = readNodeHop(T, r, 0, strlen(r)-1);
+		read_ptr = u->depth;
+		if(deepestNode->depth < read_ptr && u->depth >= strlen(r))
+			deepestNode = u;
+		T = u->suffixLink;
+	}
+	*start = *A[deepestNode->start_index];
+	*end = *A[deepestNode->end_index];
+	return;
+}
+
+void mapReads(Node *root, unsigned int *A[], unsigned int *start, unsigned int *end){
+	unsigned int i = 0;
+	for( i = 0; i < numReads; i++){
+		findLoc(root, readsList[i], A, start, end);
+	}
+}
