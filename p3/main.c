@@ -100,7 +100,7 @@ int setUp(const char ** argv) {
 
 //	int ibytes = input_size;
 //	int rbytes = reads_size;
-	int abytes = alpha_size;
+//	int abytes = alpha_size;
 	char inchar = '\0';
 
 	// read in name of sequence
@@ -126,12 +126,10 @@ int setUp(const char ** argv) {
 			if (inchar != ' ' && inchar != '\n') {
 				ibuff[inputLen] = inchar;
 				++inputLen;
-				//++i;
-				//ibytes--;
 			}
 			inchar = fgetc(inputfile);
 		}
-	} while (inchar != EOF); /*ibytes > 0 && */
+	} while (inchar != EOF);
 	ibuff[inputLen] = '$';
 	inputLen++;
 	ibuff[inputLen] = '\0';
@@ -168,9 +166,12 @@ int setUp(const char ** argv) {
 		printf("\nERROR: Cannot allocate memory for readsList.\n");
 		return (-1);
 	}
-	// TODO: finish this
+	
 	int readIndex = 0;
 	int readLen = 0;
+	int maxReadLen = 0;
+	
+	// read in reads, names, and make a readsList
 	do {
 		inchar = fgetc(readsfile);
 		if (inchar == '>') {		// read in a name
@@ -188,13 +189,19 @@ int setUp(const char ** argv) {
 		else {
 			readsList[readIndex] = &rbuff[readsLen];
 			++readIndex;
+			++numReads;
 			while (inchar != '\n' && inchar != EOF) {
 				if (inchar == 'N')
 					rbuff[readsLen] = 'A';
-				++readLen; //TODO
+				++readLen;
 				inchar = fgetc(readsfile);
 			}
 		}
+		if (readLen > maxReadLen) {
+			maxReadIndex = readIndex;
+			maxReadLen = readLen;
+		}
+		readLen = 0;
 		if (inchar == '\n') {
 			rbuff[readsLen] = '\0';
 			++readsLen;
@@ -209,7 +216,7 @@ int setUp(const char ** argv) {
 			abuff[alphabetLen] = inchar;
 			++alphabetLen;
 		}
-	} while (abytes > 0 && inchar != EOF);
+	} while (inchar != EOF);
 	abuff[alphabetLen] = '\0';
 
 	fclose(inputfile);
