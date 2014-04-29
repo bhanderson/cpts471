@@ -98,8 +98,8 @@ int setUp(const char ** argv) {
 
 	unsigned int i = 0;
 
-	int ibytes = input_size;
-	int rbytes = reads_size;
+//	int ibytes = input_size;
+//	int rbytes = reads_size;
 	int abytes = alpha_size;
 	char inchar = '\0';
 
@@ -175,25 +175,29 @@ int setUp(const char ** argv) {
 		inchar = fgetc(readsfile);
 		if (inchar == '>') {		// read in a name
 			inchar = fgetc(readsfile);
-			readsList[readIndex] = &rbuff[rbuffLen];
+			readsList[readIndex] = &rbuff[readsLen];
 			++readIndex;
 			while(inchar != '\n' && inchar != EOF) {
-				rbuff[rbuffLen] = inchar;
-				++rbuffLen;
+				rbuff[readsLen] = inchar;
+				++readsLen;
 				inchar = fgetc(readsfile);
 			}
 			rbuff[readLen] = '\0'; 
 			++readLen;
 		}
 		else {
+			readsList[readIndex] = &rbuff[readsLen];
+			++readIndex;
 			while (inchar != '\n' && inchar != EOF) {
 				if (inchar == 'N')
-					rbuff[rbuffLen] = 'A';
+					rbuff[readsLen] = 'A';
+				++readLen; //TODO
+				inchar = fgetc(readsfile);
 			}
 		}
 		if (inchar == '\n') {
-			rbuff[rbuffLen] = '\0';
-			++rbuffLen;
+			rbuff[readsLen] = '\0';
+			++readsLen;
 		}
 	} while (inchar != EOF);
 	rbuff[readLen] = '\0';
@@ -209,7 +213,7 @@ int setUp(const char ** argv) {
 	abuff[alphabetLen] = '\0';
 
 	fclose(inputfile);
-	flcose(readsfile);
+	fclose(readsfile);
 	fclose(alphafile);
 
 	return (0);
@@ -218,5 +222,6 @@ int main(const int argc, const char *argv[]){
 	if(validateArgs(argc, argv)<0){
 		return -1;
 	}
+	setUp(argv);
 	return 0;
 }
