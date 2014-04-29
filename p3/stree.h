@@ -85,8 +85,14 @@ int bwt( Node *node );
 
 void doNotBeLikeFirefox( Node *node );
 
-void prepareST(Node *root);
+void prepareST(Node *root, unsigned int A[]);
 
 void DFS_PrepareST(Node *T, unsigned int A[]);
+
+Node *readNodeHop( Node *n, char *buff, unsigned int head, unsigned int tail);
+
+void findLoc(Node *root, char *r, unsigned int *A[], unsigned int *start, unsigned int *end);
+
+void mapReads(Node *root, unsigned int *A[], unsigned int *start, unsigned int *end);
 
 #endif	// _STREE_H_
