@@ -40,6 +40,12 @@ int allarr(int m, int n);
 
 int optimal(int i, int j);
 
+int localAlign(char *s1, char *s2, unsigned int length,
+				unsigned int *matches,
+				unsigned int *mismatches,
+				unsigned int *gaps,
+				unsigned int *openings);
+
 int align(char *s1, char *s2);
 
 int dynamicstrinput(char *path);
@@ -47,6 +53,8 @@ int dynamicstrinput(char *path);
 int strtoint(char *str);
 
 int settings(const char *argv[]);
+
+int mapRetrace(unsigned int *matches, unsigned int *mismatches, unsigned int *gaps, unsigned int *openings);
 
 int retrace();
 

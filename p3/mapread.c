@@ -94,11 +94,54 @@ Node *findLoc(Node *root, char *r){
 	return deepestNode;
 }
 
+char *getSubstring(int *length, int start, unsigned int end){
+	if(start < 0)
+		start = 0;
+	if(end > inputLen)
+		end = inputLen;
+
+	*length = end - start;
+
+	return &ibuff[start];
+}
+
 void mapReads(Node *root){
 	unsigned int i;
+	int j, readLen=0, subLen, score;
+	unsigned int matches = 0, mismatches = 0, gaps = 0, openings = 0;
+	unsigned int alignLen = 0;
+	double percentIdentity = 0.0;
+	double lenCoverage = 0.0;
+	double maxCoverage = 0.0;
+	unsigned int bestHitStart = 0, bestHitEnd = 0;
+	unsigned int maxReadLocation;
 	Node *deepest = NULL;
-	for(i=0;i<numReads;i++){
+	char *subString;
+	for(i=1; i<numReads; i+=2){
+		readLen = strlen(readsList[i]);
 		deepest = findLoc(root, readsList[i]);
-
-	}
+		for(j=deepest->start_index; j<= deepest->end_index; j++){
+			subString = getSubstring(&subLen, leafarr[j] - readLen, leafarr[j] + readLen);
+			MA = 1; MI = -2; H = -5; G = -1;
+			score = localAlign(ibuff, subString, subLen, &matches, &mismatches, &gaps, &openings);
+			alignLen = matches + mismatches + gaps;
+			percentIdentity = matches / alignLen;
+			lenCoverage = alignLen / readLen;
+			if(percentIdentity >= X && lenCoverage >= Y){
+				if (lenCoverage > maxCoverage){
+					maxCoverage = lenCoverage;
+					maxReadLocation = i;
+					bestHitStart = leafarr[j] - readLen;
+					bestHitEnd = leafarr[j] + readLen;
+					printf("Read Name: %s\n", readsList[maxReadLocation-1]);
+					printf("Start Index Hit: %d\n", bestHitStart);
+					printf("End Index Hit: %d\n", bestHitEnd);
+				} else {
+					printf("<%s> no hit found\n", readsList[i-1]);
+				}
+			}
+			dynamicfree(); // dptables are for loops
+		} // end for j
+	} // end for i
+	doNotBeLikeFirefox(root);
 }

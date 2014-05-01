@@ -57,6 +57,8 @@ Node *makeNode( unsigned int id, Node *parent,
 	newnode->suffixHead = suffixHead;
 	newnode->suffixTail = suffixTail;
 	newnode->numChildren = 0;
+	newnode->start_index = -1;
+	newnode->end_index = -1;
 	newnode->children = calloc(1, alphabetLen * sizeof(Node *));
 	newnode->depth = stringDepth;
 	return (newnode);

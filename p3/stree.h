@@ -50,8 +50,8 @@ typedef struct Node{		// ananth complete
 	unsigned int numChildren;
 	unsigned int suffixHead;
 	unsigned int suffixTail;
-	unsigned int start_index;
-	unsigned int end_index;
+	int start_index;
+	int end_index;
 	struct Node *parent;
 	struct Node *suffixLink;
 	struct Node **children;

@@ -4,6 +4,9 @@
 #include "stree.h"
 #include "dptable.h"
 
+double X = 90.0;
+double Y = 80.0;
+
 int *leafarr = NULL;
 
 void prepareST(Node *root);
