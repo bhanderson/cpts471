@@ -26,19 +26,13 @@
 
 unsigned int alphabetLen = 0;
 unsigned int inputLen = 0;
-unsigned int readsLen = 0;
 unsigned int inodes = 0;
 unsigned int leafs = 1;
-unsigned int nextIndex = 0;
-unsigned int numReads = 0;
-unsigned int maxReadIndex = 0;
+unsigned int maxDepth = 0;
 
 char *abuff;
 char *ibuff;
-char *rbuff;
-char **readsList;
 char iname[16];
-
 
 typedef int bool;
 enum { false, true };		// get mad, this is worth it
@@ -65,7 +59,7 @@ int addChild( Node *parent, Node *child );
 Node *makeNode( unsigned int id, Node *parent,
 		unsigned int suffixHead, unsigned int suffixTail, unsigned int Depth );
 
-Node *matchChild( Node *n, char *buff, unsigned int suffix, unsigned int *i );
+Node *matchChild( Node *n, unsigned int suffix, unsigned int *i );
 
 Node *splitEdge( Node *current, unsigned int head, unsigned int tail);
 
@@ -76,7 +70,7 @@ Node *ananthNodeHops( Node *vPrime, Node *u, unsigned int bHead,
 
 int identifyCase( Node *root, Node *u );
 
-Node *nodeHop( Node *n, char *buff, unsigned int head, unsigned int tail);
+Node *nodeHop( Node *n, unsigned int head, unsigned int tail);
 
 Node *insert( unsigned int i, Node *root, Node *leaf );
 
@@ -88,4 +82,4 @@ int bwt( Node *node );
 
 void doNotBeLikeFirefox( Node *node );
 
-#endif	// _STREE_H_
+#endif	// _MC_STREE_H_

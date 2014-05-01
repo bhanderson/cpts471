@@ -10,21 +10,7 @@
 #define DEL 2
 #define INS 4
 
-int LOCAL = 0, MA = 0, MI = 0, G = 0, H = 0;
-char *dynamicstring;
-char *s1, *s2, *s1name, *s2name;
-int highscore[2];
-int strnum = 0;
 
-
-typedef struct DP_cell{
-	int s;
-	int d;
-	int i;
-} DP_cell;
-
-
-DP_cell **dynamicarray;
 
 
 void print_menu(){
@@ -149,7 +135,7 @@ int optimal(int i, int j){
 
 // sequence, substring, lenght of substring
 int localAlign(char *s1, char *s2, unsigned int length,
-		unsigned int *matches, 
+		unsigned int *matches,
 		unsigned int *mismatches,
 		unsigned int *gaps,
 		unsigned int *openings)

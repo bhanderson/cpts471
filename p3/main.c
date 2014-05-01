@@ -1,9 +1,14 @@
-#include "stree.h"
+#include "stree.c"
+
+#include "mapread.c"
+#include "dptable.c"
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/sysinfo.h>
 #include <sys/time.h>
 #include <sys/types.h>
+
+
 
 
 int validateArgs(const int argc, const char **argv) {
@@ -168,7 +173,7 @@ int setUp(const char ** argv) {
 	}
 	
 	int readIndex = 0;
-	int readLen = 0;
+	int currReadLen = 0;
 	int maxReadLen = 0;
 	
 	// read in reads, names, and make a readsList
@@ -183,8 +188,8 @@ int setUp(const char ** argv) {
 				++readsLen;
 				inchar = fgetc(readsfile);
 			}
-			rbuff[readLen] = '\0'; 
-			++readLen;
+			//rbuff[readsLen] = '\0'; 
+			//++readsLen;
 		}
 		else {
 			readsList[readIndex] = &rbuff[readsLen];
@@ -193,21 +198,24 @@ int setUp(const char ** argv) {
 			while (inchar != '\n' && inchar != EOF) {
 				if (inchar == 'N')
 					rbuff[readsLen] = 'A';
-				++readLen;
+				else
+					rbuff[readsLen] = inchar;
+				++readsLen;
+				++currReadLen;
 				inchar = fgetc(readsfile);
 			}
 		}
-		if (readLen > maxReadLen) {
+		if (currReadLen > maxReadLen) {
 			maxReadIndex = readIndex;
-			maxReadLen = readLen;
+			maxReadLen = currReadLen;
+			currReadLen = 0;
 		}
-		readLen = 0;
 		if (inchar == '\n') {
 			rbuff[readsLen] = '\0';
 			++readsLen;
 		}
 	} while (inchar != EOF);
-	rbuff[readLen] = '\0';
+	rbuff[readsLen] = '\0';
 
 	// read in alphabet
 	do {
@@ -225,10 +233,22 @@ int setUp(const char ** argv) {
 
 	return (0);
 }
+
 int main(const int argc, const char *argv[]){
 	if(validateArgs(argc, argv)<0){
 		return -1;
 	}
 	setUp(argv);
+//	ibuff = "banana$";
+//	inputLen = 7;
+	Node *root = suffixTree();
+//	dfs(root);
+	
+	prepareST(root);
+
+	mapReads(root);
+
+
+
 	return 0;
 }

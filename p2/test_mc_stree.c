@@ -293,6 +293,8 @@ int main (int argc, const char *argv[])
 	gettimeofday(&tstop, NULL);
 	printf("\nST BWT: %f ms\n\n", diff_time(&tstart, &tstop));
 
+	dfs(testTree);
+
 	doNotBeLikeFirefox(testTree);
 	cleanupTime();
 

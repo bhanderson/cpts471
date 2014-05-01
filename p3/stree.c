@@ -57,21 +57,22 @@ Node *makeNode( unsigned int id, Node *parent,
 	newnode->suffixHead = suffixHead;
 	newnode->suffixTail = suffixTail;
 	newnode->numChildren = 0;
-	newnode->start_index = -1;
-	newnode->end_index = -1;
 	newnode->children = calloc(1, alphabetLen * sizeof(Node *));
 	newnode->depth = stringDepth;
+	newnode->start_index = -1;
+	newnode->end_index = -1;
 	return (newnode);
 }
 
+
 // find the child that matches the first character of the suffix
-Node *matchChild( Node *n, char *buff, unsigned int suffix, unsigned int *i ){
+Node *matchChild( Node *n, unsigned int suffix, unsigned int *i ){
 	Node *current = NULL;
 	//at node n check all children's first char
 	//at the child
 	for (*i = 0; *i < n->numChildren && n->numChildren > 0; *i+=1){
 		current = n->children[*i];
-		if (buff[current->suffixHead] == buff[suffix]){
+		if (ibuff[current->suffixHead] == ibuff[suffix]){
 			return (current);
 		}
 	}
@@ -81,7 +82,7 @@ Node *matchChild( Node *n, char *buff, unsigned int suffix, unsigned int *i ){
 // split the current nodes parent edge with the suffix return the leaf
 Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 	unsigned int i = 0, min = 0, x = 0, y = 0, z = 0;
-	matchChild(current->parent, ibuff, head, &z);
+	matchChild(current->parent, head, &z);
 	x = tail;
 	y = current->suffixTail;
 	min = y ^ ((x ^ y) & -(x < y));
@@ -92,6 +93,9 @@ Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 					current->suffixHead, i - 1,
 					current->parent->depth + i - current->suffixHead);
 			inodes++;
+			if (newInode->depth > maxDepth){
+				maxDepth = newInode->depth;
+			}
 			// need to set the current children to the new inodes children
 			addChild(newInode, current);
 			newInode->parent->children[z] = newInode;
@@ -112,9 +116,9 @@ Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 
 Node *ananthFindPath( Node *v, unsigned int head ){
 	unsigned int childNum, tail = inputLen -1;
-	Node *hopped = nodeHop(v, ibuff, head, inputLen -1);
+	Node *hopped = nodeHop(v, head, inputLen -1);
 	unsigned int hops = hopped->depth - v->depth;
-	Node *child = matchChild(hopped, ibuff, head+hops, &childNum);
+	Node *child = matchChild(hopped, head+hops, &childNum);
 	if ( child == NULL){
 		child = makeNode(leafs, hopped,
 				head + hops, tail,
@@ -135,7 +139,7 @@ Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead,
 
 	while(r <= (bLen)){ // r <= beta len
 		// let e be the edge under currnode that starts with the character b[r]
-		e = matchChild(currNode, ibuff, bHead+r, &childNum);
+		e = matchChild(currNode, bHead+r, &childNum);
 		if(e){ // if e exists
 			unsigned int edgeLen = (e->suffixTail - e->suffixHead + 1);
 			if( edgeLen+r > bLen ){
@@ -164,6 +168,7 @@ Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead,
 	return i;
 }
 
+
 // find the type of node to insert
 int identifyCase( Node *root, Node *u ){
 	if( u->suffixLink != NULL )
@@ -180,9 +185,9 @@ int identifyCase( Node *root, Node *u ){
 
 // given a node and a suffix find the end of the suffix by traversing down
 // returns the parent that mismatches
-Node *nodeHop( Node *n, char *buff, unsigned int head, unsigned int tail){
+Node *nodeHop( Node *n,unsigned int head, unsigned int tail){ 
 	unsigned int numChild = 0, i = 0, x, y, min;
-	Node *a = matchChild(n, buff, head, &numChild);
+	Node *a = matchChild(n, head, &numChild);
 	// if there isnt a child that matches return that node
 	if( a == NULL){
 		//if ( strlen(beta) == 1 )
@@ -195,13 +200,14 @@ Node *nodeHop( Node *n, char *buff, unsigned int head, unsigned int tail){
 	y = a->suffixTail - a->suffixHead + 1;
 	min = y ^ ((x ^ y) & -(x < y));
 	for( i = 0; i < min; i++){
-		if( buff[head + i] != buff[a->suffixHead + i] ){
+		if( ibuff[head + i] != ibuff[a->suffixHead + i] ){
 			return (n);
 		}
 	}
 	// not an ending leaf and the for loop has gone through the string
-	return (nodeHop( a, buff, head+i, tail));
+	return (nodeHop( a, head+i, tail));
 }
+
 
 Node *insert( unsigned int i, Node *root, Node *leaf ){
 	// ananth is right we are wrong
@@ -266,6 +272,7 @@ Node *insert( unsigned int i, Node *root, Node *leaf ){
 	return 0;
 }
 
+
 Node *suffixTree( void ){
 	Node *root = makeNode(0, NULL, 0, 0, 0);
 	root->suffixLink = root;
@@ -279,6 +286,7 @@ Node *suffixTree( void ){
 	}
 	return root;
 }
+
 
 // depth first search - preorder
 int dfs( Node *node ){
@@ -305,6 +313,7 @@ int dfs( Node *node ){
 	return (0);
 }
 
+
 /* Function: bwt()
  * Input:
  * 		*node: pointer to node in tree
@@ -313,6 +322,7 @@ int dfs( Node *node ){
  * Summary: Burrows Wheeler Transform. Given an input string, construct a BWT
  * 		and print it out.  Basically, go to leafs and find representative val.
  */
+
 
 int bwt( Node *node ){
 	unsigned int i;
@@ -328,6 +338,7 @@ int bwt( Node *node ){
 	return (0);
 }
 
+
 // free memory
 void doNotBeLikeFirefox( Node *node ) {
 	unsigned int i;//,j;
@@ -342,4 +353,3 @@ void doNotBeLikeFirefox( Node *node ) {
 		free(node);
 	}
 }
-

@@ -5,6 +5,11 @@ int *allocate_leafarr(int len){
 
 	leaves = (int*)malloc(sizeof(int)*(len));
 
+	if(!leaves){
+		perror("could not allocate leaves");
+		exit(1);
+	}
+
 	for(i=0;i<len;i++){
 		leaves[i] = -1;
 	}
@@ -13,7 +18,7 @@ int *allocate_leafarr(int len){
 }
 
 void prepareST(Node *root){
-	leafarray = allocate_leafarr(inputLen +1);
+	leafarr = allocate_leafarr(inputLen +1);
 
 	DFS_PrepareST(root);
 }
@@ -41,14 +46,28 @@ void DFS_PrepareST(Node *T){
 	}
 }
 
+Node *readMatchChild( Node *n, char *buff, unsigned int suffix, unsigned int *i ){
+	Node *current = NULL;
+	//at node n check all children's first char
+	//at the child
+	for (*i = 0; *i < n->numChildren && n->numChildren > 0; *i+=1){
+		current = n->children[*i];
+		if (buff[current->suffixHead] == buff[suffix]){
+			return (current);
+		}
+	}
+	*i = -1;
+	return (NULL);
+}
+
 Node *readNodeHop( Node *n, char *buff, unsigned int head, unsigned int tail){
 	unsigned int numChild = 0, i = 0, x, y, min;
-	Node *a = matchChild(n, buff, head, &numChild);
+	Node *a = readMatchChild(n, buff, head, &numChild);
 	// if there isnt a child that matches return that node
 	if( a == NULL){
 		//if ( strlen(beta) == 1 )
 		//	return n;
-		return (a);
+		return (n);
 	}
 	//x = (int)strlen(beta);
 	//y = (int)strlen(a->parentEdgeLabel);
@@ -61,12 +80,14 @@ Node *readNodeHop( Node *n, char *buff, unsigned int head, unsigned int tail){
 		}
 	}
 	// not an ending leaf and the for loop has gone through the string
-	return (nodeHop( a, buff, head+i, tail));
+	return (readNodeHop( a, buff, head+i, tail));
 }
 
 int matchesBelow(Node *n, char *buff, int start){
 	unsigned int i=0, j=0, count=0;
-	Node *child = matchChild(n, buff, start, &i);
+	Node *child = readMatchChild(n, buff, start, &i);
+	if(child == NULL)
+		return 0;
 	for(j=0; j<child->suffixHead - child->suffixTail +1; j++){
 		if(buff[start] == ibuff[child->suffixHead+j]){
 			count++;

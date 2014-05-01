@@ -9,6 +9,18 @@ double Y = 80.0;
 
 int *leafarr = NULL;
 
+unsigned int nextIndex = 0;
+
+unsigned int readsLen = 0;
+
+char *rbuff;
+
+char **readsList;
+
+unsigned int numReads = 0;
+
+unsigned int maxReadIndex = 0;
+
 void prepareST(Node *root);
 
 void DFS_PrepareST(Node *T);
