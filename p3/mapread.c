@@ -152,8 +152,10 @@ void mapReads(Node *root){
 				if (lenCoverage > maxCoverage){
 					maxCoverage = lenCoverage;
 					maxReadLocation = i;
-					bestHitStart = leafarr[j] - readLen;
-					bestHitEnd = leafarr[j] + readLen;
+					//bestHitStart = leafarr[j] - readLen;
+					bestHitStart = j - readLen < 0 ? 0 : j - readLen;
+					//bestHitEnd = leafarr[j] + readLen;
+					bestHitEnd = j + readLen;
 					printf("Read Name: %s\n", readsList[maxReadLocation-1]);
 					printf("Start Index Hit: %d\n", bestHitStart);
 					printf("End Index Hit: %d\n", bestHitEnd);
@@ -164,5 +166,5 @@ void mapReads(Node *root){
 			dynamicfree(strlen(ibuff), strlen(subString)); // dptables are for loops
 		} // end for j
 	} // end for i
-	//doNotBeLikeFirefox(root);
+//	doNotBeLikeFirefox(root);
 }
