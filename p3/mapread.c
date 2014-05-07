@@ -27,7 +27,7 @@ void DFS_PrepareST(Node *T){
 	if(T==NULL) return;
 
 	if (T->numChildren == 0){ // is a leaf node
-		leafarr[nextIndex] = T->id;
+		leafarr[nextIndex] = T->id - 1;
 		if(T->depth >= 1){
 			T->start_index = nextIndex;
 			T->end_index = nextIndex;
@@ -52,7 +52,7 @@ Node *readMatchChild( Node *n, char *buff, unsigned int suffix, unsigned int *i 
 	//at the child
 	for (*i = 0; *i < n->numChildren && n->numChildren > 0; *i+=1){
 		current = n->children[*i];
-		if (buff[current->suffixHead] == buff[suffix]){
+		if (ibuff[current->suffixHead] == buff[suffix]){
 			return (current);
 		}
 	}
@@ -75,7 +75,7 @@ Node *readNodeHop( Node *n, char *buff, unsigned int head, unsigned int tail){
 	y = a->suffixTail - a->suffixHead + 1;
 	min = y ^ ((x ^ y) & -(x < y));
 	for( i = 0; i < min; i++){
-		if( buff[head + i] != buff[a->suffixHead + i] ){
+		if( buff[head + i] != ibuff[a->suffixHead + i] ){
 			return (n);
 		}
 	}
@@ -102,7 +102,7 @@ Node *findLoc(Node *root, char *r){
 	Node *T = root;
 	unsigned int read_ptr = 0, i = 0, mostMatches = 0;
 	Node *deepestNode = NULL;
-	while(T){
+	do{
 		Node *u = readNodeHop(T, r, 0, strlen(r)-1);
 		read_ptr = u->depth;
 		i = matchesBelow(u, r, u->depth);
@@ -111,7 +111,7 @@ Node *findLoc(Node *root, char *r){
 			mostMatches = u->depth + i;
 		}
 		T = u->suffixLink;
-	}
+	} while (T!=root);
 	return deepestNode;
 }
 
@@ -121,7 +121,7 @@ char *getSubstring(int *length, int start, unsigned int end){
 	if(end > inputLen)
 		end = inputLen;
 
-	*length = end - start;
+	*length = end - start + 1;
 
 	return &ibuff[start];
 }
@@ -138,7 +138,7 @@ void mapReads(Node *root){
 	unsigned int maxReadLocation;
 	Node *deepest = NULL;
 	char *subString;
-	for(i=1; i<numReads; i+=2){
+	for(i=1; i<numReads*2; i+=2){
 		readLen = strlen(readsList[i]);
 		deepest = findLoc(root, readsList[i]);
 		for(j=deepest->start_index; j<= deepest->end_index; j++){
@@ -146,8 +146,8 @@ void mapReads(Node *root){
 			MA = 1; MI = -2; H = -5; G = -1;
 			score = localAlign(ibuff, subString, subLen, &matches, &mismatches, &gaps, &openings);
 			alignLen = matches + mismatches + gaps;
-			percentIdentity = matches / alignLen;
-			lenCoverage = alignLen / readLen;
+			percentIdentity = (double)matches / (double)alignLen;
+			lenCoverage = (double)alignLen / (double)readLen;
 			if(percentIdentity >= X && lenCoverage >= Y){
 				if (lenCoverage > maxCoverage){
 					maxCoverage = lenCoverage;
@@ -161,8 +161,8 @@ void mapReads(Node *root){
 					printf("<%s> no hit found\n", readsList[i-1]);
 				}
 			}
-			dynamicfree(); // dptables are for loops
+			dynamicfree(strlen(ibuff), strlen(subString)); // dptables are for loops
 		} // end for j
 	} // end for i
-	doNotBeLikeFirefox(root);
+	//doNotBeLikeFirefox(root);
 }

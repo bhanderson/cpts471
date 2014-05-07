@@ -191,14 +191,14 @@ int setUp(const char ** argv) {
 			//rbuff[readsLen] = '\0'; 
 			//++readsLen;
 		}
-		else {
+		else if(inchar != EOF){
 			readsList[readIndex] = &rbuff[readsLen];
 			++readIndex;
 			++numReads;
 			while (inchar != '\n' && inchar != EOF) {
-				if (inchar == 'N')
-					rbuff[readsLen] = 'A';
-				else
+//				if (inchar == 'N')		for banana only
+//					rbuff[readsLen] = 'A';
+//				else
 					rbuff[readsLen] = inchar;
 				++readsLen;
 				++currReadLen;
@@ -239,10 +239,7 @@ int main(const int argc, const char *argv[]){
 		return -1;
 	}
 	setUp(argv);
-//	ibuff = "banana$";
-//	inputLen = 7;
 	Node *root = suffixTree();
-//	dfs(root);
 	
 	prepareST(root);
 

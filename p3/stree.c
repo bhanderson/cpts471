@@ -349,7 +349,9 @@ void doNotBeLikeFirefox( Node *node ) {
 		//for(j=0;j<alphabetLen;j++)
 		//	free(node->children[j]);
 		//	node->children[j] = NULL;
-		free(node->children);
-		free(node);
+		if(node->children)
+			free(node->children);
+		if(node)
+			free(node);
 	}
 }

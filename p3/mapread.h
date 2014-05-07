@@ -4,8 +4,8 @@
 #include "stree.h"
 #include "dptable.h"
 
-double X = 90.0;
-double Y = 80.0;
+double X = .9;
+double Y = .8;
 
 int *leafarr = NULL;
 

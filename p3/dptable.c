@@ -18,16 +18,18 @@ void print_menu(){
 }
 
 
-int dynamicfree(){
+int dynamicfree(int s1len, int s2len){
 	int i = 0;
 	if (dynamicarray){
-		for (i=0;i< (int)strlen(s1)+1;i++){
+		for (i=0;i< s1len;i++){
 			free(dynamicarray[i]);
 		}
 		free(dynamicarray);
 	}
 	if(dynamicstring)
 		free(dynamicstring);
+	highscore[0] = 0;
+	highscore[1] = 0;
 	return 0;
 }
 
@@ -140,6 +142,8 @@ int localAlign(char *s1, char *s2, unsigned int length,
 		unsigned int *gaps,
 		unsigned int *openings)
 {
+	//s1 = str1;
+	//s2 = str2;
 	int i, j, m, n;
 	//m = strlen(s1);
 	m = length;
@@ -202,7 +206,7 @@ int localAlign(char *s1, char *s2, unsigned int length,
 	//printf("Optimal Score: %d\n", optimal(highscore[0], highscore[1]));
 	//}
 	//printf("Optimal Score: %d\n", optimal(i-1,j-1));
-	mapRetrace(matches, mismatches, gaps, openings);
+	mapRetrace(s1, s2, matches, mismatches, gaps, openings);
 
 	return optimal(highscore[0], highscore[1]);
 }
@@ -448,17 +452,17 @@ ERROR:
 }
 
 
-int mapRetrace(unsigned int *matches, unsigned int *mismatches, unsigned int *gaps, unsigned int *openings){
+int mapRetrace(char *s1, char *s2, unsigned int *matches, unsigned int *mismatches, unsigned int *gaps, unsigned int *openings){
 	int i = strlen(s1), j = strlen(s2);
 	int count = 0, o = i + j, penalty;
 	//int matches = 0, mismatches = 0, gaps = 0, openings = 0,
 	int max = 0;
 	char res1[o], res2[o], rema[o], dir;
 
-	if(LOCAL){
+//	if(LOCAL){
 		i = highscore[0];
 		j = highscore[1];
-	}
+//	}
 
 	max = optimal(i,j);
 	if(max == dynamicarray[i][j].s)
@@ -469,10 +473,10 @@ int mapRetrace(unsigned int *matches, unsigned int *mismatches, unsigned int *ga
 		dir = 'i';
 
 	while(i > 0 || j > 0){
-		if(LOCAL){
+		//if(LOCAL){
 			if(optimal(i,j) == 0)
 				break;
-		}
+		//}
 		switch(dir){
 			case 'd':
 				// got score from deletion
@@ -572,10 +576,10 @@ int retrace(){
 	int matches = 0, mismatches = 0, gaps = 0, openings = 0, max = 0;
 	char res1[o], res2[o], rema[o], dir;
 
-	if(LOCAL){
+	//if(LOCAL){
 		i = highscore[0];
 		j = highscore[1];
-	}
+	//}
 
 	max = optimal(i,j);
 	if(max == dynamicarray[i][j].s)
@@ -586,10 +590,10 @@ int retrace(){
 		dir = 'i';
 
 	while(i > 0 || j > 0){
-		if(LOCAL){
+		//if(LOCAL){
 			if(optimal(i,j) == 0)
 				break;
-		}
+		//}
 		switch(dir){
 			case 'd':
 				// got score from deletion

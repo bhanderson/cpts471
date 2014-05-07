@@ -26,7 +26,7 @@ DP_cell **dynamicarray;
 
 void print_menu();
 
-int dynamicfree();
+int dynamicfree(int s1len, int s2len);
 
 void wordwrap(char *a1, char *m, char *a2);
 
@@ -54,7 +54,7 @@ int strtoint(char *str);
 
 int settings(const char *argv[]);
 
-int mapRetrace(unsigned int *matches, unsigned int *mismatches, unsigned int *gaps, unsigned int *openings);
+int mapRetrace(char *s1, char *s2, unsigned int *matches, unsigned int *mismatches, unsigned int *gaps, unsigned int *openings);
 
 int retrace();
 
