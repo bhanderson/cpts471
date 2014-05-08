@@ -40,7 +40,7 @@ int allarr(int m, int n);
 
 int optimal(int i, int j);
 
-int localAlign(char *s1, char *s2, unsigned int length,
+int localAlign(char *read, char *sub,
 				unsigned int *matches,
 				unsigned int *mismatches,
 				unsigned int *gaps,

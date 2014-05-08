@@ -129,56 +129,82 @@ Node *findLoc(Node *root, char *read){
 	*/
 }
 
-char *getSubstring(int *length, int start, unsigned int end){
-	if(start < 0)
-		start = 0;
-	if(end > inputLen)
-		end = inputLen;
+char *getSubstring(Node *n, int rlen, unsigned int *start, unsigned int *end){
+	unsigned int i = 0;
+	char *retval;
+	if ((int)n->suffixHead - rlen < 0)
+		*start = 0;
+	else
+		*start = n->suffixHead - rlen;
 
-	*length = end - start + 1;
+	if (n->suffixTail + rlen > inputLen)
+		*end = inputLen;
+	else
+		*end = n->suffixTail + rlen;
 
-	return &ibuff[start];
+	retval = malloc(((*end - *start) + 1) * sizeof(char));
+	if(!retval){
+		perror("could not allocate substring");
+		exit(-1);
+	}
+	for(i = *start; i < *end; i++){
+		retval[i - *start] = ibuff[i];
+	}
+	retval[i] = 0;
+	return retval;
 }
 
 void mapReads(Node *root){
-	unsigned int i;
-	int j, readLen=0, subLen, score;
+	unsigned int i = 0, readLen = 0, score = 0, start = 0, end = 0;
 	unsigned int matches = 0, mismatches = 0, gaps = 0, openings = 0;
 	unsigned int alignLen = 0;
 	double percentIdentity = 0.0;
 	double lenCoverage = 0.0;
 	double maxCoverage = 0.0;
-	unsigned int bestHitStart = 0, bestHitEnd = 0;
 	unsigned int maxReadLocation;
+	unsigned int bestHitStart = 0, bestHitEnd = 0;
+	/*
+	int j, readLen=0, subLen, score;
+	*/
 	Node *deepest = NULL;
 	char *subString;
 	for(i=1; i<numReads*2; i+=2){
 		readLen = strlen(readsList[i]);
 		deepest = findLoc(root, readsList[i]);
+		subString = getSubstring(deepest, readLen, &start, &end);
+
+		MA = 1; MI = -2; H = -5; G = -1;
+
+		score = localAlign(readsList[i], subString, &matches, &mismatches, &gaps, &openings);
+		alignLen = matches + mismatches + gaps;
+		percentIdentity = (double)matches / (double)alignLen;
+		lenCoverage = (double)alignLen / (double)readLen;
+		if(percentIdentity >= X && lenCoverage >= Y){
+			if (lenCoverage > maxCoverage){
+				maxCoverage = lenCoverage;
+				maxReadLocation = i;
+				//bestHitStart = leafarr[j] - readLen;
+				bestHitStart = start;
+				//bestHitEnd = leafarr[j] + readLen;
+				bestHitEnd = end;
+				printf("Read Name: %s\n", readsList[maxReadLocation-1]);
+				printf("Start Index Hit: %d\n", bestHitStart);
+				printf("End Index Hit: %d\n", bestHitEnd);
+			} else {
+				printf("<%s> no hit found\n", readsList[i-1]);
+			}
+		}
+
+		//subString = getSubstring(&subLen, leafarr[j] - readLen, leafarr[j] + readLen);
+		/*
 		for(j=deepest->start_index; j<= deepest->end_index; j++){
 			subString = getSubstring(&subLen, leafarr[j] - readLen, leafarr[j] + readLen);
 			MA = 1; MI = -2; H = -5; G = -1;
 			score = localAlign(ibuff, subString, subLen, &matches, &mismatches, &gaps, &openings);
-			alignLen = matches + mismatches + gaps;
-			percentIdentity = (double)matches / (double)alignLen;
-			lenCoverage = (double)alignLen / (double)readLen;
-			if(percentIdentity >= X && lenCoverage >= Y){
-				if (lenCoverage > maxCoverage){
-					maxCoverage = lenCoverage;
-					maxReadLocation = i;
-					//bestHitStart = leafarr[j] - readLen;
-					bestHitStart = j - readLen < 0 ? 0 : j - readLen;
-					//bestHitEnd = leafarr[j] + readLen;
-					bestHitEnd = j + readLen;
-					printf("Read Name: %s\n", readsList[maxReadLocation-1]);
-					printf("Start Index Hit: %d\n", bestHitStart);
-					printf("End Index Hit: %d\n", bestHitEnd);
-				} else {
-					printf("<%s> no hit found\n", readsList[i-1]);
-				}
-			}
+		
 			dynamicfree(strlen(ibuff), strlen(subString)); // dptables are for loops
 		} // end for j
+		*/	
 	} // end for i
 //	doNotBeLikeFirefox(root);
 }

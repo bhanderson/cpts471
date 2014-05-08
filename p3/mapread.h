@@ -29,6 +29,8 @@ Node *readNodeHop( Node *n, char *buff, unsigned int head, unsigned int tail);
 
 Node *findLoc(Node *root, char *r);
 
+char *getSubstring(Node *n, int rlen, unsigned int *start, unsigned int *end);
+
 void mapReads(Node *root);
 
 void printLabel(Node *n);
