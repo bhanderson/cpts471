@@ -99,6 +99,19 @@ int matchesBelow(Node *n, char *buff, int start){
 }
 
 Node *findLoc(Node *root, char *read){
+	Node *deepestNode = NULL, *u = NULL;
+	unsigned int i = 0, read_ptr = 0, r = 0, mostMatches = 0;
+	for(i=0; i < strlen(read); i++){
+		u = readNodeHop(root, read, i, strlen(read)-1);
+		read_ptr = u->depth;
+		r = matchesBelow(u, read, u->depth);
+		if(u->depth + r > mostMatches && u->depth>=1){
+			deepestNode = u;
+			mostMatches = u->depth + r;
+		}
+	}
+	return deepestNode;
+	/*
 	Node *T = root;
 	unsigned int read_ptr = 0, r = 0, mostMatches = 0;
 	Node *deepestNode = NULL;
@@ -111,8 +124,9 @@ Node *findLoc(Node *root, char *read){
 			mostMatches = u->depth + r;
 		}
 		T = u->suffixLink;
-	} while (T!=root && read_ptr + r != strlen(read)-1);
+	} while (T!=root && read_ptr + r < strlen(read));
 	return deepestNode;
+	*/
 }
 
 char *getSubstring(int *length, int start, unsigned int end){
@@ -167,4 +181,12 @@ void mapReads(Node *root){
 		} // end for j
 	} // end for i
 //	doNotBeLikeFirefox(root);
+}
+
+void printLabel(Node *n){
+	unsigned int i=0;
+	for(i= 0; i <= n->suffixTail; i++){
+		printf("%c", ibuff[i]);
+	}
+	printf("\n");
 }

@@ -31,4 +31,6 @@ Node *findLoc(Node *root, char *r);
 
 void mapReads(Node *root);
 
+void printLabel(Node *n);
+
 #endif
