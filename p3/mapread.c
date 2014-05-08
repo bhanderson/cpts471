@@ -98,20 +98,20 @@ int matchesBelow(Node *n, char *buff, int start){
 	return count;
 }
 
-Node *findLoc(Node *root, char *r){
+Node *findLoc(Node *root, char *read){
 	Node *T = root;
-	unsigned int read_ptr = 0, i = 0, mostMatches = 0;
+	unsigned int read_ptr = 0, r = 0, mostMatches = 0;
 	Node *deepestNode = NULL;
 	do{
-		Node *u = readNodeHop(T, r, 0, strlen(r)-1);
+		Node *u = readNodeHop(T, read, read_ptr, strlen(read)-1);
 		read_ptr = u->depth;
-		i = matchesBelow(u, r, u->depth);
-		if(u->depth + i > mostMatches){
+		r = matchesBelow(u, read, u->depth);
+		if(u->depth + r > mostMatches && u->depth>=1){
 			deepestNode = u;
-			mostMatches = u->depth + i;
+			mostMatches = u->depth + r;
 		}
 		T = u->suffixLink;
-	} while (T!=root);
+	} while (T!=root && read_ptr + r != strlen(read)-1);
 	return deepestNode;
 }
 
