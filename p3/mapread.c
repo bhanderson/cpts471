@@ -163,19 +163,19 @@ void mapReads(Node *root){
 	double maxCoverage = 0.0;
 	unsigned int maxReadLocation;
 	unsigned int bestHitStart = 0, bestHitEnd = 0;
-	/*
-	int j, readLen=0, subLen, score;
-	*/
 	Node *deepest = NULL;
 	char *subString;
+
 	for(i=1; i<numReads*2; i+=2){
 		readLen = strlen(readsList[i]);
 		deepest = findLoc(root, readsList[i]);
-		subString = getSubstring(deepest, readLen, &start, &end);
+		subString = getSubstring(deepest, 25 /*readLen*/, &start, &end);
 
 		MA = 1; MI = -2; H = -5; G = -1;
 
-		score = localAlign(readsList[i], subString, &matches, &mismatches, &gaps, &openings);
+		score = mapAlign(readsList[i], subString, &matches, &mismatches, &gaps, &openings);
+		dynamicfree(strlen(readsList[i]), strlen(subString));
+
 		alignLen = matches + mismatches + gaps;
 		percentIdentity = (double)matches / (double)alignLen;
 		lenCoverage = (double)alignLen / (double)readLen;
@@ -194,17 +194,6 @@ void mapReads(Node *root){
 				printf("<%s> no hit found\n", readsList[i-1]);
 			}
 		}
-
-		//subString = getSubstring(&subLen, leafarr[j] - readLen, leafarr[j] + readLen);
-		/*
-		for(j=deepest->start_index; j<= deepest->end_index; j++){
-			subString = getSubstring(&subLen, leafarr[j] - readLen, leafarr[j] + readLen);
-			MA = 1; MI = -2; H = -5; G = -1;
-			score = localAlign(ibuff, subString, subLen, &matches, &mismatches, &gaps, &openings);
-		
-			dynamicfree(strlen(ibuff), strlen(subString)); // dptables are for loops
-		} // end for j
-		*/	
 	} // end for i
 //	doNotBeLikeFirefox(root);
 }

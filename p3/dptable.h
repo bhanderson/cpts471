@@ -46,6 +46,12 @@ int localAlign(char *read, char *sub,
 				unsigned int *gaps,
 				unsigned int *openings);
 
+int mapAlign(char *read, char *sub,
+				unsigned int *matches,
+				unsigned int *mismatches,
+				unsigned int *gaps,
+				unsigned int *openings);
+
 int align(char *s1, char *s2);
 
 int dynamicstrinput(char *path);
