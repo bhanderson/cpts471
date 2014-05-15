@@ -39,6 +39,7 @@ int addChild( Node *parent, Node *child ){
 	return (0);
 }
 
+
 // constructor for creating a node
 Node *makeNode( unsigned int id, Node *parent,
 		unsigned int suffixHead, unsigned int suffixTail, unsigned int stringDepth ){
@@ -59,8 +60,6 @@ Node *makeNode( unsigned int id, Node *parent,
 	newnode->numChildren = 0;
 	newnode->children = calloc(1, alphabetLen * sizeof(Node *));
 	newnode->depth = stringDepth;
-	newnode->start_index = -1;
-	newnode->end_index = -1;
 	return (newnode);
 }
 
@@ -78,6 +77,7 @@ Node *matchChild( Node *n, unsigned int suffix, unsigned int *i ){
 	}
 	return (NULL);
 }
+
 
 // split the current nodes parent edge with the suffix return the leaf
 Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
@@ -114,6 +114,7 @@ Node *splitEdge( Node *current, unsigned int head, unsigned int tail ){
 	return (current);
 }
 
+
 Node *ananthFindPath( Node *v, unsigned int head ){
 	unsigned int childNum, tail = inputLen -1;
 	Node *hopped = nodeHop(v, head, inputLen -1);
@@ -130,6 +131,7 @@ Node *ananthFindPath( Node *v, unsigned int head ){
 	}
 	return child;
 }
+
 
 Node *ananthNodeHops(Node *vPrime, Node *u, unsigned int bHead,
 		unsigned int bEnd, unsigned int suffix){
@@ -349,13 +351,7 @@ void doNotBeLikeFirefox( Node *node ) {
 		//for(j=0;j<alphabetLen;j++)
 		//	free(node->children[j]);
 		//	node->children[j] = NULL;
-		if(node->children){
-			free(node->children);
-			node->children = NULL;
-		}
-		if(node){
-			free(node);
-			node = NULL;
-		}
+		free(node->children);
+		free(node);
 	}
 }

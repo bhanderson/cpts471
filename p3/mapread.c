@@ -97,50 +97,109 @@ int matchesBelow(Node *n, char *buff, int start){
 	}
 	return count;
 }
-
+/*
 Node *findLoc(Node *root, char *read){
-	Node *deepestNode = NULL, *u = NULL;
-	unsigned int i = 0, read_ptr = 0, r = 0, mostMatches = 0;
-	for(i=0; i < strlen(read); i++){
-		u = readNodeHop(root, read, i, strlen(read)-1);
-		read_ptr = u->depth;
-		r = matchesBelow(u, read, u->depth);
-		if(u->depth + r > mostMatches && u->depth>=1){
-			deepestNode = u;
-			mostMatches = u->depth + r;
+	//Node *deepestNode = NULL, *u = NULL;
+	Node *u = NULL;
+	//unsigned int i = 0, read_ptr = 0, r = 0, mostMatches = 0;
+	unsigned int i = 0;
+	u = readNodeHop(root, read, i, strlen(read)-1);
+	   for(i=0; i < strlen(read); i++){
+	   read_ptr = u->depth;
+	   r = matchesBelow(u, read, u->depth);
+	   if(u->depth + r > mostMatches && u->depth>=1){
+	   deepestNode = u;
+	   mostMatches = u->depth + r;
+	   }
+	   }
+	return u;
+	   Node *T = root;
+	   unsigned int read_ptr = 0, r = 0, mostMatches = 0;
+	   Node *deepestNode = NULL;
+	   do{
+	   Node *u = readNodeHop(T, read, read_ptr, strlen(read)-1);
+	   read_ptr = u->depth;
+	   r = matchesBelow(u, read, u->depth);
+	   if(u->depth + r > mostMatches && u->depth>=1){
+	   deepestNode = u;
+	   mostMatches = u->depth + r;
+	   }
+	   T = u->suffixLink;
+	   } while (T!=root && read_ptr + r < strlen(read));
+	   return deepestNode;
+}
+*/
+
+Node *findPath(Node *n, char *buff){
+	unsigned int buff_ptr = 0, ibuff_ptr = n->suffixHead;
+	unsigned int i;
+	unsigned int matchesBelow = 0;
+	bool childFound = false;
+	Node *current = n;
+	while(buff_ptr < strlen(buff)){
+		childFound = false;
+		for(i=0;i < current->numChildren;i++){
+			if(ibuff[current->children[i]->suffixHead] == buff[buff_ptr]){
+				current = current->children[i];
+				ibuff_ptr = current->suffixHead;
+				childFound = true;
+				matchesBelow = 0;
+				break;
+			}
+		}
+		if(!childFound)
+			return current;
+
+		while(ibuff_ptr <= current->suffixTail && buff_ptr < strlen(buff)){
+			if(ibuff[ibuff_ptr] == buff[buff_ptr]){ // match
+				ibuff_ptr ++;
+				buff_ptr ++;
+				matchesBelow +=1;
+			} else { // mismatch
+				buff_ptr -= matchesBelow;
+				if(current->suffixLink == NULL)
+					current = current->parent->suffixLink;
+				else
+					current = current->suffixLink;
+				ibuff_ptr = current->suffixHead;
+				break;
+			}
 		}
 	}
-	return deepestNode;
-	/*
+	return current;
+}
+
+Node *findLoc2(Node *root, char *read){
 	Node *T = root;
-	unsigned int read_ptr = 0, r = 0, mostMatches = 0;
-	Node *deepestNode = NULL;
-	do{
+	//unsigned int read_ptr = 0;
+	//Node *deepestNode = T;
+	Node *u = findPath(T, read);
+	/*
+	while(read_ptr < strlen(read)){
 		Node *u = readNodeHop(T, read, read_ptr, strlen(read)-1);
-		read_ptr = u->depth;
-		r = matchesBelow(u, read, u->depth);
-		if(u->depth + r > mostMatches && u->depth>=1){
+		read_ptr = u->depth+1;
+		if(u->depth >=1 && u->depth > deepestNode->depth){
 			deepestNode = u;
-			mostMatches = u->depth + r;
 		}
 		T = u->suffixLink;
-	} while (T!=root && read_ptr + r < strlen(read));
+	}
 	return deepestNode;
 	*/
+	return u;
 }
 
 char *getSubstring(Node *n, int rlen, unsigned int *start, unsigned int *end){
 	unsigned int i = 0;
 	char *retval;
-	if ((int)n->suffixHead - rlen < 0)
+	if ((int)n->start_index - rlen < 0)
 		*start = 0;
 	else
-		*start = n->suffixHead - rlen;
+		*start = n->start_index - rlen;
 
-	if (n->suffixTail + rlen > inputLen)
+	if ((unsigned int)n->end_index + rlen > inputLen)
 		*end = inputLen;
 	else
-		*end = n->suffixTail + rlen;
+		*end = n->end_index + rlen;
 
 	retval = malloc(((*end - *start) + 1) * sizeof(char));
 	if(!retval){
@@ -150,7 +209,7 @@ char *getSubstring(Node *n, int rlen, unsigned int *start, unsigned int *end){
 	for(i = *start; i < *end; i++){
 		retval[i - *start] = ibuff[i];
 	}
-	retval[i] = 0;
+	retval[i- *start] = 0;
 	return retval;
 }
 
@@ -168,12 +227,13 @@ void mapReads(Node *root){
 
 	for(i=1; i<numReads*2; i+=2){
 		readLen = strlen(readsList[i]);
-		deepest = findLoc(root, readsList[i]);
+		deepest = findLoc2(root, readsList[i]);
 		subString = getSubstring(deepest, 25 /*readLen*/, &start, &end);
 
 		MA = 1; MI = -2; H = -5; G = -1;
 
-		score = mapAlign(readsList[i], subString, &matches, &mismatches, &gaps, &openings);
+		//score = mapAlign(readsList[i], subString, &matches, &mismatches, &gaps, &openings);
+		score = localAlign(readsList[i], subString, &matches, &mismatches, &gaps, &openings);
 		dynamicfree(strlen(readsList[i]), strlen(subString));
 
 		alignLen = matches + mismatches + gaps;
@@ -195,7 +255,7 @@ void mapReads(Node *root){
 			}
 		}
 	} // end for i
-//	doNotBeLikeFirefox(root);
+	//	doNotBeLikeFirefox(root);
 }
 
 void printLabel(Node *n){

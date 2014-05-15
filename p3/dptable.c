@@ -256,6 +256,7 @@ int mapAlign(char *read, char *sub,
 		printf("Optimal Score: %d\n", optimal(highscore[0], highscore[1]));
 	//}
 	//printf("Optimal Score: %d\n", optimal(i-1,j-1));
+	mapRetrace(read, sub, matches, mismatches, gaps, openings);
 	return optimal(highscore[0], highscore[1]);
 }
 
